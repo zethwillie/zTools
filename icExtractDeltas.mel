@@ -1,0 +1,54 @@
+//----------------------------------------------------------------------------------------------
+//
+//	creates a new blend shape target from a bound skin
+//
+//	SCRIPT:			icExtractDeltas.mel
+//
+//	AUTHOR:			Ingo Clemens
+//					bravestrabbit@gmx.de
+//	DATE:			Mar 02, 2009
+//					created: Mar 02, 2009
+//
+//----------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------
+//
+//	USE AND MODIFY AT YOUR OWN RISK!!
+//
+//----------------------------------------------------------------------------------------------
+
+
+global proc icExtractDeltas ()
+{
+	//get the selection
+	string $sel[] = `ls -sl -type transform`;
+	string $shapes[];
+
+	//check if the shapes are poly objects
+	for ($s in $sel)
+	{
+		$shapes = `listRelatives -s $s`;
+		for ($sh in $shapes)
+		{
+			if (`nodeType $sh` != "mesh")
+			{
+				error "The selected geometry is no polygon object!";
+			}
+		}
+	}
+	if (size($sel) == 2)
+	{
+		$shapes = `listRelatives -s $sel[0]`;
+		string $skin[] = `listConnections -type "skinCluster" $shapes[0]`;
+		if (!`size($skin)`)
+		{
+			error "The first selected object is not bound to a skin cluster!";
+		}
+	}
+	else
+	{
+		error "Please select two polygonal objects!";
+	}
+
+	extractDeltas -m $sel[0] -s $sel[1];
+}

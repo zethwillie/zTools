@@ -1,0 +1,9 @@
+{
+    //list missing textures
+    //select texture nodes from HS
+    string $textures[] = `ls -sl`;
+    for ($each in $textures){
+    string $thisTex = `getAttr ($each + ".fileTextureName")`;
+    print ($thisTex + "\n");
+    }
+}

@@ -1,0 +1,5 @@
+ 
+two circles - spin and tilt
+parent tilt to spin, parent geo to gruop to tilt
+put tilt pivot on edge of object (edge of coin for instance)
+mult spin.roty by -1 and pump into geo group. This counter rotates the geo to stay still

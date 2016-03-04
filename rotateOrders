@@ -1,0 +1,16 @@
+xyz - first is rotated last
+
+if y is down the axis, x back:
+
+yzx - rotate y affects nothing else
+	rotate z takes y with it
+	rotate x takes all with it. 
+
+	y should be first to keep the rotate down the bone clean
+	x should be the more dominant axis (takes the whole things with it)
+	z is the axis that will cause gimble lock . . . 
+	
+
+	 Basically first axis is a much used axis, down the chain if necessary
+	 Third is dominant axis of action
+	 Second should be the LEAST used axis for sure (this is the one that will create gimble lock with the first)
