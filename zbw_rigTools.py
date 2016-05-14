@@ -1,6 +1,7 @@
 #zbw_rigTools
 
 import maya.cmds as cmds
+import maya.mel as mel
 ########
 import zTools.zbw_rig as rig
 from functools import partial
@@ -16,7 +17,10 @@ zDict = {"attr":"import zTools.zbw_attributes as zat; zat.attributes()",
 "smIK":"import zTools.zbw_smallIKStretch as zsik; zsik.smallIKStretch()",
 "foll":"import zTools.zbw_makeFollicle as zmf; zmf.makeFollicle()",
 "ribbon":"import zTools.zbw_ribbon as zrib; zrib.ribbon()",
-"soft":"import zTools.zbw_softDeformer as zsft; zsft.softDeformer()"
+"soft":"import zTools.zbw_softDeformer as zsft; zsft.softDeformer()",
+"jntRadius":"import zTools.zbw_jointRadius as jntR; jntR.jointRadius()", 
+"randSelect":"import zTools.zbw_randomSelection as zrand; reload(zrand); zrand.randomSelection()",
+"trfmBuffer":"import zTools.zbw_transformBuffer as ztbuf; reload(ztbuf); ztbuf.transformBuffer()"
 }
 
 colors = {'red':13, 'blue':6, 'green':14, 'yellow':17, 'pink':20, 'ltBlue':18, 'brown':10, 'purple':30, 'dkGreen':7}
@@ -35,20 +39,21 @@ def rigToolsUI(*args):
 	widgets["ctrlFrLO"] = cmds.frameLayout(l="CONTROLS", w=110, h=380, bv=True, bgc = (0.3,0.3,0.3))
 	widgets["ctrlCLO"] = cmds.columnLayout(bgc = (0.3,0.3,0.3))
 
-	widgets["circleBut"] = cmds.button(l="circle", w=110, bgc=(.7, .7, .5), c = partial(control, "circle"))
-	widgets["squareBut"] = cmds.button(l="square", w=110, bgc=(.7, .7, .5), c = partial(control, "square"))
-	widgets["boxBut"] = cmds.button(l="box", w=110, bgc=(.7, .7, .5), c = partial(control, "box"))
-	widgets["lolBut"] = cmds.button(l="lollipop", w=110, bgc=(.7, .7, .5), c = partial(control, "lollipop"))
-	widgets["barbellBut"] = cmds.button(l="barbell", w=110, bgc=(.7, .7, .5), c = partial(control, "barbell"))
-	widgets["crossBut"] = cmds.button(l="cross", w=110, bgc=(.7, .7, .5), c = partial(control, "cross"))
-	widgets["bentXBut"] = cmds.button(l="bent cross", w=110, bgc=(.7, .7, .5), c = partial(control, "bentCross"))
-	widgets["arrowBut"] = cmds.button(l="arrow", w=110, bgc=(.7, .7, .5), c = partial(control, "arrow"))
-	widgets["bentArrowBut"] = cmds.button(l="bent arrow", w=110, bgc=(.7, .7, .5), c = partial(control, "bentArrow"))
-	widgets["splitOBut"] = cmds.button(l="split circle", w=110, bgc=(.7, .7, .5), c = partial(control, "splitCircle"))
-	widgets["cylinderBut"] = cmds.button(l="cylinder", w=110, bgc=(.7, .7, .5), c = partial(control, "cylinder"))
-	widgets["starBut"] = cmds.button(l="star", w=110, bgc=(.7, .7, .5), c = partial(control, "star"))
-	widgets["octagonBut"] = cmds.button(l="octagon", w=110, bgc=(.7, .7, .5), c = partial(control, "octagon"))
-	widgets["halfCircBut"] = cmds.button(l="half circle", w=110, bgc=(.7, .7, .5), c = partial(control, "halfCircle"))
+	widgets["circleBut"] = cmds.button(l="circle", w=110, h=21, bgc=(.7, .7, .5), c = partial(control, "circle"))
+	widgets["sphereBut"] = cmds.button(l="sphere", w=110, h=21, bgc=(.7, .7, .5), c = partial(control, "sphere"))
+	widgets["squareBut"] = cmds.button(l="square", w=110, h=21, bgc=(.7, .7, .5), c = partial(control, "square"))
+	widgets["boxBut"] = cmds.button(l="box", w=110, h=21, bgc=(.7, .7, .5), c = partial(control, "box"))
+	widgets["lolBut"] = cmds.button(l="lollipop", w=110, h=21, bgc=(.7, .7, .5), c = partial(control, "lollipop"))
+	widgets["barbellBut"] = cmds.button(l="barbell", w=110, h=21, bgc=(.7, .7, .5), c = partial(control, "barbell"))
+	widgets["crossBut"] = cmds.button(l="cross", w=110, h=21, bgc=(.7, .7, .5), c = partial(control, "cross"))
+	widgets["bentXBut"] = cmds.button(l="bent cross", h=21, w=110, bgc=(.7, .7, .5), c = partial(control, "bentCross"))
+	widgets["arrowBut"] = cmds.button(l="arrow", w=110, h=21, bgc=(.7, .7, .5), c = partial(control, "arrow"))
+	widgets["bentArrowBut"] = cmds.button(l="bent arrow", h=21, w=110, bgc=(.7, .7, .5), c = partial(control, "bentArrow"))
+	widgets["splitOBut"] = cmds.button(l="split circle", h=21, w=110, bgc=(.7, .7, .5), c = partial(control, "splitCircle"))
+	widgets["cylinderBut"] = cmds.button(l="cylinder", h=21, w=110, bgc=(.7, .7, .5), c = partial(control, "cylinder"))
+	widgets["starBut"] = cmds.button(l="star", w=110, h=21, bgc=(.7, .7, .5), c = partial(control, "star"))
+	widgets["octagonBut"] = cmds.button(l="octagon", h=21, w=110, bgc=(.7, .7, .5), c = partial(control, "octagon"))
+	widgets["halfCircBut"] = cmds.button(l="half circle", h=21, w=110, bgc=(.7, .7, .5), c = partial(control, "halfCircle"))
 	cmds.separator(h=10, style="none")
 	widgets["ctrlAxisRBG"] = cmds.radioButtonGrp(nrb=3, la3=("x", "y", "z"), cw=([1, 33], [2, 33], [3, 33]), cal=([1, "left"], [2, "left"], [3, "left"]), sl=1)
 
@@ -57,13 +62,14 @@ def rigToolsUI(*args):
 	widgets["actionFLO"] = cmds.formLayout(w=150, h=288, bgc = (0.3,0.3,0.3))
 	widgets["actionFrLO"] = cmds.frameLayout(l="ACTIONS", w=150, h=288, bv=True, bgc = (0.3,0.3,0.3))
 	widgets["actionCLO"] = cmds.columnLayout(bgc = (0.3,0.3,0.3))
-
-	widgets["grpFrzBut"] = cmds.button(l="group freeze selected", w=150, bgc=(.5, .7, .5), c=groupFreeze)
-	widgets["grpAbvBut"] = cmds.button(l="insert group above ('Grp')", w=150, bgc=(.5, .7, .5), c=insertGroupAbove)
-	widgets["grpCnctBut"] = cmds.button(l="group freeze connect", w=150, bgc=(.5, .7, .5), c=freezeAndConnect)
-	widgets["prntChnBut"] = cmds.button(l="parent chain selected", w=150, bgc=(.5, .7, .5), c=parentChain)
+	widgets["grpFrzBut"] = cmds.button(l="group freeze selected", w=150, bgc=(.5, .7, .5), c = groupFreeze)
+	widgets["grpAbvBut"] = cmds.button(l="insert group above ('Grp')", w=150, bgc=(.5, .7, .5), c = insertGroupAbove)
+	widgets["grpCnctBut"] = cmds.button(l="group freeze connect", w=150, bgc=(.5, .7, .5), c = freezeAndConnect)
+	widgets["prntChnBut"] = cmds.button(l="parent chain selected", w=150, bgc=(.5, .7, .5), c = parentChain)
 	widgets["slctHiBut"] = cmds.button(l="select hierarchy", w=150, bgc=(.5, .7, .5), c = selectHi)
-	widgets["slctCmptBut"] = cmds.button(l="select components", w=150, bgc=(.5, .7, .5), c= selectComponents)
+	widgets["slctCmptBut"] = cmds.button(l="select components", w=150, bgc=(.5, .7, .5), c = selectComponents)
+	widgets["cpSkinWtsBut"] = cmds.button(l="copy skin & weights", w=150, bgc=(.5, .7, .5), c = copySkinning)	
+	widgets["remNSBut"] = cmds.button(l="remove all namespaces", w=150, bgc=(.5, .7, .5), c = remNS)	
 
 #zScript Layout
 	cmds.setParent(widgets["mainFLO"])
@@ -78,6 +84,9 @@ def rigToolsUI(*args):
 	widgets["sftDefBut"] = cmds.button(l="zbw_softDeformers", w=135, bgc = (.7, .5, .5), c=partial(zAction, "soft"))
 	widgets["follBut"] = cmds.button(l="zbw_makeFollicle", w=135, bgc = (.7, .5, .5), c=partial(zAction, "foll"))
 	widgets["ribbonBut"] = cmds.button(l="zbw_ribbon", w=135, bgc = (.7, .5, .5), c=partial(zAction, "ribbon"))
+	widgets["jntRadBut"] = cmds.button(l="zbw_jointRadius", w=135, bgc = (.7, .5, .5), c=partial(zAction, "jntRadius"))
+	widgets["randSelect"] = cmds.button(l="zbw_randomSelection", w=135, bgc = (.7, .5, .5), c=partial(zAction, "randSelect"))
+	widgets["trnBuffer"] = cmds.button(l="zbw_transformBuffer", w=135, bgc = (.7, .5, .5), c=partial(zAction, "trfmBuffer"))	
 
 #color layout
 	cmds.setParent(widgets["mainFLO"])
@@ -124,7 +133,13 @@ def rigToolsUI(*args):
 		(widgets["follBut"], "left", 0),
 		(widgets["follBut"], "top", 100),
 		(widgets["ribbonBut"], "left", 140),
-		(widgets["ribbonBut"], "top", 100),				
+		(widgets["ribbonBut"], "top", 100),	
+		(widgets["jntRadBut"], "left", 0),
+		(widgets["jntRadBut"], "top", 125),
+		(widgets["randSelect"], "left", 140),
+		(widgets["randSelect"], "top", 125),
+		(widgets["trnBuffer"], "left", 0),
+		(widgets["trnBuffer"], "top", 150),						
 		])	
 	
 	#cmds.window(widgets["win"], e=True, w=300, h=400)
@@ -156,6 +171,21 @@ def zAction(action="none", *args):
 
 	else:
 		cmds.warning("zbw_rigTools.zAction: For some reason this script isn't in my dictionary")
+
+def remNS(*args):
+	"""removes namespaces . . . """
+
+	rem = ["UI", "shared"]
+	ns = cmds.namespaceInfo(lon=True, r=True)
+	for y in rem:
+		ns.remove(y)
+
+	ns.sort(key = lambda a: a.count(":"), reverse=True)
+	for n in ns:
+		ps = cmds.ls("{}:*".format(n), type="transform")
+		for p in ps:
+			cmds.rename(p, p.rpartition(":")[2]) 
+		cmds.namespace(rm=n)
 
 def groupFreeze(*args):
 	"""group freeze an obj"""
@@ -258,6 +288,36 @@ def changeColor(color, *args):
 				for shape in shapes:
 					cmds.setAttr("%s.overrideEnabled"%shape, 1)
 					cmds.setAttr("%s.overrideColor"%shape, color)
+
+
+def copySkinning(*args):
+	"""select the orig bound mesh, then the new unbound target mesh and run"""
+
+	sel = cmds.ls(sl=True)
+	orig = sel[0]
+	target = sel[1]
+
+	#get orig obj joints
+	try:
+		jnts = cmds.skinCluster(orig, q=True, influence = True)
+	except:
+		cmds.warning("couldn't get skin weights from {}".format(orig))
+
+	#bind the target with the jnts
+	try:
+		targetClus = cmds.skinCluster(jnts, target, bindMethod=0, skinMethod=0, normalizeWeights=1, maximumInfluences = 3, obeyMaxInfluences=False, tsb=True)[0]
+		print targetClus
+	except:
+		cmds.warning("couln't bind to {}".format(target))
+			
+	#get skin clusters
+	origClus = mel.eval("findRelatedSkinCluster " + orig)
+
+	#copy skin weights from orig to target
+	try:
+		cmds.copySkinWeights(ss=origClus, ds=targetClus, noMirror=True, sa="closestPoint", ia="closestJoint")
+	except:
+		cmds.warning("couldn't copy skin weights from {0} to {1}".format(orig, target))
 
 ##########
 # load function
