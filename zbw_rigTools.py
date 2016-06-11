@@ -70,6 +70,8 @@ def rigToolsUI(*args):
 	widgets["slctCmptBut"] = cmds.button(l="select components", w=150, bgc=(.5, .7, .5), c = selectComponents)
 	widgets["cpSkinWtsBut"] = cmds.button(l="copy skin & weights", w=150, bgc=(.5, .7, .5), c = copySkinning)	
 	widgets["remNSBut"] = cmds.button(l="remove all namespaces", w=150, bgc=(.5, .7, .5), c = remNS)	
+	widgets["cntrLoc"] = cmds.button(l="selection center locator", w=150, bgc=(.5, .7, .5), c = centerLoc)
+	widgets["hideShp"] = cmds.button(l="selection toggle shape vis", w=150, bgc=(.5, .7, .5), c=hideShape)
 
 #zScript Layout
 	cmds.setParent(widgets["mainFLO"])
@@ -204,14 +206,25 @@ def groupFreeze(*args):
 		cmds.parent(obj, grp)
 		cmds.select(grp, r=True)
 
+
+def nameCheck(name):
+	if cmds.objExists(name):
+		name = "{}_GRP".format(name)
+		print name
+		nameCheck(name)
+	else:
+		return(name)
+
 def insertGroupAbove(*args):
 	sel = cmds.ls(sl=True)
 
 	for obj in sel:
 		par = cmds.listRelatives(obj, p=True)
 		
-		grp = cmds.group(em=True, n="{}Grp".format(obj))
+		grp = cmds.group(em=True, n="{}_Grp".format(obj))
 		
+		# grp = nameCheck(grp)
+
 		pos = cmds.xform(obj, q=True, ws=True, rp=True)
 		rot = cmds.xform(obj, q=True, ws=True, ro=True)
 		
@@ -221,8 +234,7 @@ def insertGroupAbove(*args):
 		cmds.parent(obj, grp)
 		if par:
 			cmds.parent(grp, par[0])
-		else:
-			pass
+
 
 def freezeAndConnect(*args):
 	sel = cmds.ls(sl=True)
@@ -272,7 +284,6 @@ def selectComponents(*args):
 			else:
 				return
 
-
 def controlsOnCurve(*args):
 	pass
 
@@ -318,6 +329,36 @@ def copySkinning(*args):
 		cmds.copySkinWeights(ss=origClus, ds=targetClus, noMirror=True, sa="closestPoint", ia="closestJoint")
 	except:
 		cmds.warning("couldn't copy skin weights from {0} to {1}".format(orig, target))
+
+
+def centerLoc(*args):
+	"""creates a center loc on the avg position"""
+
+	sel = cmds.ls(sl=True, fl=True)
+	if sel:
+		ps = []
+		for vtx in sel:
+			ps.append(cmds.xform(vtx, q=True, ws=True, rp=True))
+
+		# this is cool!
+		center = [sum(y)/len(y) for y in zip(*ps)]
+
+		loc = cmds.spaceLocator(name="centerLoc")
+		cmds.xform(loc, ws=True, t=center)
+
+def hideShape(*args):
+	"""hides the shape nodes of the selected objects"""
+
+	sel = cmds.ls(sl=True)
+	if sel:
+		for obj in sel:
+			shp = cmds.listRelatives(obj, shapes = True)
+			if shp:
+				for s in shp:
+					if cmds.getAttr("{}.visibility".format(s)):
+						cmds.setAttr("{}.visibility".format(s), 0)
+					else:
+						cmds.setAttr("{}.visibility".format(s), 1)
 
 ##########
 # load function
