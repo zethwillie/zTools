@@ -2,7 +2,7 @@
 #file: zbw_rig.py
 #author: zeth willie
 #contact: zeth@catbuks.com, www.williework.blogspot.com
-#date modified: 09/23/12
+#date modified: 09/17/16
 #
 #notes: helper scripts for rigging
 ########################
