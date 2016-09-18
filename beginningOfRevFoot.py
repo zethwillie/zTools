@@ -26,3 +26,5 @@ cmds.parent("ballLoc", ballGrp)
 cmds.parent(ballGrp, "toeLoc", toeGrp)
 cmds.parent(toeGrp, "heelLoc", heelGrp)
 cmds.parent(heelGrp, "ankleLoc", ankleGrp)
+
+
