@@ -2,7 +2,7 @@
 #file: zbw_rig.py
 #author: zeth willie
 #contact: zeth@catbuks.com, www.williework.blogspot.com
-#date modified: 09/17/16
+#date modified: 09/23/12
 #
 #notes: helper scripts for rigging
 ########################
@@ -835,3 +835,35 @@ def makePlane(*args):
 
 #show/hide selected local rot axes
 
+def swapDupe(obj, target, delete = True, name="", *args):
+	"""
+	replaces an target with a duplicate of the obj
+	select the object you want to duplicate, then the target(s), delete bool, name optional
+	[obj] is the object to duplicate
+	[target] is the target to match and delete(?)
+	[delete] is bool to tell whether to delete the target or not
+	[name] is string to rename to
+	"""
+
+	if not name:
+		name = obj
+
+	# get pos, rot, scale of target
+	pos = cmds.xform(target, q=True, ws=True, rp=True)
+	rot = cmds.xform(target, q=True, ws=True, ro=True)
+	scl = cmds.getAttr("{}.scale".format(target))
+
+	# duplicate the object and rename to name, if no name just use unique names
+	dupe = cmds.duplicate(obj, name=name, returnRootsOnly=True, renameChildren=True)
+	cmds.xform(dupe, ws=True, t=pos)
+	cmds.xform(dupe, ws=True, ro=rot)
+	cmds.xform(dupe, ws=True, s=scl[0])
+
+	parent = cmds.listRelatives(target, parent=True)
+	if parent:
+		cmds.parent(dupe, parent[0])
+
+	if delete:
+		cmds.delete(target)
+
+	return(dupe[0])

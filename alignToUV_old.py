@@ -16,7 +16,7 @@ def radsToDegrees(rads):
 	return rads * 180.0 / math.pi
 
 def alignToUV(targetObj="none", sourceObj="none", sourceU=0.0, sourceV=0.0, mainAxis="+z", secAxis="+x", UorV="v"):
-	"""
+"""
 	inputs should be 1. targetObj 2. sourceObj 3. sourceU 4. sourceV 5. mainAxis(lowerCase, + or -, i.e."-x" 8. secAxis (lowcase, + or -) 7, UorV ("u" or "v" for the direction along surface for the sec axis)
 """
 

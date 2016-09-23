@@ -1,16 +1,9 @@
 import maya.cmds as cmds
 import zTools.zbw_rig as rig
 
-#---------------- button to build
-#---------------- hook up texture button 
 
-#---------------- put strand cap under it's own control (that way it moves with the head)
-
-#---------------- if you dont' seelct a profile curve it will make one for you (but selection order has to change (path first))
-#---------------- dupe profile curve and use that
-
-#print cmds.objectType(cmds.listRelatives(cmds.ls(sl=True)[0]), s=True)[0]
 widgets = {}
+
 
 def extrudeUI():
 	if cmds.window("curveExtrudeWin", exists=True):
@@ -25,7 +18,9 @@ def extrudeUI():
 	widgets["nameTFG"] = cmds.textFieldGrp(l="Rig Name: ", cal=[(1, "left"),(2, "left")],cw=[(1, 50),(2, 245)])
 	cmds.separator(h=5)
 
-	widgets["text2"] = cmds.text(l="Select the path curve.\nOptionally, then select profile crv and the cap rig in that order\nNote that cap rig and profile curve should be y up!", al="left")
+	widgets["text2"] = cmds.text(l="Select the path curve.\nOptionally, "
+	                               "then select profile crv and the cap rig in that order\n"
+	                               "Note that cap rig and profile curve should be y up!", al="left")
 	cmds.separator(h=5)	
 	widgets["extrBut"] = cmds.button(l="Create Extrusion Rig!", w=300, h=35, bgc = (.4, .5,.4), c=prepExtrude)
 
@@ -33,10 +28,11 @@ def extrudeUI():
 
 	widgets["text3"] = cmds.text(l="Once you've attached a material :\nselect the control, then any place2DTexture nodes", al="left")
 	cmds.separator(h=5)	
-	widgets["textureBut"] = cmds.button(l="Connect Ctrl to place2DTexture nodes!", w=300, h=35, bgc = (.25, .35, .5), c=connectTexture)
+	widgets["textureBut"] = cmds.button(l="Connect Ctrl to place2DTexture nodes!", w=300, h=35, bgc = (.25, .35, .5), c = connectTexture)
 
 	cmds.window(widgets["win"], e=True, w=w, h=h)
 	cmds.showWindow(widgets["win"])
+
 
 def prepExtrude(*args):
 	
@@ -71,7 +67,7 @@ def prepExtrude(*args):
 	extrude(name)
 
 def extrude(name = "defaultName", *args):
-
+	print "starting extrude"
 	sel = cmds.ls(sl=True)
 	guideCrv = sel[0]
 
@@ -90,7 +86,7 @@ def extrude(name = "defaultName", *args):
 
 	capAxis = "y"
 	capUp = "z"
-	#upLoc = cmds.spaceLocator(name = "{}_upLoc".format(name))[0]
+	# upLoc = cmds.spaceLocator(name = "{}_upLoc".format(name))[0]
 
 	ctrl = rig.createControl(type="sphere", name="{}_CTRL".format(name), color="blue")
 	ctrlGrp = cmds.group(empty=True, name="{}_path_GRP".format(name))
@@ -102,7 +98,7 @@ def extrude(name = "defaultName", *args):
 	cmds.parent(deadGrp, ctrlGrp)	
 	cmds.parent(ctrl, ctrlGrp)
 
-	#add attrs to control
+	# add attrs to control
 	cmds.addAttr(ctrl, ln="__xtraAttrs__", nn="__xtraAttrs__", at="bool", k=True)
 	cmds.setAttr("{}.__xtraAttrs__".format(ctrl), l=True)
 	cmds.addAttr(ctrl, ln="alongPath", at="float", min=0, max=100, k=True, dv=100.0)	
@@ -148,16 +144,15 @@ def extrude(name = "defaultName", *args):
 	cmds.connectAttr("{}.capWidth".format(ctrl), "{}.scaleZ".format(capGrp))
 	cmds.connectAttr("{}.capHeight".format(ctrl), "{}.scaleY".format(capGrp))
 
-
 	# position control at start of curve
 	startPos = cmds.pointOnCurve(guideCrv, parameter = 0, position = True)
 	cmds.xform(ctrlGrp, ws=True, t=startPos)
-	#cmds.xform(upLoc, ws=True, t=(startPos[0], startPos[1]+3.0, startPos[2]))
+	# cmds.xform(upLoc, ws=True, t=(startPos[0], startPos[1]+3.0, startPos[2]))
 
-	moPath = cmds.pathAnimation(capGrp, guideCrv, fractionMode=True, follow=True, followAxis=capAxis, upAxis=capUp, worldUpType="scene", startTimeU=0.0, endTimeU=100.0)
+	moPath = cmds.pathAnimation(capGrp, guideCrv, fractionMode=True, follow=True, followAxis=capAxis, upAxis=capUp,
+	                            worldUpType="scene", startTimeU=0.0, endTimeU=100.0)
 	moPathAnimAttr = cmds.listConnections("{}.uValue".format(moPath), d=False, p=True)[0]
 
-#---------------- set frame to start of timeline, then back to current
 	start, end = getSliderRange()
 	current = cmds.currentTime(q=True)
 	cmds.currentTime(start)
@@ -169,14 +164,15 @@ def extrude(name = "defaultName", *args):
 
 	cmds.currentTime(current)
 
-	#extrude the curve
-	extr = cmds.extrude(profileCrv, guideCrv, ch=True, range=True, polygon=True, extrudeType=2, useComponentPivot=True, fixedPath=True, useProfileNormal=True, reverseSurfaceIfPathReversed=True)
+	# extrude the curve
+	extr = cmds.extrude(profileCrv, guideCrv, ch=True, range=True, polygon=True, extrudeType=2, useComponentPivot=True,
+	                    fixedPath=True, useProfileNormal=True, reverseSurfaceIfPathReversed=True)
 	extrGeo, extrNode = extr[0], extr[1]
 	
 	normal = cmds.polyNormal(extrGeo, normalMode=4, userNormalMode=0, ch=1)[0]
 	cmds.connectAttr("{}.outputX".format(reverse), "{}.normalMode".format(normal))
 	
-	#get extrude connections
+	# get extrude connections
 	connects = cmds.listConnections(extrNode)
 	profNode, pathNode, tessNode = connects[0], connects[1], connects[2]
 
@@ -189,7 +185,6 @@ def extrude(name = "defaultName", *args):
 	cmds.setAttr("{}.v".format(profileCrv), 0)
 	cmds.parent(capGrp, deadGrp)	
 
-
 	# motion path stuff
 	cmds.delete(moPathAnimAttr.partition(".")[0])
 	cmds.connectAttr("{}.outputX".format(mult), "{}.uValue".format(moPath))
@@ -197,26 +192,32 @@ def extrude(name = "defaultName", *args):
 	# reference
 	# extrude -ch true -rn true -po 1 -et 2 -ucp 1 -fpt 1 -upn 1 -rotation 0 -scale 1 -rsp 1 "nurbsCircle1" "curve4" ;
 
-def getSliderRange(*args):
-    """gets framerange in current scene and returns start and end frames"""
+	print "ending extrude"
 
-    #get timeslider range start
-    startF = cmds.playbackOptions(query=True, min=True)
-    endF = cmds.playbackOptions(query=True, max=True)
-    return(startF, endF)
+
+def getSliderRange(*args):
+	"""gets framerange in current scene and returns start and end frames"""
+
+	# get timeslider range start
+	startF = cmds.playbackOptions(query=True, min=True)
+	endF = cmds.playbackOptions(query=True, max=True)
+
+	return(startF, endF)
+
 
 def connectTexture(*args):
 	sel = cmds.ls(sl=True)
 	ctrl = sel[0]
-	#repeatMult = cmds.connectionInfo("{}.repeatMult".format(ctrl), sourceFromDestination=True).partition(".")[0]
-	#parameterMult = cmds.connectionInfo("{}.parameterMult".format(ctrl), sourceFromDestination=True).partition(".")[0]
-	#print repeatMult, parameterMult
+	# repeatMult = cmds.connectionInfo("{}.repeatMult".format(ctrl), sourceFromDestination=True).partition(".")[0]
+	# parameterMult = cmds.connectionInfo("{}.parameterMult".format(ctrl), sourceFromDestination=True).partition(".")[0]
+	# print repeatMult, parameterMult
 
 	if len(sel) > 1:
 		p2ds = sel[1:]
 
 		for node in p2ds:
 			cmds.connectAttr("{}.rptHolder".format(ctrl), "{}.repeatV".format(node))
+
 
 def curveExtrude():
 	extrudeUI()

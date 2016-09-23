@@ -44,14 +44,14 @@ def randRemovePercent(keepNum, *args):
 	sel =  cmds.ls(sl=True, fl=True)
 
 	remNum = (100.0 - keepNum)/100.00
-	print remNum, "remove percent"
+	#print remNum, "remove percent"
 	count = 0
 	ch = []
 	if sel:
 		for obj in sel:
 			x = random.uniform(0,1)
 			if x < (remNum):
-				print x, "--->", remNum
+				# print x, "--->", remNum
 				ch.append(obj)
 				count = count + 1
 
@@ -59,7 +59,7 @@ def randRemovePercent(keepNum, *args):
 	cmds.select(newSel, r=True)
 	print count, "objects removed"
 
-	print len(sel), "objects remaining"
+	#print len(sel), "objects remaining"
 
 def preciseRemovePercent(keepNum, *args):
 	"""selects the exact amount of things to remove and randomly selects which from the selection list"""

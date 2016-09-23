@@ -5,10 +5,13 @@ from functools import partial
 
 # some tools to work with crvs
 
-#---------------- create line tool
+#---------------- draw cv, ep curve buttons
+
 #---------------- on rebuild curves options: have checkbox for keep history, keep original
 #---------------- button to wire def one curve to another 
 #---------------- quick build control rig (using above . . . )
+
+#---------------- use line though object in UI!!!
 
 widgets = {}
 
@@ -89,6 +92,30 @@ def crvToolsUI():
 		(widgets["hammerBut"], "top", 50),
 		])
 
+
+	# create line
+	cmds.setParent(widgets["CLO"])
+	widgets["lineFrLO"] = cmds.frameLayout("Create Line", w=width, cll=True, cl=False, bgc = (0, 0, 0))
+	widgets["lineFLO"] = cmds.formLayout(w=width,h=90 , bgc = (.3, .3, .3))
+	widgets["lineText"] = cmds.text(l="Create a nurbs line along an axis", al="left")
+	widgets["lineLenFFG"] = cmds.floatFieldGrp(nf = 1, l = "Length", cal=[(1, "left"), (2,"left")], cw = [(1, 40), (2, 35)], v1=10.0)
+	widgets["lineDenFFG"] = cmds.floatFieldGrp(nf = 1, l = "Pts/Unit", cal=[(1, "left"), (2,"left")], cw = [(1, 40), (2, 35)], v1=.5, pre=3)
+	widgets["lineAxisRBG"] = cmds.radioButtonGrp(nrb=3, l1="x", l2="y", l3="z", cw = [(1, 35), (2, 35),(3, 35)], sl=1)
+	widgets["lineBut"] = cmds.button(l="Create Line!", w = 280, h=35, bgc = (.5, .5, .4), c = createLine)
+
+	cmds.formLayout(widgets["lineFLO"], e=True, af=[
+		(widgets["lineText"], "left", 10),
+		(widgets["lineText"], "top", 5),
+		(widgets["lineLenFFG"], "left", 10),
+		(widgets["lineLenFFG"], "top", 25),
+		(widgets["lineDenFFG"], "left", 90),
+		(widgets["lineDenFFG"], "top", 25),
+		(widgets["lineAxisRBG"], "left", 170),
+		(widgets["lineAxisRBG"], "top", 25),			
+		(widgets["lineBut"], "left", 10),
+		(widgets["lineBut"], "top", 50),
+		])
+
 	# smooth points
 	# cmds.setParent(widgets["CLO"])
 	# widgets["smoothFrLO"] = cmds.frameLayout("Smooth Points", w=width, cll=False, cl=True, bgc = (0, 0, 0))
@@ -110,6 +137,47 @@ def curveCheck(obj):
 		return False
 	else:
 		return True
+
+def createLine(*args):
+	""" 
+	gets info from win to create nurbs curve along an axis
+	"""
+	axis = cmds.radioButtonGrp(widgets["lineAxisRBG"], q=True, sl=True)
+	length = cmds.floatFieldGrp(widgets["lineLenFFG"], q=True, v1=True)
+	density = cmds.floatFieldGrp(widgets["lineDenFFG"], q=True, v1=True)
+
+	numCvs = length * density
+	if numCvs < 3.0: # curve needs 3 cvs (for 3 dg curve)
+		numCvs = 3.0
+
+	cvDist = length/numCvs
+
+	# make a list of pt dist along some axis
+	axisList = []
+	for x in range(0,int(numCvs)+1):
+		axisList.append(x)
+
+	pts = []
+
+	if axis == 1:
+		for y in range(0, int(numCvs)+1):
+			pt = [axisList[y]*cvDist, 0, 0]
+			pts.append(pt)
+
+	if axis == 2:
+		for y in range(0, int(numCvs)+1):
+			pt = [0, axisList[y]*cvDist, 0]
+			pts.append(pt)
+
+	if axis == 3:
+		for y in range(0, int(numCvs)+1):
+			pt = [0, 0, axisList[y]*cvDist]
+			pts.append(pt)			
+		
+	line = cmds.curve(name = "line_01", d=3, p=pts)
+	shp = cmds.listRelatives(line, s=True)[0]
+	cmds.rename(shp, "{}Shape".format(line))
+	cmds.select(line, r=True)
 
 def movePivot(side, *args):
 
@@ -400,6 +468,24 @@ def hammerPoints(neighbors = 3):
 		newPos = [avgX, avgY, avgZ]
 		
 		cmds.xform(tgtPt, ws=True, t=newPos)
+
+
+def lineThroughObjs(*args):
+	"""
+	select objs and this will draw a curve through their pivots (in order)
+	"""
+	sel = cmds.ls(sl=True)
+	pts = []
+
+	for obj in sel:
+		pos = cmds.xform(obj, q=True, ws=True, rp=True)
+		pts.append(pos)
+		
+	cmds.curve(d=3, ep=pts)
+
+#---------------- option to connect objs to ep's
+#---------------- cmds.connectAttr("curveShape1.editPoints[2]", "pSphere3.translate", f=True)
+
 
 def curveTools():
 	crvToolsUI()
