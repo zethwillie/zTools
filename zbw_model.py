@@ -1,6 +1,7 @@
+# -*- coding: utf-8 -*-
 #
 
-
+"""
 zoom in
 
 selection handles on/off
@@ -14,3 +15,4 @@ configurations of isolate select
 image plane manipulations
 
 comm tools?
+"""

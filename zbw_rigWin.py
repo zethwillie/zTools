@@ -9,74 +9,74 @@ import maya.OpenMaya as om
 
 #create control
 def createControl(*args):
-	pass
+    pass
 
 #zbw_message
 def message(*args):
-	pass
+    pass
 
 #group orient
 def groupOrient(*args):
-	pass
+    pass
 
 #align to uv
 def alignToUV(*args):
-	pass
+    pass
 
 #zbw_attributes (rewrite as pymel,python)
 def attributes(*args):
-	pass
+    pass
 
 #softmod deformer
 def softModDeformer(*args):
-	pass
+    pass
 
 #softselect deformer
 def softSelectDeformer(*args):
-	pass
+    pass
 
 #measure distance
 def measure(*args):
-	pass
+    pass
 
 #scale stretch ik? translate stretch ik?
 
 #fk chain
 def fkChain(*args):
-	pass
+    pass
 
 #joints from list
 def jointChain(*args):
-	pass
+    pass
 
 #comet rename
 def cometRename(*args):
-	pass
+    pass
 
 #comet joint orient
 def cometJointOrient(*args):
-	pass
+    pass
 
 #abSymMesh
 def abSymMesh(*args):
-	pass
+    pass
 
 #cvInverter?
 
 #zbw_ribbon
 def zbw_ribbon(*args):
-	pass
+    pass
 
 #zbw_charRigger??
 
 #append to sys path
 def appendToPath(*args):
-	pass
+    pass
 
 #vertext to uv (print uv)
 def vertexToUV(*args):
-	pass
+    pass
 
 #zbw_shapeScale
 def shapeScale(*args):
-	pass
+    pass

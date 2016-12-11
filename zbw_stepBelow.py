@@ -19,16 +19,16 @@ endF = cmds.playbackOptions(query=True, max=True)
 sel = cmds.ls(sl=True)
 
 if sel:
-	curveList = []
-	for obj in sel:
-		relsSh = cmds.listRelatives(obj, ad=True, f=True, type="nurbsCurve")
-		for shape in relsSh:
-			curve = cmds.listRelatives(shape, p=True, type="transform")
-			curveList.append(curve)
-		if curveList:
-			for curve in curveList:
-				ctrls.append(curve)
+    curveList = []
+    for obj in sel:
+        relsSh = cmds.listRelatives(obj, ad=True, f=True, type="nurbsCurve")
+        for shape in relsSh:
+            curve = cmds.listRelatives(shape, p=True, type="transform")
+            curveList.append(curve)
+        if curveList:
+            for curve in curveList:
+                ctrls.append(curve)
 if ctrls:		
-	for ctrl in ctrls:
-		print ctrl
-		cmds.keyTangent(ctrl, ott="step")
+    for ctrl in ctrls:
+        print ctrl
+        cmds.keyTangent(ctrl, ott="step")

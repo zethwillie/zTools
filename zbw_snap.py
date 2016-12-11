@@ -18,7 +18,7 @@ def snapUI():
         cmds.deleteUI("snapWin", window=True)
         cmds.windowPref("snapWin", remove=True)
 
-    widgets["win"] = cmds.window("snapWin", t="zbw_snap", w=210, h=100)
+    widgets["win"] = cmds.window("snapWin", t="zbw_snap", w=210, h=100, rtf=True)
     widgets["mainCLO"] = cmds.columnLayout(w=210, h=100)
     cmds.text("Select the target object(s),\nthen the object(s) you want to snap", al="center", w=210)
     cmds.separator(h=5, style="single")
@@ -28,8 +28,9 @@ def snapUI():
     cmds.separator(h=5, style="single")
     widgets["snapButton"] = cmds.button(l="Snap!", w=210, h=30, bgc=(.6,.8,.6), c=snapIt)
 
-    cmds.showWindow(widgets["win"])
-    cmds.window(widgets["win"], e=True, w=210, h=100)
+
+    cmds.window(widgets["win"], e=True, w=5, h=5)
+    cmds.showWindow(widgets["win"])    
 
 
 def snapIt(*args):

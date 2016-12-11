@@ -1,0 +1,2 @@
+
+	for vtx in vtxs:

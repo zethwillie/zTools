@@ -1,48 +1,41 @@
 import maya.cmds as cmds
+import maya.OpenMaya as om
 import math
 
-def vectorLength(vec=(0,0,0),*args):
+
+# trig stuff - use math
+
+
+# vector stuff
+def length(vec=(0,0,0),*args):
     """
     finds the length of the vector
     """
-    A0 = vec[0]
-    A1 = vec[1]
-    A2 = vec[2]
-
-    length = math.sqrt(A0**2 + A1**2 + A2**2)
+    v = om.MVector(vec[0], vec[1], vec[2])
+    length = v.length()
 
     return length
 
 def normalizeVector(vec=(0,0,0), *args):
     """
-    normalizes the vector so all three axes are from 0-1
+    normalizes the given array3
     """
-    A0 = vec[0]
-    A1 = vec[1]
-    A2 = vec[2]
+    normalVec = om.MVector(vec[0], vec[1], vec[2]).normal()
 
-    length = vectorLength(vec)
-    normalVec = [A0/length, A1/length, A2/length]
+    return (normalVec[0], normalVec[1], normalVec[2])
 
-    return normalVec
-
-def dotProduct(vecA = [1,2,3], vecB = [4,5,6], *args):
+def dot(vecA = [1,2,3], vecB = [4,5,6], *args):
     """
-    returns the dot product of two vecs. This is the projection of one vector onto another (first onto second)
+    returns the dot product of two vecs
     """
-    A0 = vecA[0]
-    A1 = vecA[1]
-    A2 = vecA[2]
+    A = om.MVector(vecA[0], vecA[1], vecA[2])
+    B = om.MVector(vecB[0], vecB[1], vecB[2])
 
-    B0 = vecB[0]
-    B1 = vecB[1]
-    B2 = vecB[2]
-
-    dot = A0*B0 + A1*B1 + A2*B2
+    dot = A*B
 
     return dot
 
-def dotNormalized(vecA = [1,2,3], vecB = [4,5,6], *args):
+def dotN(vecA = [1,2,3], vecB = [4,5,6], *args):
     """
     returns the normalized dot product (projection of first onto second from 0-1)
     """
@@ -57,11 +50,11 @@ def angleBetween(vecA, vecB, *args):
     """
     finds the angle between two vectors (in degrees)
     """
-    dot = dotNormalized(vecA, vecB)
+    d = dotN(vecA, vecB)
 
-    rads = math.acos(dot)
+    rads = math.acos(d)
     degrees = rads*(180/math.pi)
 
     return degrees
 
-
+# matrix stuff

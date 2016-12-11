@@ -1,0 +1,36 @@
+//expression for wheel rotation
+
+float $radius =1.2;
+int $dirVec;
+// get Joint translation value for calculating direction vector.
+float $pastValX = `getAttr  -time (frame -1) basePos_jnt.tx`;
+float $pastValZ = `getAttr  -time (frame -1) basePos_jnt.tz`;
+
+// Now compare the difference of tip joint with base joint and basejoint's previous frame
+float $currPosX = tipPos_jnt.translateX - basePos_jnt.translateX;
+float $currPosZ = tipPos_jnt.translateZ - basePos_jnt.translateZ;
+// with past
+float $pastPosX = tipPos_jnt.translateX - $pastValX;
+float $pastPosZ = tipPos_jnt.translateZ - $pastValZ;
+
+// now calculate the magnitude
+float $currMag = `mag << $currPosX,0,$currPosZ>>`;
+float $pastMag = `mag << $pastPosX,0,$pastPosZ>>`;
+
+if ($pastMag >= $currMag) $dirVec = 1;
+else $dirVec = -1;
+
+// get controls translation value for actual calculations.
+float $pastCtrValX = `getAttr  -time (frame -1) placement_ctr.tx`;
+float $pastCtrValZ = `getAttr  -time (frame -1) placement_ctr.tz`;
+
+float $currDistX = placement_ctr.translateX - $pastCtrValX;
+float $currDistZ = placement_ctr.translateZ - $pastCtrValZ;
+
+float $distance = ($currDistX*$currDistX) + ($currDistZ*$currDistZ);
+$distance = sqrt($distance);
+// finding distance by dividing into circumfrence
+
+float $rotation = $distance /(2* 3.1428*$radius) *-360 * $dirVec;
+$rotation += tyreRot.rotateY;
+tyreRot.rotateY = $rotation %360;
