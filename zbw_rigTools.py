@@ -416,6 +416,7 @@ def bBox(*args):
     # center pivot on ctrl
     cmds.xform(ctrl, cp=True)
     cmds.select(ctrl)
+    return(ctrl)
 
 ##########
 # load function
