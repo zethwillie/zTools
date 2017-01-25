@@ -13,7 +13,7 @@ from functools import partial
 widgets = {}
 
 zDict = {"attr":"import zTools.zbw_attributes as zat; zat.attributes()", 
-"snap":"import zTools.zbw_snap as snap; snap.snap()",
+"snap":"import zTools.zbw_snap as snap; reload(snap), snap.snap()",
 "shpScl":"import zTools.zbw_shapeScale as zss; zss.shapeScale()",
 "selBuf":"import zTools.selectionBuffer as buf; buf.selectionBuffer()",
 "smIK":"import zTools.zbw_smallIKStretch as zsik; zsik.smallIKStretch()",

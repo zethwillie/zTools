@@ -1,9 +1,17 @@
+########################
+#file: zbw_curveTools.py
+#Author: zeth willie
+#Contact: zethwillie@gmail.com, www.williework.blogspot.com
+#Date Modified: 
+#To Use: type in python window  "zbw_curveTools.curveTools()"
+#Notes/Descriptions: # some tools to work with crvs
+########################
+
 import maya.cmds as cmds
 import maya.OpenMaya as om
 import math
 from functools import partial
 
-# some tools to work with crvs
 
 #---------------- draw cv, ep curve buttons
 
@@ -329,11 +337,11 @@ def toggleMethod(*args):
     sel = cmds.radioButtonGrp(widgets["methodRBG"], q=True, sl=True)
     
     if sel == 1:
-        cmds.intFieldGrp(widgets["recoFFG"], e=True, en=True)
+        cmds.floatFieldGrp(widgets["recoFFG"], e=True, en=True)
         cmds.intFieldGrp(widgets["totalIFBG"], e=True, en=False)
 
     elif sel == 2:
-        cmds.intFieldGrp(widgets["recoFFG"], e=True, en=False)
+        cmds.floatFieldGrp(widgets["recoFFG"], e=True, en=False)
         cmds.intFieldGrp(widgets["totalIFBG"], e=True, en=True)
 
 def toggleDispl(*args):
@@ -386,7 +394,7 @@ def lerp(a, b, perc):
 
 def doSmooth(*args):
     num = cmds.intFieldGrp(widgets["smthNumIFG"], q=True, v1=True)
-    push = cmds.floatFieldGrp(widgets["smthPushFFG"], q=True, v1=True)
+    # push = cmds.floatFieldGrp(widgets["smthPushFFG"], q=True, v1=True)
     smoothPoints(num, push)
 
 def smoothPoints(num = 5, push = 0.05):
