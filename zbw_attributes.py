@@ -2,7 +2,7 @@
 #file: zbw_attributes.py
 #Author: zeth willie
 #Contact: zeth@catbuks.com, www.williework.blogspot.com
-#Date Modified: 04/27/13
+#Date Modified: 01/27/17
 #To Use: type in python window  "import zbw_attributes as att; att.attributes()"
 #Notes/Descriptions: Some basic functions for manipulating channels, attrs and connections
 ########################
@@ -11,7 +11,8 @@ import maya.cmds as cmds
 from functools import partial
 import maya.mel as mel
 
-#TO-DO----------------add "breakConnections"? disconnect and if they're anim curves delete them.
+#TODO
+#----------------add "breakConnections"? disconnect and if they're anim curves delete them.
 
 widgets = {}
 colors = {}
@@ -48,8 +49,8 @@ def attrUI(*args):
     if cmds.window("attrWin", exists=True):
         cmds.deleteUI("attrWin")
 
-    widgets["win"] = cmds.window("attrWin", t="zbw_attributes", h=370, w=250, s=True)
-    widgets["tabLO"] = cmds.tabLayout()
+    widgets["win"] = cmds.window("attrWin", t="zbw_attributes", h=400, w=250, s=True, rtf=True)
+    widgets["tabLO"] = cmds.tabLayout(h=300)
     widgets["channelColLO"] = cmds.columnLayout("Object/Attr Controls", w=250, bgc=(.8,.8,.8))
 
     widgets["lockFrLO"] = cmds.frameLayout(l="Lock/Hide", cll=True, w=250, bgc=(.7,.6,.6))
@@ -76,8 +77,8 @@ def attrUI(*args):
     cmds.separator(h=5, st="none")
     widgets["lockAttrTFBG"] = cmds.textFieldButtonGrp(l="Locked Attr", tx = "__xtraAttrs__", bl="Create", cal=[(1,"left"),(2,"left"),(3,"left")], cw3=[60,135,50], bc=lockedAttr)
     cmds.separator(h=5,st="none")
-    widgets["channelsBut"] = cmds.button(l="Move Selected Attr Up", w=250, h=20, bgc=(.5,.7,.5), rs=True, c= partial(shiftAttr, 1))
-    widgets["channelsBut"] = cmds.button(l="Move Selected Attr Down", w=250, h=20, bgc=(.7,.5,.5), rs=True, c=partial(shiftAttr, 0))
+    widgets["channelsBut"] = cmds.button(l="Move Selected Attr Up", w=250, h=30, bgc=(.5,.7,.5), rs=True, c= partial(shiftAttr, 1))
+    widgets["channelsBut"] = cmds.button(l="Move Selected Attr Down", w=250, h=30, bgc=(.7,.5,.5), rs=True, c=partial(shiftAttr, 0))
     cmds.separator(h=5,st="none")
 
     #back to columnLayout
@@ -132,7 +133,7 @@ def attrUI(*args):
     cmds.text("Select a target object and channel:")
     widgets["connectee"] = cmds.textFieldButtonGrp(l="Connectee", w=250, bl="<<<", cal=[(1,"left"),(2,"left"),(3,"left")], cw3=[60,140,30], bc=partial(getChannel, "connectee"))
     cmds.separator(h=10,st="none")
-    widgets["connectBut"] = cmds.button(l="Connect Two Channels", w=240, h=30, bgc=(.5,.5,.5), c=connectChannels)
+    widgets["connectBut"] = cmds.button(l="Connect Two Channels", w=240, h=20, bgc=(.5,.5,.5), c=connectChannels)
     cmds.separator(h=5,st="none")
 
     cmds.setParent(widgets["connectColLO"])
@@ -142,7 +143,7 @@ def attrUI(*args):
     widgets["toShapeVis"] = cmds.textFieldButtonGrp(l="Vis Driver", w=250, bl="<<<", cal=[(1,"left"),(2,"left"),(3,"left")], cw3=[60,140,30], bc=partial(getChannel, "toShapeVis"))
     cmds.separator(h=5,st="none")
     cmds.text("Now select the objs to drive:")
-    widgets["shapeBut"] = cmds.button(l="Connect to Shapes' vis", w=240, h=30, bgc=(.5,.5,.5), c=connectShapeVis)
+    widgets["shapeBut"] = cmds.button(l="Connect to Shapes' vis", w=240, h=20, bgc=(.5,.5,.5), c=connectShapeVis)
     cmds.separator(h=5,st="none")
 
     cmds.setParent(widgets["connectColLO"])
@@ -151,8 +152,14 @@ def attrUI(*args):
 
     widgets["conversionCB"] = cmds.checkBox(l="Skip 'conversion' nodes?", v=1)
     cmds.text("Select an attribute in the channel box:")
-    widgets["getInputBut"] = cmds.button(l="Select inConnection object", w=240, h=30, bgc=(.5,.5,.5), c=getInput)
-    widgets["getOutputBut"] = cmds.button(l="Select outConnection objects", w=240, h=30, bgc=(.5,.5,.5), c=getOutput)
+    widgets["getInputBut"] = cmds.button(l="Select inConnection object", w=240, h=20, bgc=(.5,.5,.5), c=getInput)
+    widgets["getOutputBut"] = cmds.button(l="Select outConnection objects", w=240, h=20, bgc=(.5,.5,.5), c=getOutput)
+
+    cmds.setParent(widgets["connectColLO"])
+    widgets["functionFrame"] = cmds.frameLayout(l="Some functions", cll=True, bgc=(.6,.8,.6))
+    widgets["inOutColLO"] = cmds.columnLayout(bgc=(.8,.8,.8))
+    widgets["hideShapeVisBut"] = cmds.button(l="Toggle selected shape vis", w=240, h=20, bgc=(.5,.5,.5), c=toggleSelShapeVis)
+    widgets["segSclBut"] = cmds.button(l="toggle JntSegmentScaleComp", w=240, h=20, bgc=(.5,.5,.5), c=JntSegScl)
 
     #show window
     cmds.showWindow(widgets["win"])
@@ -292,6 +299,43 @@ def changeColor(color, *args):
             for shape in shapes:
                 cmds.setAttr("%s.overrideEnabled"%shape, 1)
                 cmds.setAttr("%s.overrideColor"%shape, color)
+
+
+def toggleSelShapeVis(*args):
+    """toggles the selected transforms' shape visibility"""
+    sel = cmds.ls(sl=True, type="transform")
+    if sel:
+        for obj in sel:
+            shp = cmds.listRelatives(obj, s=True)
+            if not shp:
+                return()
+            for s in shp:
+                currVal = cmds.getAttr("{0}.visibility".format(s))
+                newVal = 0
+                if currVal == 0:
+                    newVal = 1
+                elif currVal == 1:
+                    newVal = 0
+                cmds.setAttr("{0}.visibility".format(s), newVal)
+
+
+def JntSegScl(*args):
+    """turns on/off selected jnts seg scale compensate attr"""
+
+    jnts = cmds.ls(sl=True, type="joint")
+    if not jnts:
+        cmds.warning("No joints selected!")
+        return()
+
+    for jnt in jnts:
+        currVal = cmds.getAttr("{0}.segmentScaleCompensate".format(jnt))
+        if currVal == 0:
+            newVal = 1
+        elif currVal == 1:
+            newVal =0
+
+        cmds.setAttr("{0}.segmentScaleCompensate".format(jnt), newVal)
+
 
 def breakConnections(*args):
     #disconnectAttr

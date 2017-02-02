@@ -34,7 +34,6 @@ def snapUI():
     cmds.window(widgets["win"], e=True, w=5, h=5)
     cmds.showWindow(widgets["win"])    
 
-
 def snapIt(pivt=False, *args):
     """
     Does the snapping by xform. Should work with any rotation order, etc
@@ -52,6 +51,8 @@ def snapIt(pivt=False, *args):
     moveViaPivot = cmds.checkBox(widgets["snapPivCB"], q=True, v=True)
 
     sel = cmds.ls(sl=True, fl=True)
+    if len(sel) < 2:
+        return()
     # get pt components for later
     selPts = cmds.filterExpand(sm=(31, 28, 30, 35, 46, 47, 51), ex=True)
     # remove these from selection (faces and edges)
@@ -67,14 +68,30 @@ def snapIt(pivt=False, *args):
                 objects.remove(x)
             if selEdgeFace and (x in selPts):
                 objects.remove(x)
-#---------------- refactor this to pull the 'get target' part out to do only once
-        for obj in objects:
-            if translate:
-                if pivot:
-                    targetPos = cmds.xform(target, ws=True, q=True, rp=True)
-                else:
-                    targetPos = cmds.xform(target, ws=True, q=True, t=True)
 
+        targetPos = (0,0,0)
+        
+        if selPts and (target in selPts):
+            targetPos = cmds.pointPosition(target)
+        elif pivot:
+            targetPos = cmds.xform(target, ws=True, q=True, rp=True)
+        else:
+            targetPos = cmds.xform(target, ws=True, q=True, t=True)
+
+
+        tarRot = cmds.xform(target, ws=True, q=True, ro=True)
+        tarRO = cmds.xform(target, q=True, roo=True)
+
+        for obj in objects:
+            if rotate:
+                cmds.select(obj, r=True)                
+                objRO = cmds.xform(obj, q=True, roo=True)
+                # if not pivt:
+                cmds.xform(obj, roo=tarRO)
+                cmds.xform(obj, ws=True, ro=tarRot)
+                cmds.xform(obj, roo=objRO, p=True)
+
+            if translate:
                 if pivt:
                     cmds.xform(obj, ws=True, a=True, piv=targetPos, p=True)
                 else:
@@ -86,32 +103,18 @@ def snapIt(pivt=False, *args):
                         endPos = (objTrans[0]-objPiv[0]+targetPos[0], objTrans[1]-objPiv[1]+targetPos[1], objTrans[2]-objPiv[2]+targetPos[2])
                         cmds.xform(obj, ws=True, t=endPos)
 
-            if rotate:
-                cmds.select(obj, r=True)                
-                tarRot = cmds.xform(target, ws=True, q=True, ro=True)
-                objRO = cmds.xform(obj, q=True, roo=True)
-                tarRO = cmds.xform(target, q=True, roo=True)
-                if not pivt:
-                    #get rot order of obj
-                    cmds.xform(obj, roo=tarRO)
-                    cmds.xform(obj, ws=True, ro=tarRot)
-                    cmds.xform(obj, roo=objRO, p=True)
-                # else:
-                #     print "about to try to manipPivot"
-                #     cmds.manipPivot(o=tarRot)
-
         cmds.select(objects, r=True)
 
     else:
         if (len(sel)>=2):
-            targets = sel[0:-1]
-            object = sel[-1:][0]
+            objects = sel[0:-1]
+            target = sel[-1:][0]
 
-            for x in targets:
+            for x in objects:
                 if selEdgeFace and (x in selEdgeFace):
-                    targets.remove(x)
+                    objects.remove(x)
 
-            objRO = cmds.xform(object, q=True, roo=True)
+            tarRO = cmds.xform(target, q=True, roo=True)
 
             txList = []
             tyList = []
@@ -120,29 +123,30 @@ def snapIt(pivt=False, *args):
             ryList = []
             rzList = []
             TX, TY, TZ, RX, RY, RZ = 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
-            for tar in targets:
+            for obj in objects:
                 component = False
-                if tar in selPts:
+                if selPts and (obj in selPts):
                      component = True
+
                 if pivot and not component:
-                    tarPos = cmds.xform(tar, q=True, ws=True, rp=True)
+                    objPos = cmds.xform(obj, q=True, ws=True, rp=True)
                 if (not pivot and not component) or component:
-                    tarPos = cmds.xform(tar, q=True, ws=True, t=True)
+                    objPos = cmds.xform(obj, q=True, ws=True, t=True)
 
-                txList.append(tarPos[0])
-                tyList.append(tarPos[1])
-                tzList.append(tarPos[2])
+                txList.append(objPos[0])
+                tyList.append(objPos[1])
+                tzList.append(objPos[2])
 
-                #convert it to the rot order of the object
-                tarRO = cmds.xform(tar, q=True, roo=True)
-                cmds.xform(tar, p=True, roo=objRO)
+                #convert it to the rot order of the target
+                objRO = cmds.xform(obj, q=True, roo=True)
+                cmds.xform(obj, p=True, roo=objRO)
                 #get the rotation
-                tarRot = cmds.xform(tar, q=True, ws=True, ro=True)
-                rxList.append(tarRot[0])
-                ryList.append(tarRot[1])
-                rzList.append(tarRot[2])
+                objRot = cmds.xform(obj, q=True, ws=True, ro=True)
+                rxList.append(objRot[0])
+                ryList.append(objRot[1])
+                rzList.append(objRot[2])
                 #convert it back
-                cmds.xform(tar, p=True, roo=tarRO)
+                cmds.xform(obj, p=True, roo=objRO)
 
             #now average them all
             for tx in txList:
@@ -165,21 +169,21 @@ def snapIt(pivt=False, *args):
             avgRy = RY/len(ryList)
             avgRz = RZ/len(rzList)
 
-            if translate:
-                cmds.select(object, r=True)
-                if not pivt:
-                    cmds.xform(object, ws=True, t=(avgTx, avgTy,avgTz))
-                else:
-                    cmds.xform(object, ws=True, piv=(avgTx, avgTy, avgTz), p=True)
             if rotate:
-                cmds.select(object, r=True)
+                cmds.select(target, r=True)
+                cmds.xform(target, ws=True, ro=(avgRx, avgRy, avgRz))
+
+            if translate:
+                cmds.select(target, r=True)
                 if not pivt:
-                    cmds.xform(object, ws=True, ro=(avgRx, avgRy, avgRz))
-                # else: 
-                #     cmds.manipPivot(o=(avgRx, avgRy, avgRz))
+                    cmds.xform(target, ws=True, t=(avgTx, avgTy,avgTz))
+                else:
+                    cmds.xform(target, ws=True, piv=(avgTx, avgTy, avgTz), p=True)
+
         else:
             cmds.warning("You need to select two objects or more!")
 
+        cmds.select(target, r=True)
 
 def snap(*args):
     """function to run the script"""

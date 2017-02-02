@@ -1,4 +1,12 @@
-#zbw_rigTools
+########################
+#file: zbw_rigTools.py
+#Author: zeth willie
+#Contact: zethwillie@gmail.com, www.williework.blogspot.com
+#Date Modified: 1/17/17
+#To Use: type in python window  "import zbw_rigTools as rigTools; reload(rigTools); rigTools.rigTools()"
+#Notes/Descriptions: some rigging tools. require zTools folder in a python path.
+########################
+
 
 import maya.cmds as cmds
 import maya.mel as mel
@@ -12,7 +20,7 @@ from functools import partial
 
 widgets = {}
 
-zDict = {"attr":"import zTools.zbw_attributes as zat; zat.attributes()", 
+zDict = {"attr":"import zTools.zbw_attributes as zat; reload(zat); zat.attributes()", 
 "snap":"import zTools.zbw_snap as snap; reload(snap), snap.snap()",
 "shpScl":"import zTools.zbw_shapeScale as zss; zss.shapeScale()",
 "selBuf":"import zTools.selectionBuffer as buf; buf.selectionBuffer()",

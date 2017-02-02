@@ -2,7 +2,7 @@
 #file: zbw_transformBuffer.py
 #Author: zeth willie
 #Contact: zethwillie@gmail.com, www.williework.blogspot.com
-#Date Modified: 
+#Date Modified: 1/20/17
 #To Use: type in python window  "zbw_transformBuffer.transformBuffer()"
 #Notes/Descriptions: script to just buffer(catch) the transform vals of an object. Then push them back to some selected geo
 ########################
