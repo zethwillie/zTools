@@ -1,5 +1,5 @@
 def addToTen(n):
-    return(n+11)
+    return(n+10)
 
 
 def divideByTen(n):
@@ -7,4 +7,4 @@ def divideByTen(n):
 
 
 def lowerCaseText(n):
-    return(n.upper())
+    return(n.lower())

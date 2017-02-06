@@ -1,13 +1,21 @@
+########################
+#file: zbw_spaceBuffer.py
+#Author: zeth willie
+#Contact: zethwillie@gmail.com, www.williework.blogspot.com
+#Date Modified: 2/1/17
+#To Use: type in python window  "import zTools.zbw_spaceBuffer as zspb; reload(zspb); zspb.spaceBuffer()"
+#Notes/Descriptions:  used to create a chain a grps that is parent constrained to the original obj/parent hierarchy.
+########################
 
-#---------------- small ui, button to create the buffers, button to create oriented joint grp from ctrl ws
-#---------------- put into functions
 #---------------- give option to include the upper group
 #---------------- WHAT AM I DOING WITH THE GROUP ABOVE? ONLY TO ZERO OUT THE THING UNDER? 
 
-#---------------- should I create joint and group at the control? 
+#---------------- should I create joint and group at the control?
+
 import maya.cmds as cmds
 
 widgets = {}
+
 
 def spaceBufferUI(*args):
     if cmds.window("spaceBufferWin", exists=True):
@@ -17,7 +25,7 @@ def spaceBufferUI(*args):
     widgets["mainCLO"] = cmds.columnLayout(w=200)
 
     widgets["jntCreateBut"] = cmds.button(l="Create Joint/Grps at Selection!", w=200, h=30, bgc=(.6, .8,.6), c=createJointFromObj)
-    widgets["makeBuffer"] = cmds.button(l="Create Space Buffer!", w=200, h=30, bgc = (.4, .6, .8), c=createSpaceBuffers)
+    widgets["makeBuffer"] = cmds.button(l="Create Space Buffer!", w=200, h=30, bgc=(.4, .6, .8), c=createSpaceBuffers)
 
     cmds.window(widgets["win"], e=True, wh=(5, 5), rtf=True)
     cmds.showWindow(widgets["win"])
@@ -63,7 +71,6 @@ def createSpaceBuffers(*args):
     src1 = sel[0] # parent of Ctrl (or thing you want to relate it to)
     src2 = sel[1] # ctrl
     tgt = sel[2]  # joint (should be in a group)
-    print "TARGET: ", tgt
 
     tgtGrp = cmds.group(em=True, name="{0}_spaceBuffer".format(src2))
     tgtParGrp = cmds.group(em=True, name="{0}_spaceBuffer".format(src1))
