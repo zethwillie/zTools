@@ -50,5 +50,5 @@ global proc icExtractDeltas ()
 		error "Please select two polygonal objects!";
 	}
 
-	extractDeltas -m $sel[0] -s $sel[1];
+	extractDeltas -s $sel[0] -c $sel[1];
 }

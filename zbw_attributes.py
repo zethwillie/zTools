@@ -13,6 +13,7 @@ import maya.mel as mel
 
 #TODO
 #----------------add "breakConnections"? disconnect and if they're anim curves delete them.
+#---------------- transfer attributes (and connections) from one object to another (ie switch custom attrs to a new control)
 
 widgets = {}
 colors = {}
@@ -49,7 +50,7 @@ def attrUI(*args):
     if cmds.window("attrWin", exists=True):
         cmds.deleteUI("attrWin")
 
-    widgets["win"] = cmds.window("attrWin", t="zbw_attributes", h=400, w=250, s=True, rtf=True)
+    widgets["win"] = cmds.window("attrWin", t="zbw_attributes", h=450, w=250, s=True, rtf=True)
     widgets["tabLO"] = cmds.tabLayout(h=300)
     widgets["channelColLO"] = cmds.columnLayout("Object/Attr Controls", w=250, bgc=(.8,.8,.8))
 
@@ -112,15 +113,6 @@ def attrUI(*args):
     cmds.canvas(w=50, h=20, rgb=(.0,0,.0), pc=partial(changeColor, colors["black"]))
     cmds.canvas(w=50, h=20, rgb=(1,1,1), pc=partial(changeColor, colors["white"]))
 
-#TO-DO----------------figure out breaking connections(to delete or not?), call add attr win
-    # cmds.setParent(widgets["channelColLO"])
-    # widgets["channelFrLO"] = cmds.frameLayout(l="Channels", cll=True, w=250, bgc=(1,1,1))
-    # widgets["channelRCLO"] = cmds.columnLayout(bgc=(.8,.8,.8))
-    # widgets["breakAllBut"] = cmds.button(l="Break All Connections", w=150, h=30, bgc=(.5,.5,.5))
-    # widgets["breakSelBut"] = cmds.button(l="Break Selected Connections", w=150, h=30, bgc=(.5,.5,.5))
-    # cmds.separator(h=10, st="none")
-    # widgets["addAttBut"] = cmds.button(l="Show 'Add Attribute' win", w=150, h=30, bgc=(.5,.5,.5))
-
     cmds.setParent(widgets["tabLO"])
     widgets["connectColLO"] = cmds.columnLayout("Connections", w=250, bgc=(.8,.8,.8))
     widgets["connectFrame"] = cmds.frameLayout(l="Make General Connections", cll=True, bgc=(.6,.8,.6))
@@ -129,12 +121,12 @@ def attrUI(*args):
     #connection stuff
     cmds.text("Select a source object and a channel:")
     widgets["connector"] = cmds.textFieldButtonGrp(l="Connector", w=250, bl="<<<", cal=[(1,"left"),(2,"left"),(3,"left")], cw3=[60,140,30], bc=partial(getChannel, "connector"))
-    cmds.separator(h=5,st="none")
+    cmds.separator(h=3,st="none")
     cmds.text("Select a target object and channel:")
     widgets["connectee"] = cmds.textFieldButtonGrp(l="Connectee", w=250, bl="<<<", cal=[(1,"left"),(2,"left"),(3,"left")], cw3=[60,140,30], bc=partial(getChannel, "connectee"))
-    cmds.separator(h=10,st="none")
+    cmds.separator(h=3,st="none")
     widgets["connectBut"] = cmds.button(l="Connect Two Channels", w=240, h=20, bgc=(.5,.5,.5), c=connectChannels)
-    cmds.separator(h=5,st="none")
+    cmds.separator(h=3,st="none")
 
     cmds.setParent(widgets["connectColLO"])
     widgets["shapeFrame"] = cmds.frameLayout(l="Connect to Shape Visibility", cll=True, bgc=(.6,.8,.6))
@@ -153,17 +145,44 @@ def attrUI(*args):
     widgets["conversionCB"] = cmds.checkBox(l="Skip 'conversion' nodes?", v=1)
     cmds.text("Select an attribute in the channel box:")
     widgets["getInputBut"] = cmds.button(l="Select inConnection object", w=240, h=20, bgc=(.5,.5,.5), c=getInput)
+    cmds.separator(h=3,st="none")
     widgets["getOutputBut"] = cmds.button(l="Select outConnection objects", w=240, h=20, bgc=(.5,.5,.5), c=getOutput)
 
     cmds.setParent(widgets["connectColLO"])
     widgets["functionFrame"] = cmds.frameLayout(l="Some functions", cll=True, bgc=(.6,.8,.6))
     widgets["inOutColLO"] = cmds.columnLayout(bgc=(.8,.8,.8))
     widgets["hideShapeVisBut"] = cmds.button(l="Toggle selected shape vis", w=240, h=20, bgc=(.5,.5,.5), c=toggleSelShapeVis)
+    cmds.separator(h=3,st="none")
     widgets["segSclBut"] = cmds.button(l="toggle JntSegmentScaleComp", w=240, h=20, bgc=(.5,.5,.5), c=JntSegScl)
+    cmds.separator(h=3,st="none")
+    cmds.text("First sel is source, next are targets:") 
+    widgets["connectRCL"] = cmds.rowColumnLayout(nc=3, cs=[(1, 0), (2, 5), (3, 5)])
+    widgets["cnctTBut"] = cmds.button(l="conn Transl", w=75, h=20, bgc=(.7,.5,.5), c=partial(connectAttrs, "t"))
+    widgets["cnctRBut"] = cmds.button(l="conn Rot", w=75, h=20, bgc=(.5,.7,.5), c=partial(connectAttrs, "r"))
+    widgets["cnctSBut"] = cmds.button(l="conn Scl", w=75, h=20, bgc=(.5,.5,.7), c=partial(connectAttrs, "s"))
 
     #show window
     cmds.showWindow(widgets["win"])
-    cmds.window(widgets["win"], e=True, w=250, h=370)
+    cmds.window(widgets["win"], e=True, w=250, h=400, rtf=True)
+
+def get_source_and_targets():
+    sel = cmds.ls(sl=True)
+    if sel and len(sel)>1:
+        src = sel[0]
+        tgts = sel[1:] 
+        return(src, tgts)
+    else:
+        return(None)
+
+
+def connectAttrs(attrType=None, *args):
+    src, tgts = get_source_and_targets()
+    if src:
+        for tgt in tgts:
+            try:
+                cmds.connectAttr("{0}.{1}".format(src, attrType), "{0}.{1}".format(tgt, attrType))
+            except:
+                cmds.warning("there was an issue connecting to {0} of {1}. Make sure the channels are free!".format(attrType, tgt))
 
 
 def enableChannel(source, target, *args):
