@@ -165,7 +165,17 @@ def attrUI(*args):
     cmds.showWindow(widgets["win"])
     cmds.window(widgets["win"], e=True, w=250, h=400, rtf=True)
 
-def get_source_and_targets():
+def get_source_and_targets(*args):
+    """
+    checks current selection, first sel is source, remaining are targets
+    args:
+        None
+    Return:
+        list (string, list): [0] is the source, [1] is the list of targets
+        or 
+        None
+    """
+    
     sel = cmds.ls(sl=True)
     if sel and len(sel)>1:
         src = sel[0]
@@ -194,6 +204,7 @@ def enableChannel(source, target, *args):
         cmds.checkBoxGrp(CBG, e=True, en=True, va3=(1,1,1))
     else:
         cmds.checkBoxGrp(CBG, e=True, en=False, va3=(0,0,0))
+
 
 def channelLockHide(*args):
     """this is the function to actually do the locking and hiding of the attrs selected in the UI"""
@@ -239,6 +250,7 @@ def channelLockHide(*args):
     else:
         cmds.warning("You haven't selected anything!")
 
+
 def lockedAttr(*args):
     """creates a locked attr (I use as a separator). Uses the long name as the nice name (literal name in channel box)"""
     attrName = cmds.textFieldButtonGrp(widgets["lockAttrTFBG"], q=True, tx=True)
@@ -258,6 +270,7 @@ def lockedAttr(*args):
             cmds.warning("Please select some objects to add attr to!")
     else:
         cmds.warning("Please enter a name for the attr!")
+
 
 def shiftAttr(mode, *args):
     """shifts the selected attr up or down"""
@@ -307,6 +320,7 @@ def shiftAttr(mode, *args):
                 if attrLock:
                     for alck in attrLock:
                         cmds.setAttr(eachObj + '.' + alck,lock=1)
+
 
 def changeColor(color, *args):
     """changes the shape node color of the selected objects"""
@@ -360,6 +374,7 @@ def breakConnections(*args):
     #disconnectAttr
     pass
 
+
 def getChannel(tfbg, *args):
     """gets the selected channel of the selected objects"""
 
@@ -392,6 +407,7 @@ def getChannel(tfbg, *args):
         full = "%s.%s"%(obj, channel)
         cmds.textFieldButtonGrp(widgets[tfbg], e=True, tx=full)
 
+
 def connectChannels(*args):
     """connects two channels together from the test fields"""
 
@@ -402,6 +418,7 @@ def connectChannels(*args):
         print "Connected %s -----> %s"%(connector, connectee)
     except:
         cmds.warning("Couldn't connect those attrs. . . Sorry!")
+
 
 def getInput(*args):
     """ collects the input from the selected obj.channel"""
@@ -445,6 +462,7 @@ def getInput(*args):
             cmds.select(cl=True)
             for node in inNodes:
                 cmds.select(node, add=True)
+
 
 def getOutput(*args):
     """ collects the outputs from the selected obj.channel"""
