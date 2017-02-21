@@ -88,30 +88,30 @@ def attrUI(*args):
     widgets["colorRCLO"] = cmds.rowColumnLayout(nr=4, bgc=(.8,.8,.8))
 
     #color controls (red, green, blue, yellow, other)
-    cmds.canvas(w=50, h=20, rgb=(1,0,0), pc=partial(changeColor, colors["red"]))
-    cmds.canvas(w=50, h=20, rgb=(.5,.1,.1), pc=partial(changeColor, colors["darkRed"]))
-    cmds.canvas(w=50, h=20, rgb=(.659,.275,.449), pc=partial(changeColor, colors["lightRed"]))
-    cmds.canvas(w=50, h=20, rgb=(1,.8,.965), pc=partial(changeColor, colors["pink"]))
+    cmds.canvas(w=50, h=30, rgb=(1,0,0), pc=partial(changeColor, colors["red"]))
+    cmds.canvas(w=50, h=30, rgb=(.5,.1,.1), pc=partial(changeColor, colors["darkRed"]))
+    cmds.canvas(w=50, h=30, rgb=(.659,.275,.449), pc=partial(changeColor, colors["lightRed"]))
+    cmds.canvas(w=50, h=30, rgb=(1,.8,.965), pc=partial(changeColor, colors["pink"]))
 
-    cmds.canvas(w=50, h=20, rgb=(0,1,0), pc=partial(changeColor, colors["green"]))
-    cmds.canvas(w=50, h=20, rgb=(0,.35,0), pc=partial(changeColor, colors["darkGreen"]))
-    cmds.canvas(w=50, h=20, rgb=(0,.55,.335), pc=partial(changeColor, colors["medGreen"]))
-    cmds.canvas(w=50, h=20, rgb=(.35,.635,.15), pc=partial(changeColor, colors["yellowGreen"]))
+    cmds.canvas(w=50, h=30, rgb=(0,1,0), pc=partial(changeColor, colors["green"]))
+    cmds.canvas(w=50, h=30, rgb=(0,.35,0), pc=partial(changeColor, colors["darkGreen"]))
+    cmds.canvas(w=50, h=30, rgb=(0,.55,.335), pc=partial(changeColor, colors["medGreen"]))
+    cmds.canvas(w=50, h=30, rgb=(.35,.635,.15), pc=partial(changeColor, colors["yellowGreen"]))
 
-    cmds.canvas(w=50, h=20, rgb=(0,0,1), pc=partial(changeColor, colors["blue"]))
-    cmds.canvas(w=50, h=20, rgb=(0,0,.35), pc=partial(changeColor, colors["darkBlue"]))
-    cmds.canvas(w=50, h=20, rgb=(0,.2,.6), pc=partial(changeColor, colors["medBlue"]))
-    cmds.canvas(w=50, h=20, rgb=(.65,.8,1), pc=partial(changeColor, colors["lightBlue"]))
+    cmds.canvas(w=50, h=30, rgb=(0,0,1), pc=partial(changeColor, colors["blue"]))
+    cmds.canvas(w=50, h=30, rgb=(0,0,.35), pc=partial(changeColor, colors["darkBlue"]))
+    cmds.canvas(w=50, h=30, rgb=(0,.2,.6), pc=partial(changeColor, colors["medBlue"]))
+    cmds.canvas(w=50, h=30, rgb=(.65,.8,1), pc=partial(changeColor, colors["lightBlue"]))
 
-    cmds.canvas(w=50, h=20, rgb=(1,1,0), pc=partial(changeColor, colors["yellow"]))
-    cmds.canvas(w=50, h=20, rgb=(.225,.1,0), pc=partial(changeColor, colors["darkBrown"]))
-    cmds.canvas(w=50, h=20, rgb=(.5,.275,0), pc=partial(changeColor, colors["brown"]))
-    cmds.canvas(w=50, h=20, rgb=(.922,.707,.526), pc=partial(changeColor, colors["darkYellow"]))
+    cmds.canvas(w=50, h=30, rgb=(1,1,0), pc=partial(changeColor, colors["yellow"]))
+    cmds.canvas(w=50, h=30, rgb=(.225,.1,0), pc=partial(changeColor, colors["darkBrown"]))
+    cmds.canvas(w=50, h=30, rgb=(.5,.275,0), pc=partial(changeColor, colors["brown"]))
+    cmds.canvas(w=50, h=30, rgb=(.922,.707,.526), pc=partial(changeColor, colors["darkYellow"]))
 
-    cmds.canvas(w=50, h=20, rgb=(.33,0,.33), pc=partial(changeColor, colors["purple"]))
-    cmds.canvas(w=50, h=20, rgb=(.2,0,.25), pc=partial(changeColor, colors["darkPurple"]))
-    cmds.canvas(w=50, h=20, rgb=(.0,0,.0), pc=partial(changeColor, colors["black"]))
-    cmds.canvas(w=50, h=20, rgb=(1,1,1), pc=partial(changeColor, colors["white"]))
+    cmds.canvas(w=50, h=30, rgb=(.33,0,.33), pc=partial(changeColor, colors["purple"]))
+    cmds.canvas(w=50, h=30, rgb=(.2,0,.25), pc=partial(changeColor, colors["darkPurple"]))
+    cmds.canvas(w=50, h=30, rgb=(.0,0,.0), pc=partial(changeColor, colors["black"]))
+    cmds.canvas(w=50, h=30, rgb=(1,1,1), pc=partial(changeColor, colors["white"]))
 
     cmds.setParent(widgets["tabLO"])
     widgets["connectColLO"] = cmds.columnLayout("Connections", w=250, bgc=(.8,.8,.8))
@@ -160,6 +160,9 @@ def attrUI(*args):
     widgets["cnctTBut"] = cmds.button(l="conn Transl", w=75, h=20, bgc=(.7,.5,.5), c=partial(connectAttrs, "t"))
     widgets["cnctRBut"] = cmds.button(l="conn Rot", w=75, h=20, bgc=(.5,.7,.5), c=partial(connectAttrs, "r"))
     widgets["cnctSBut"] = cmds.button(l="conn Scl", w=75, h=20, bgc=(.5,.5,.7), c=partial(connectAttrs, "s"))
+    cmds.setParent(widgets["inOutColLO"])
+    cmds.separator(h=3,st="none")
+    widgets["trnsfrAttrBut"] = cmds.button(l="Transfer Attributes (tgt, src)", w=240, bgc=(.5,.5,.5), c=transfer_attrs)
 
     #show window
     cmds.showWindow(widgets["win"])
@@ -194,6 +197,66 @@ def connectAttrs(attrType=None, *args):
             except:
                 cmds.warning("there was an issue connecting to {0} of {1}. Make sure the channels are free!".format(attrType, tgt))
 
+
+def get_channel_attributes(obj, chnl):
+    """gets and returns attributes of given channel on given object"""
+    attrType = cmds.attributeQuery(chnl, node=obj, at=True)
+    hasMin = cmds.attributeQuery(chnl, node=obj, mne=True)
+    hasMin = cmds.attributeQuery(chnl, node=obj, mne=True)
+    hasMax = cmds.attributeQuery(chnl, node=obj, mxe=True)
+    attrMin = None
+    if hasMin:
+        attrMin = cmds.attributeQuery(chnl, node=obj, min=True)
+    attrMax = None
+    if hasMax:
+        attrMax = cmds.attributeQuery(chnl, node=obj, max=True)
+    value = cmds.getAttr("{0}.{1}".format(obj, chnl))
+    inConnection = cmds.listConnections("{0}.{1}".format(obj, chnl), plugs=True, destination=False, source=True)
+    outConnection = cmds.listConnections("{0}.{1}".format(obj, chnl), plugs=True, destination=True, source=False)
+    locked = cmds.getAttr("{0}.{1}".format(obj, chnl), lock=True) 
+    
+    return(attrType, hasMin, attrMin, hasMax, attrMax, value, inConnection, outConnection, locked)
+
+def transfer_attrs(*args):
+    """
+    transfers attrs and connections from second obj to first object selected 
+    """
+    tgt, src = get_source_and_targets()
+    if not tgt or len(src)>1:
+        cmds.warning("Select only one target then one source obj to transfer the attributes and connections!")
+        return()
+
+    attrs = cmds.channelBox('mainChannelBox', q=True, selectedMainAttributes=True)
+    if not attrs:
+        cmds.warning("You have to select at least one attr on last object selected to transfer!")
+        return()
+    for attr in attrs:
+        attrType, hasMin, attrMin, hasMax, attrMax, value, inConnection, outConnection, locked = get_channel_attributes(src[0], attr)
+        if not attrType == "enum":
+            # create attribute
+            if not cmds.attributeQuery(attr, node=tgt, exists=True):
+                if hasMin and not hasMax:
+                    cmds.addAttr(tgt, ln=attr, at=attrType, min=attrMin[0], dv=value, k=True)
+                elif hasMax and not hasMin:
+                    cmds.addAttr(tgt, ln=attr, at=attrType, max=attrMax[0], dv=value, k=True)
+                elif hasMin and hasMax:
+                    cmds.addAttr(tgt, ln=attr, at=attrType, min=attrMin[0], max=attrMax[0], dv=value, k=True)
+                else: 
+                    cmds.addAttr(tgt, ln=attr, at=attrType, dv=value, k=True)
+            else:
+                cmds.warning("The attribute: {0} already exists. Skipping creation!".format(attr))
+            # lock
+            if locked:
+                cmds.setAttr("{0}.{1}".format(tgt, attr), l=True)
+        else:
+            cmds.warning("I don't do enums at the moment!")
+        
+        # connect tgt attr to connection, forced
+        if inConnection:
+            cmds.connectAttr(inConnection[0], "{0}.{1}".format(tgt, attr))
+        if outConnection:
+            for conn in outConnection:
+                cmds.connectAttr("{0}.{1}".format(tgt, attr), conn, force=True)
 
 def enableChannel(source, target, *args):
     """This function enables or disables the indiv channel checkboxes when attr is toggled"""
@@ -275,9 +338,9 @@ def lockedAttr(*args):
 def shiftAttr(mode, *args):
     """shifts the selected attr up or down"""
 
-    obj = cmds.channelBox('mainChannelBox',q=True,mol=True)
+    obj = cmds.channelBox('mainChannelBox',q=True, mainObjectList=True)
     if obj:
-        attr = cmds.channelBox('mainChannelBox',q=True,sma=True)
+        attr = cmds.channelBox('mainChannelBox', q=True, selectedMainAttribute=True)
         if attr:
             for eachObj in obj:
                 udAttr = cmds.listAttr(eachObj,ud=True)
