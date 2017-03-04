@@ -20,7 +20,9 @@ def create_ctrls():
 
     cmds.select(cl=True)
     initialJnt = cmds.joint(name="initJnt", p=(0, 0, 0))
-    cmds.skinCluster(initialJnt, sel, normalizeWeights=2)
+    cmds.setAttr("{0}.v".format(initialJnt), 0)
+    cls = cmds.skinCluster(initialJnt, sel, normalizeWeights=2)[0]
+    print "++++++++++++++++++ ", cls
 
     for i in range(0, len(cvs), 3):
         nextCvs = []
@@ -46,17 +48,18 @@ def create_ctrls():
 
         cmds.parent(grp, masterGrp)
 
-    if initialJnt:
-        cls = mel.eval("findRelatedSkinCluster " + sel)
-        for cv in cvs:
-            cmds.skinPercent(cls, cv, transformValue=[initialJnt, 0])
-        cmds.parent(initialJnt, masterGrp)
+    # cls = mel.eval("findRelatedSkinCluster " + sel)
+    for cv in cvs:
+        cmds.skinPercent(cls, cv, transformValue=[initialJnt, 0])
+
+    cmds.skinCluster(cls, e=True, forceNormalizeWeights=True)
+    cmds.parent(initialJnt, masterGrp)
 
     geoGrp = cmds.group(em=True, name="{0}_geo_grp".format(sel))
     cmds.setAttr("{0}.inheritsTransform".format(geoGrp), 0)
     cmds.parent(sel, geoGrp)
 
-    l_ctrls = larger_ctrls(grps)
+    l_ctrls = larger_ctrls(grps, sel)
 
     # create master ctrl
     master = rig.createControl(type="star", color="blue", name="{0}_master_CTRL".format(sel))
@@ -70,18 +73,16 @@ def create_ctrls():
     for l in l_ctrls[1]:
         cmds.connectAttr("{0}.showLargeCtrls".format(master), "{0}.v".format(l))
 
-    cmds.setAttr("{0}.v".format(initialJnt), 0)
-
     cmds.parent(l_ctrls[0], master)
     cmds.parent(geoGrp, master)
     cmds.parent(masterGrp, master)
 
 
-def larger_ctrls(grps):
+def larger_ctrls(grps, sel):
     # create controls for every 10? ctrls, get center then get nearest point on curve?
     ctrlNodes = []
     bigCtrls = []
-    l_ctrl_grp = cmds.group(em=True, name="ctrlRigGrp")
+    l_ctrl_grp = cmds.group(em=True, name="{0}_ctrlRigGrp".format(sel))
 
     ctrlNodes.append(grps[-1]) # add last grp
     for i in range(0, len(grps)-1, 10):
@@ -96,14 +97,14 @@ def larger_ctrls(grps):
             local = grps[0:10]
             list(set(local))
             pos = get_center_point(local)
-            box = rig.createControl(name="largeCtrl_{0}".format(i), type="cube", color="green")
+            box = rig.createControl(name="{0}_largeCtrl_{1}".format(sel, i), type="cube", color="green")
             grp = cmds.group(em=True, name="{0}_GRP".format(box))
             cmds.parent(box, grp)
             cmds.xform(grp, ws=True, t=pos)
             for k in range(len(local)):
                 pc = cmds.parentConstraint(box, local[k], mo=True, w=pcwgts[k])
             bigCtrls.append(grp)
-            print "zero: ({0}): ".format(len(local))+ str(local)
+            # print "zero: ({0}): ".format(len(local))+ str(local)
         elif i == 10:
             # only set front from 5-9, back from 10-19
             pcwgts = [.1, .2, .4, .6, .8, 1, .9, .8, .7, .6, .5, .4, .3, .2, .1]              
@@ -113,27 +114,27 @@ def larger_ctrls(grps):
                 local.append(j)
             list(set(local))
             pos = get_center_point(local)
-            box = rig.createControl(name="largeCtrl_{0}".format(i), type="cube", color="green")
+            box = rig.createControl(name="{0}_largeCtrl_{1}".format(sel, i), type="cube", color="green")
             grp = cmds.group(em=True, name="{0}_GRP".format(box))
             cmds.parent(box, grp)
             cmds.xform(grp, ws=True, t=pos)           
             for k in range(len(local)):
                 pc = cmds.parentConstraint(box, local[k], mo=True, w=pcwgts[k])
             bigCtrls.append(grp)                
-            print "one ({0}): ".format(len(local)) + str(local)
+            # print "one ({0}): ".format(len(local)) + str(local)
         elif i == len(ctrlNodes)-1: # last
             pcwgts = [.2, .4, .6, .8, 1]              
             local = grps[-5:]
             list(set(local))
             pos = get_center_point(local)
-            box = rig.createControl(name="largeCtrl_{0}".format(i), type="cube", color="green")
+            box = rig.createControl(name="{0}_largeCtrl_{1}".format(sel, i), type="cube", color="green")
             grp = cmds.group(em=True, name="{0}_GRP".format(box))
             cmds.parent(box, grp)
             cmds.xform(grp, ws=True, t=pos)
             for k in range(len(local)):
                 pc = cmds.parentConstraint(box, local[k], mo=True, w=pcwgts[k])
             bigCtrls.append(grp)                
-            print "second ({0}): ".format(len(local)) + str(local)
+            # print "second ({0}): ".format(len(local)) + str(local)
         elif i == len(ctrlNodes)-2: # second to last
             pcwgts = [.1, .2, .3, .4, .5, .6, .7, .8, .9, 1, .9, .8, .7, .6, .5, .4, .3, .2, .1]        
             for j in grps[i-1:i-10]:
@@ -142,14 +143,14 @@ def larger_ctrls(grps):
                 local.append(j)
             list(set(local))
             pos = get_center_point(local)
-            box = rig.createControl(name="largeCtrl_{0}".format(i), type="cube", color="green")
+            box = rig.createControl(name="{0}_largeCtrl_{1}".format(sel, i), type="cube", color="green")
             grp = cmds.group(em=True, name="{0}_GRP".format(box))
             cmds.parent(box, grp)
             cmds.xform(grp, ws=True, t=pos)           
             for obj in local:
                 pc = cmds.parentConstraint(box, local[k], mo=True, w=pcwgts[k])
             bigCtrls.append(grp)                
-            print "second ({0}): ".format(len(local)) + str(local)
+            # print "second ({0}): ".format(len(local)) + str(local)
         else:
             pcwgts = [.1, .2, .3, .4, .5, .6, .7, .8, .9, 1, .9, .8, .7, .6, .5, .4, .3, .2, .1]
             for j in grps[i-10:i]: # all of these go from grps-9, ctrlNode, grps+9
@@ -158,14 +159,14 @@ def larger_ctrls(grps):
                 local.append(j)
             list(set(local))
             pos = get_center_point(local)
-            box = rig.createControl(name="largeCtrl_{0}".format(i), type="cube", color="green")
+            box = rig.createControl(name="{0}_largeCtrl_{1}".format(sel, i), type="cube", color="green")
             grp = cmds.group(em=True, name="{0}_GRP".format(box))
             cmds.parent(box, grp)
             cmds.xform(grp, ws=True, t=pos)           
             for k in range(len(local)):
                 pc = cmds.parentConstraint(box, local[k], mo=True, w=pcwgts[k])
             bigCtrls.append(grp)
-            print "{0} ({1}): ".format(len(local), i) + str(local) 
+            # print "{0} ({1}): ".format(len(local), i) + str(local) 
 
     for c in bigCtrls:
         cmds.parent(c, l_ctrl_grp)
