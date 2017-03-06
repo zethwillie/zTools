@@ -10,6 +10,9 @@
 
 import maya.cmds as cmds
 import maya.OpenMaya as OpenMaya
+import zTools.zbw_rig as rig
+import zTools.mayaDecorators as decor
+
 
 widgets = {}
 
@@ -29,9 +32,12 @@ def softDeformerUI():
     widgets["incrCBG"] = cmds.checkBoxGrp(l="Increment name after creation?", v1=1, cw=[(1,200)], cal=[(1,"left"), (2,"left")])
     widgets["checkCBG"] = cmds.checkBoxGrp(l="AutoCheck if there are deformers?", v1=1, cw=[(1,200)], cal=[(1,"left"), (2,"left")])
     widgets["scaleFFG"] = cmds.floatFieldGrp(l="Control Scale", v1=1, pre=2, cw=[(1,100),(2,50)], cal=[(1,"left"),(2,"left")])
+    widgets["bpFrameIFG"] = cmds.intFieldGrp(l="Bind Pose Frame", cw=[(1,100),(2,50)], cal=[(1,"left"),(2,"left")])
+    widgets["mainCtrlTFBG"] = cmds.textFieldButtonGrp(l="main control",cw=[(1,75),(2,175),(3,75)], cal=[(1,"left"), (2, "left"),(3,"left")], bl="<<<",bc=getCtrl)
 
     cmds.separator(h=10, style="single")
     widgets["button"] = cmds.button(l="Create Deformer", w=300, h=40, bgc=(.6,.8,.6), c=softModDeformerDo)
+    widgets["button"] = cmds.button(l="Soft Wave (scale to drive falloff)", w=300, h=40, bgc=(.8,.8,.6), c=softWave)
 
     #second tab to softselect deformer
     cmds.setParent(widgets["tabLO"])
@@ -51,6 +57,102 @@ def softDeformerUI():
 # --------------------------
 # softMod deformer
 # --------------------------
+
+@decor.d_unifyUndo
+def softWave(*args):
+
+    bpf = cmds.intFieldGrp(widgets["bpFrameIFG"], q=True, v1=True)
+    currentTime = cmds.currentTime(q=True)
+    cmds.currentTime(bpf)
+
+    sftmod, ctrl, geo, defGroup = softModDeformerDo()
+
+    main = cmds.textFieldButtonGrp(widgets["mainCtrlTFBG"], q=True, tx=True)
+    if not main:
+        cmds.warning("You need to have a main control selected to hook things up!")
+        return()
+
+    if not cmds.objExists("{0}_waveDeformer_GRP".format(geo)):
+        waveGrp = cmds.group(name="{0}_waveDeformer_GRP".format(geo), em=True)
+    p = cmds.listRelatives("{0}_waveDeformer_GRP".format(geo), p=True)
+    if not p:
+        cmds.parent("{0}_waveDeformer_GRP".format(geo), main)
+
+    ctrlPos = cmds.xform(ctrl, q=True, ws=True, rp=True)
+    arrow = rig.createControl(name="{0}_ptrCtrl".format(ctrl), type="arrow", axis="z", color="yellow")
+    grp = rig.groupFreeze(arrow)
+    # loc = cmds.spaceLocator(name="{0}_LOC".format(ctrl))
+    cmds.xform(grp, ws=True, t=ctrlPos)
+    nc = cmds.normalConstraint(geo, grp)
+    cmds.delete(nc)
+    pc = cmds.parentConstraint(arrow, ctrl, mo=True)
+
+    # hide control
+    cmds.setAttr("{0}.v".format(ctrl), 0)
+    # add values to positions in graph
+    positions = [0.0, 0.3, 0.6, 0.9, 0.95]
+    values = [1.0, -0.3, 0.1, -0.05, 0.01]
+    for i in range(len(positions)):
+        cmds.setAttr("{0}.falloffCurve[{1}].falloffCurve_Position".format(sftmod, i), positions[i])
+        cmds.setAttr("{0}.falloffCurve[{1}].falloffCurve_FloatValue".format(sftmod, i), values[i])
+        cmds.setAttr("{0}.falloffCurve[{1}].falloffCurve_Interp".format(sftmod, i), 2)
+
+    # connect falloff
+    mult = cmds.shadingNode("multiplyDivide", asUtility=True, name="{0}_mult".format(ctrl))
+    cmds.setAttr("{0}.input2".format(mult), 5, 5, 5)
+    cmds.connectAttr("{0}.scale".format(arrow),"{0}.input1".format(mult))
+    cmds.connectAttr("{0}.outputX".format(mult), "{0}.falloff".format(ctrl))
+
+    cmds.addAttr(arrow, ln="WaveAttrs", at="enum", k=True)
+    cmds.setAttr("{0}.WaveAttrs".format(arrow), l=True)
+    # expose these on the control
+    for j in range(5):
+        cmds.addAttr(arrow, ln="position{0}".format(j), at="float", min=0.0, max=1.0, dv=positions[j], k=True)
+        cmds.connectAttr("{0}.position{1}".format(arrow, j), "{0}.falloffCurve[{1}].falloffCurve_Position".format(sftmod, j))
+        
+    for j in range(5):
+        cmds.addAttr(arrow, ln="value{0}".format(j), at="float", min=-1.0, max=1.0, dv=values[j], k=True)
+        cmds.connectAttr("{0}.value{1}".format(arrow, j), "{0}.falloffCurve[{1}].falloffCurve_FloatValue".format(sftmod, j))
+        cmds.setAttr("{0}.position{1}".format(arrow, j), l=True)
+        cmds.setAttr("{0}.value{1}".format(arrow, j), l=True)
+
+    # group the whole thing
+    cmds.parent(defGroup, grp)
+    cmds.parent(grp, "{0}_waveDeformer_GRP".format(geo))
+    cmds.currentTime(currentTime)
+
+#---------------- get list of all softMod defs, then figure out how to pop these into the front of the deformer stack
+#string $types[] = `nodeType -inherited $node`;
+# defs = []
+# history = cmds.listHistory("pSphere1") or []
+# defHist = cmds.ls(history, type="geometryFilter", long=True)
+# for d in defHist:
+#     if d not in ["tweak1"]:
+#         defs.append(d)
+# newDefs = []        
+# for x in defs:
+#     if (cmds.objectType(x)=="softMod"):
+#         newDefs.insert(0, x)
+#     else:
+#         newDefs.append(x)
+# print newDefs
+        
+# for y in range(len(newDefs)-1, -1):
+#     print newDefs[y]
+#     cmds.reorderDeformers(newDefs[y], newDefs[y+1], "pSphere1")
+
+# then reorder deformers
+
+
+def getCtrl(*args):
+    ctrl = None
+    sel = cmds.ls(sl=True, type="transform")
+    if sel and (len(sel)==1):
+        ctrl = sel[0]
+
+    if ctrl:
+        cmds.textFieldButtonGrp(widgets["mainCtrlTFBG"], e=True, tx=ctrl)
+
 
 def softModDeformerDo(*args):
     """creates and sets up the softmod deformer setup"""
@@ -102,7 +204,7 @@ def softModDeformerDo(*args):
 
         # create a soft mod at vert position (avg)
         softMod = defName
-        softModAll = cmds.softMod(relative=False, falloffCenter = vertPos, falloffRadius=5.0, n=softMod)
+        softModAll = cmds.softMod(relative=False, falloffCenter = vertPos, falloffRadius=5.0, n=softMod, frontOfChain=True)
         print "softmodAll = :", softModAll
         cmds.rename(softModAll[0], softMod)
         softModXform = cmds.listConnections(softModAll[0], type="transform")[0]
@@ -216,6 +318,7 @@ def softModDeformerDo(*args):
 
         #select the control to wrap up
         cmds.select(control)
+        return(softMod, control, obj, defGroup)
     else:
         cmds.warning("An object of this name, %s, already exists! Choose a new name!"%defName)
 
