@@ -1041,3 +1041,23 @@ def getFrameRange(*args):
     min = cmds.playbackOptions(q=True, min=True)
     max = cmds.playbackOptions(q=True, max=True)
     return(min, max)
+
+
+def insertGroupAbove(obj, *args):
+    par = cmds.listRelatives(obj, p=True)
+    
+    grp = cmds.group(em=True, n="{}_Grp".format(obj))
+    
+    # grp = nameCheck(grp)
+
+    pos = cmds.xform(obj, q=True, ws=True, rp=True)
+    rot = cmds.xform(obj, q=True, ws=True, ro=True)
+    
+    cmds.xform(grp, ws=True, t=pos)
+    cmds.xform(grp, ws=True, ro=rot) 
+     
+    cmds.parent(obj, grp)
+    if par:
+        cmds.parent(grp, par[0])
+
+    return(grp)

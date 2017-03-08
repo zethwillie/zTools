@@ -104,7 +104,10 @@ def softWave(*args):
     cmds.connectAttr("{0}.outputX".format(mult), "{0}.falloff".format(ctrl))
 
     cmds.addAttr(arrow, ln="WaveAttrs", at="enum", k=True)
+    cmds.addAttr(arrow, ln="waveStrength", at="float", min=0, max=1, dv=1, k=True)
     cmds.setAttr("{0}.WaveAttrs".format(arrow), l=True)
+    cmds.connectAttr("{0}.waveStrength".format(arrow), "{0}.envelope".format(ctrl))
+
     # expose these on the control
     for j in range(5):
         cmds.addAttr(arrow, ln="position{0}".format(j), at="float", min=0.0, max=1.0, dv=positions[j], k=True)

@@ -19,7 +19,7 @@ def create_ctrls():
     masterGrp = cmds.group(em=True, name="{0}_fineCtrls_GRP".format(sel))
 
     cmds.select(cl=True)
-    initialJnt = cmds.joint(name="initJnt", p=(0, 0, 0))
+    initialJnt = cmds.joint(name="{0}_initJnt".format(sel), p=(0, 0, 0))
     cmds.setAttr("{0}.v".format(initialJnt), 0)
     cls = cmds.skinCluster(initialJnt, sel, normalizeWeights=2)[0]
     print "++++++++++++++++++ ", cls
