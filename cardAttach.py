@@ -34,4 +34,3 @@ def cardAttach():
 
 		#delete the closestPoint on mesh
 		cmds.delete(cpom)
-

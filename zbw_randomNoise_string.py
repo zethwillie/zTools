@@ -12,24 +12,41 @@ def isrUI(*args):
 
     widgets["win"] = cmds.window("irnWin", t="zbw_insertRandomNoise", w=225, h=100)
     widgets["CLO"] = cmds.columnLayout()
-    cmds.text("select the controls you want to add random\n motion to. This will add a group above \nand some attrs on the controls", al="left")
+    cmds.text(
+        "select the controls you want to add random\n motion to. This will add a group above \nand some attrs on the controls",
+        al="left")
     cmds.separator(h=10)
-    widgets["offsetCBG"] = cmds.checkBoxGrp(l="Offset randomize?", v1=True, cw=[(1, 125), (2, 50)], cal=[(1,"left"), (2,"left")], cc=partial(toggleOnOff, "offsetCBG", "offsetIFG"))
-    widgets["offsetIFG"] = cmds.intFieldGrp(l="Offset Min/Max:", numberOfFields=2, cw=[(1,125), (2,50),(3,50)], cal=[(1,"left"), (2,"left"), (3,"left")], v1=-200, v2=200)
-    widgets["speedCBG"] = cmds.checkBoxGrp(l="Offset randomize?", v1=True, cw=[(1, 125), (2, 50)], cal=[(1,"left"), (2,"left")], cc=partial(toggleOnOff, "speedCBG", "speedFFG"))
-    widgets["speedFFG"] = cmds.floatFieldGrp(l="Speed Min/Max:", numberOfFields=2, cw=[(1,125), (2,50),(3,50)], cal=[(1,"left"), (2,"left"), (3,"left")], v1=-2, v2=2, pre=2)
-    widgets["ampCBG"] = cmds.checkBoxGrp(l="Amplitude randomize?:", v1=True, cw=[(1, 125), (2, 50)], cal=[(1,"left"), (2,"left")], cc=partial(toggleOnOff, "ampCBG", "ampFFG"))
-    widgets["ampFFG"] = cmds.floatFieldGrp(l="Amplitude Min/Max", numberOfFields=2, cw=[(1,125), (2,50),(3,50)], cal=[(1,"left"), (2,"left"), (3,"left")], v1=.5, v2=1, pre=2)
-    widgets["noiseCBG"] = cmds.checkBoxGrp(l="Amplitude randomize?:", v1=True, cw=[(1, 125), (2, 50)], cal=[(1,"left"), (2,"left")], cc=partial(toggleOnOff, "noiseCBG", "noiseFFG"))
-    widgets["noiseFFG"] = cmds.floatFieldGrp(l="Noise Min/Max", numberOfFields=2, cw=[(1,125), (2,50),(3,50)], cal=[(1,"left"), (2,"left"), (3,"left")], v1=.5, v2=1, pre=2, cc=partial(limitFloatField, "noiseFFG"))    
-    widgets["freqCBG"] = cmds.checkBoxGrp(l="Noise Freq randomize?:", v1=True, cw=[(1, 125), (2, 50)], cal=[(1,"left"), (2,"left")], cc=partial(toggleOnOff, "freqCBG", "freqFFG"))
-    widgets["freqFFG"] = cmds.floatFieldGrp(l="Noise Freq Min/Max", numberOfFields=2, cw=[(1,125), (2,50),(3,50)], cal=[(1,"left"), (2,"left"), (3,"left")], v1=0, v2=.25, pre=2, cc=partial(limitFloatField, "freqFFG"))
+    widgets["offsetCBG"] = cmds.checkBoxGrp(l="Offset randomize?", v1=True, cw=[(1, 125), (2, 50)],
+                                            cal=[(1, "left"), (2, "left")],
+                                            cc=partial(toggleOnOff, "offsetCBG", "offsetIFG"))
+    widgets["offsetIFG"] = cmds.intFieldGrp(l="Offset Min/Max:", numberOfFields=2, cw=[(1, 125), (2, 50), (3, 50)],
+                                            cal=[(1, "left"), (2, "left"), (3, "left")], v1=-200, v2=200)
+    widgets["speedCBG"] = cmds.checkBoxGrp(l="Offset randomize?", v1=True, cw=[(1, 125), (2, 50)],
+                                           cal=[(1, "left"), (2, "left")],
+                                           cc=partial(toggleOnOff, "speedCBG", "speedFFG"))
+    widgets["speedFFG"] = cmds.floatFieldGrp(l="Speed Min/Max:", numberOfFields=2, cw=[(1, 125), (2, 50), (3, 50)],
+                                             cal=[(1, "left"), (2, "left"), (3, "left")], v1=-2, v2=2, pre=2)
+    widgets["ampCBG"] = cmds.checkBoxGrp(l="Amplitude randomize?:", v1=True, cw=[(1, 125), (2, 50)],
+                                         cal=[(1, "left"), (2, "left")], cc=partial(toggleOnOff, "ampCBG", "ampFFG"))
+    widgets["ampFFG"] = cmds.floatFieldGrp(l="Amplitude Min/Max", numberOfFields=2, cw=[(1, 125), (2, 50), (3, 50)],
+                                           cal=[(1, "left"), (2, "left"), (3, "left")], v1=.5, v2=1, pre=2)
+    widgets["noiseCBG"] = cmds.checkBoxGrp(l="Amplitude randomize?:", v1=True, cw=[(1, 125), (2, 50)],
+                                           cal=[(1, "left"), (2, "left")],
+                                           cc=partial(toggleOnOff, "noiseCBG", "noiseFFG"))
+    widgets["noiseFFG"] = cmds.floatFieldGrp(l="Noise Min/Max", numberOfFields=2, cw=[(1, 125), (2, 50), (3, 50)],
+                                             cal=[(1, "left"), (2, "left"), (3, "left")], v1=.5, v2=1, pre=2,
+                                             cc=partial(limitFloatField, "noiseFFG"))
+    widgets["freqCBG"] = cmds.checkBoxGrp(l="Noise Freq randomize?:", v1=True, cw=[(1, 125), (2, 50)],
+                                          cal=[(1, "left"), (2, "left")], cc=partial(toggleOnOff, "freqCBG", "freqFFG"))
+    widgets["freqFFG"] = cmds.floatFieldGrp(l="Noise Freq Min/Max", numberOfFields=2, cw=[(1, 125), (2, 50), (3, 50)],
+                                            cal=[(1, "left"), (2, "left"), (3, "left")], v1=0, v2=.25, pre=2,
+                                            cc=partial(limitFloatField, "freqFFG"))
     cmds.separator(h=5)
 
 #---------------- NOW JUST NEED TO SET THESE ATTRS AT THE END BASED ON RANDOM VALUE VS. DEFAULT (MOSTLY ZERO)
-    
+
     cmds.separator(h=10)
-    
+
     widgets["but"] = cmds.button(l="add to selected control", w=225, h=40, bgc=(.5, .7, .5), c=irnDo)
 
     cmds.window(widgets["win"], e=True, wh=(5,5),rtf=True)
