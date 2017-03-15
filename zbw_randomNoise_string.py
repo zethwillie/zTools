@@ -4,49 +4,28 @@ import random
 
 widgets = {}
 
-#---------------- create message attr to link to ramp
-
 def isrUI(*args):
     if cmds.window("irnWin", exists=True):
         cmds.deleteUI("irnWin")
 
     widgets["win"] = cmds.window("irnWin", t="zbw_insertRandomNoise", w=225, h=100)
     widgets["CLO"] = cmds.columnLayout()
-    cmds.text(
-        "select the controls you want to add random\n motion to. This will add a group above \nand some attrs on the controls",
-        al="left")
+    cmds.text("select the controls you want to add random\n motion to. This will add a group above \nand some attrs on the controls", al="left")
     cmds.separator(h=10)
-    widgets["offsetCBG"] = cmds.checkBoxGrp(l="Offset randomize?", v1=True, cw=[(1, 125), (2, 50)],
-                                            cal=[(1, "left"), (2, "left")],
-                                            cc=partial(toggleOnOff, "offsetCBG", "offsetIFG"))
-    widgets["offsetIFG"] = cmds.intFieldGrp(l="Offset Min/Max:", numberOfFields=2, cw=[(1, 125), (2, 50), (3, 50)],
-                                            cal=[(1, "left"), (2, "left"), (3, "left")], v1=-200, v2=200)
-    widgets["speedCBG"] = cmds.checkBoxGrp(l="Offset randomize?", v1=True, cw=[(1, 125), (2, 50)],
-                                           cal=[(1, "left"), (2, "left")],
-                                           cc=partial(toggleOnOff, "speedCBG", "speedFFG"))
-    widgets["speedFFG"] = cmds.floatFieldGrp(l="Speed Min/Max:", numberOfFields=2, cw=[(1, 125), (2, 50), (3, 50)],
-                                             cal=[(1, "left"), (2, "left"), (3, "left")], v1=-2, v2=2, pre=2)
-    widgets["ampCBG"] = cmds.checkBoxGrp(l="Amplitude randomize?:", v1=True, cw=[(1, 125), (2, 50)],
-                                         cal=[(1, "left"), (2, "left")], cc=partial(toggleOnOff, "ampCBG", "ampFFG"))
-    widgets["ampFFG"] = cmds.floatFieldGrp(l="Amplitude Min/Max", numberOfFields=2, cw=[(1, 125), (2, 50), (3, 50)],
-                                           cal=[(1, "left"), (2, "left"), (3, "left")], v1=.5, v2=1, pre=2)
-    widgets["noiseCBG"] = cmds.checkBoxGrp(l="Amplitude randomize?:", v1=True, cw=[(1, 125), (2, 50)],
-                                           cal=[(1, "left"), (2, "left")],
-                                           cc=partial(toggleOnOff, "noiseCBG", "noiseFFG"))
-    widgets["noiseFFG"] = cmds.floatFieldGrp(l="Noise Min/Max", numberOfFields=2, cw=[(1, 125), (2, 50), (3, 50)],
-                                             cal=[(1, "left"), (2, "left"), (3, "left")], v1=.5, v2=1, pre=2,
-                                             cc=partial(limitFloatField, "noiseFFG"))
-    widgets["freqCBG"] = cmds.checkBoxGrp(l="Noise Freq randomize?:", v1=True, cw=[(1, 125), (2, 50)],
-                                          cal=[(1, "left"), (2, "left")], cc=partial(toggleOnOff, "freqCBG", "freqFFG"))
-    widgets["freqFFG"] = cmds.floatFieldGrp(l="Noise Freq Min/Max", numberOfFields=2, cw=[(1, 125), (2, 50), (3, 50)],
-                                            cal=[(1, "left"), (2, "left"), (3, "left")], v1=0, v2=.25, pre=2,
-                                            cc=partial(limitFloatField, "freqFFG"))
+    widgets["offsetCBG"] = cmds.checkBoxGrp(l="Offset randomize?", v1=True, cw=[(1, 125), (2, 50)], cal=[(1,"left"), (2,"left")], cc=partial(toggleOnOff, "offsetCBG", "offsetIFG"))
+    widgets["offsetIFG"] = cmds.intFieldGrp(l="Offset Min/Max:", numberOfFields=2, cw=[(1,125), (2,50),(3,50)], cal=[(1,"left"), (2,"left"), (3,"left")], v1=-200, v2=200)
+    widgets["speedCBG"] = cmds.checkBoxGrp(l="Speed randomize?", v1=True, cw=[(1, 125), (2, 50)], cal=[(1,"left"), (2,"left")], cc=partial(toggleOnOff, "speedCBG", "speedFFG"))
+    widgets["speedFFG"] = cmds.floatFieldGrp(l="Speed Min/Max:", numberOfFields=2, cw=[(1,125), (2,50),(3,50)], cal=[(1,"left"), (2,"left"), (3,"left")], v1=-2, v2=2, pre=2, cc=partial(limitFloatField, "speedFFG", -10, 10))
+    widgets["ampCBG"] = cmds.checkBoxGrp(l="Amplitude randomize?:", v1=True, cw=[(1, 125), (2, 50)], cal=[(1,"left"), (2,"left")], cc=partial(toggleOnOff, "ampCBG", "ampFFG"))
+    widgets["ampFFG"] = cmds.floatFieldGrp(l="Amplitude Min/Max", numberOfFields=2, cw=[(1,125), (2,50),(3,50)], cal=[(1,"left"), (2,"left"), (3,"left")], v1=.5, v2=1.5, pre=2, cc=partial(limitFloatField, "ampFFG", -10, 10))
+    widgets["noiseCBG"] = cmds.checkBoxGrp(l="Noise randomize?:", v1=True, cw=[(1, 125), (2, 50)], cal=[(1,"left"), (2,"left")], cc=partial(toggleOnOff, "noiseCBG", "noiseFFG"))
+    widgets["noiseFFG"] = cmds.floatFieldGrp(l="Noise Min/Max", numberOfFields=2, cw=[(1,125), (2,50),(3,50)], cal=[(1,"left"), (2,"left"), (3,"left")], v1=.1, v2=.3, pre=2, cc=partial(limitFloatField, "noiseFFG", 0, 1))    
+    widgets["freqCBG"] = cmds.checkBoxGrp(l="Noise Freq randomize?:", v1=True, cw=[(1, 125), (2, 50)], cal=[(1,"left"), (2,"left")], cc=partial(toggleOnOff, "freqCBG", "freqFFG"))
+    widgets["freqFFG"] = cmds.floatFieldGrp(l="Noise Freq Min/Max", numberOfFields=2, cw=[(1,125), (2,50),(3,50)], cal=[(1,"left"), (2,"left"), (3,"left")], v1=0, v2=.25, pre=2, cc=partial(limitFloatField, "freqFFG", 0, 1))
     cmds.separator(h=5)
 
-#---------------- NOW JUST NEED TO SET THESE ATTRS AT THE END BASED ON RANDOM VALUE VS. DEFAULT (MOSTLY ZERO)
-
     cmds.separator(h=10)
-
+    
     widgets["but"] = cmds.button(l="add to selected control", w=225, h=40, bgc=(.5, .7, .5), c=irnDo)
 
     cmds.window(widgets["win"], e=True, wh=(5,5),rtf=True)
@@ -72,38 +51,44 @@ def limitSingle(ffg, *args):
     cmds.floatFieldGrp(widg, e=True, v1=v1)
 
 
-def limitFloatField(ffg, *args):
+def limitFloatField(ffg, mn, mx, *args):
     widg = widgets[ffg]
     v1 = cmds.floatFieldGrp(widg, q=True, v1=True)
     v2 = cmds.floatFieldGrp(widg, q=True, v2=True)
 
-    if v1<0:
-        v1 = 0
-    if v1>1:
-        v1=1
-    if v2<0:
-        v2=0
-    if v2>1:
-        v2=1
+    if v1 < mn:
+        v1 = mn
+    if v1 > mx:
+        v1 = mx
+    if v2 < mn:
+        v2 = mn
+    if v2 > mx:
+        v2 = mx
 
     cmds.floatFieldGrp(widg, e=True, v1=v1)
     cmds.floatFieldGrp(widg, e=True, v2=v2)
 
 
+def getFFG(ffg, val, *args):
+    if val == 1:
+        return(cmds.floatFieldGrp(widgets[ffg], q=True, v1=True))
+    if val == 2:
+        return(cmds.floatFieldGrp(widgets[ffg], q=True, v2=True))
+
+
 def irnDo(*args):
     sel = cmds.ls(sl=True, type="transform")
 
-    minx = cmds.floatFieldGrp(widgets["rFFG"], q=True, v1=True)
-    maxx = cmds.floatFieldGrp(widgets["rFFG"], q=True, v2=True)
-    miny = cmds.floatFieldGrp(widgets["gFFG"], q=True, v1=True)
-    maxy = cmds.floatFieldGrp(widgets["gFFG"], q=True, v2=True)
-    minz = cmds.floatFieldGrp(widgets["bFFG"], q=True, v1=True)
-    maxz = cmds.floatFieldGrp(widgets["bFFG"], q=True, v2=True)
-
-    minNoise = cmds.floatFieldGrp(widgets["noiseFFG"], q=True, v1=True)
-    maxNoise = cmds.floatFieldGrp(widgets["noiseFFG"], q=True, v2=True)
-    minFreq = cmds.floatFieldGrp(widgets["freqFFG"], q=True, v1=True)
-    maxFreq = cmds.floatFieldGrp(widgets["freqFFG"], q=True, v2=True)
+    offMin = cmds.intFieldGrp(widgets["offsetIFG"], q=True, v1=True)
+    offMax = cmds.intFieldGrp(widgets["offsetIFG"], q=True, v2=True)
+    speedMin = getFFG("speedFFG", 1)
+    speedMax = getFFG("speedFFG", 2)
+    ampMin = getFFG("ampFFG", 1)
+    ampMax = getFFG("ampFFG", 2)
+    noiseMin = getFFG("noiseFFG", 1)
+    noiseMax = getFFG("noiseFFG", 2)
+    freqMin = getFFG("freqFFG", 1)
+    freqMax = getFFG("freqFFG", 2)
 
     if not sel:
         return()
@@ -138,7 +123,7 @@ def irnDo(*args):
         rampZ = cmds.shadingNode("ramp", asTexture=True, name="{0}_rampY".format(obj))
         for ramp in [rampX, rampY, rampZ]:
             cmds.setAttr("{0}.type".format(ramp), 0)
-            cmds.setAttr("{0}.interpolation".format(ramp), 1)
+            cmds.setAttr("{0}.interpolation".format(ramp), 4)
 
             colorDict = {}
 
@@ -165,9 +150,12 @@ def irnDo(*args):
         usrAmpMult = cmds.shadingNode("multiplyDivide", asUtility=True, name="{0}_ampMult".format(obj))
         cmds.connectAttr("{0}.outValue".format(setR), "{0}.input1".format(usrAmpMult))
 
+        envelopeMult = cmds.shadingNode("multiplyDivide", asUtility=True, name="{0}_envelope".format(obj))
+        cmds.connectAttr("{0}.output".format(usrAmpMult), "{0}.input1".format(envelopeMult))
 
         cmds.addAttr(obj, ln="randomMotionCtrls", at="enum", k=True, en="------")
         cmds.setAttr("{0}.randomMotionCtrls".format(obj), l=True)
+        cmds.addAttr(obj, ln="envelope", at="float", min=0, max=1, dv=1, k=True)
         cmds.addAttr(obj, ln="offsetFrameX", at="long", dv=0, k=True)
         cmds.addAttr(obj, ln="offsetFrameY", at="long", dv=0, k=True)
         cmds.addAttr(obj, ln="offsetFrameZ", at="long", dv=0, k=True)
@@ -186,15 +174,33 @@ def irnDo(*args):
         cmds.addAttr(obj, ln="rampTxt", at="message")
         
         # set some of the attributes on the obj
-        cmds.setAttr("{0}.noiseStrengthX".format(obj), rand(minNoise, maxNoise))
-        cmds.setAttr("{0}.noiseStrengthY".format(obj), rand(minNoise, maxNoise))
-        cmds.setAttr("{0}.noiseStrengthZ".format(obj), rand(minNoise, maxNoise))
-        cmds.setAttr("{0}.noiseFrequencyX".format(obj), rand(minFreq, maxFreq))
-        cmds.setAttr("{0}.noiseFrequencyY".format(obj), rand(minFreq, maxFreq))
-        cmds.setAttr("{0}.noiseFrequencyZ".format(obj), rand(minFreq, maxFreq))
+        if cmds.checkBoxGrp(widgets["offsetCBG"], q=True, v1=True):
+            cmds.setAttr("{0}.offsetFrameX".format(obj), rand(offMin, offMax))
+            cmds.setAttr("{0}.offsetFrameY".format(obj), rand(offMin, offMax))
+            cmds.setAttr("{0}.offsetFrameZ".format(obj), rand(offMin, offMax))            
+        if cmds.checkBoxGrp(widgets["speedCBG"], q=True, v1=True):
+            cmds.setAttr("{0}.motionSpeedX".format(obj), rand(speedMin, speedMax))
+            cmds.setAttr("{0}.motionSpeedY".format(obj), rand(speedMin, speedMax))
+            cmds.setAttr("{0}.motionSpeedZ".format(obj), rand(speedMin, speedMax))             
+        if cmds.checkBoxGrp(widgets["ampCBG"], q=True, v1=True):
+            cmds.setAttr("{0}.motionAmplitudeX".format(obj), rand(ampMin, ampMax))
+            cmds.setAttr("{0}.motionAmplitudeY".format(obj), rand(ampMin, ampMax))
+            cmds.setAttr("{0}.motionAmplitudeZ".format(obj), rand(ampMin, ampMax))             
+        if cmds.checkBoxGrp(widgets["noiseCBG"], q=True, v1=True):
+            cmds.setAttr("{0}.noiseStrengthX".format(obj), rand(noiseMin, noiseMax))
+            cmds.setAttr("{0}.noiseStrengthY".format(obj), rand(noiseMin, noiseMax))
+            cmds.setAttr("{0}.noiseStrengthZ".format(obj), rand(noiseMin, noiseMax))            
+        if cmds.checkBoxGrp(widgets["freqCBG"], q=True, v1=True):            
+            cmds.setAttr("{0}.noiseFrequencyX".format(obj), rand(freqMin, freqMax))
+            cmds.setAttr("{0}.noiseFrequencyY".format(obj), rand(freqMin, freqMax))
+            cmds.setAttr("{0}.noiseFrequencyZ".format(obj), rand(freqMin, freqMax))
+
 
         # add controls to selected obj, "motion(Speed)", "motionAmplitude"
         cmds.connectAttr("{0}.message".format(ramp), "{0}.rampTxt".format(obj))
+        cmds.connectAttr("{0}.envelope".format(obj), "{0}.input2X".format(envelopeMult))
+        cmds.connectAttr("{0}.envelope".format(obj), "{0}.input2Y".format(envelopeMult))
+        cmds.connectAttr("{0}.envelope".format(obj), "{0}.input2Z".format(envelopeMult))
         cmds.connectAttr("{0}.offsetFrameX".format(obj), "{0}.input2".format(offsetX))
         cmds.connectAttr("{0}.offsetFrameY".format(obj), "{0}.input2".format(offsetY))
         cmds.connectAttr("{0}.offsetFrameZ".format(obj), "{0}.input2".format(offsetZ))
@@ -211,7 +217,7 @@ def irnDo(*args):
         cmds.connectAttr("{0}.noiseFrequencyY".format(obj), "{0}.noiseFreq".format(rampY))
         cmds.connectAttr("{0}.noiseFrequencyZ".format(obj), "{0}.noiseFreq".format(rampZ))
 
-        cmds.connectAttr("{0}.output".format(usrAmpMult), "{0}.translate".format(grp))
+        cmds.connectAttr("{0}.output".format(envelopeMult), "{0}.translate".format(grp))
 
     cmds.select(sel, r=True)
 

@@ -60,6 +60,16 @@ def randomAttrsUI():
     widgets["floatTransBut"] = cmds.button(w=w, l="Randomize Float Attributes", h=35, bgc=(.4, .5, .4), c=randomizeFloats)
     cmds.separator(h=5)
 
+    cmds.setParent(widgets["mainCLO"])
+    widgets["multFrLO"] = cmds.frameLayout("Multiply Float Attributes", w=w, cll=True, cl=True, bgc=(0,0,0), cc=resizeWindow)
+    widgets["multCLO"] = cmds.columnLayout()
+    cmds.text("This will multiply float/int attributes\nselected in the channel box", al="left")
+    cmds.separator(h=10)
+    widgets["multFFG"] = cmds.floatFieldGrp(w=w, l="Multiplier", nf=1, cl2=["left", "left"], v1=1.0, cw2=[95, 70])
+    cmds.separator(h=10)
+    widgets["multBut"] = cmds.button(w=w, l="Multiply Attributes", h=35, bgc=(.4, .4, .5), c=multiplyFloats)
+    cmds.separator(h=5)
+
     resizeWindow()
     cmds.showWindow(widgets["win"])
 
@@ -181,14 +191,30 @@ def randomizeFloats(*args):
                 cmds.setAttr("{0}.{1}".format(obj, attr), newVal)
 
 
+def multiplyFloats(*args):
+    sel = cmds.ls(sl=True)
+    attrs = getChannels()
+
+    mult = cmds.floatFieldGrp(widgets["multFFG"], q=True, v1=True)
+
+    for obj in sel:
+        for attr in attrs:
+            if (cmds.attributeQuery(attr, node=obj, exists=True)):
+                current = cmds.getAttr("{0}.{1}".format(obj, attr))
+                newVal = current * mult
+                cmds.setAttr("{0}.{1}".format(obj, attr), newVal)
+
+
 def getChannels(*args):
     cBox = mel.eval('$temp=$gChannelBoxName')
     cAttrs = cmds.channelBox(cBox, q=True, selectedMainAttributes=True, ssa=True, sha=True, soa=True)
     return cAttrs
 
+
 def getRandomFloat(low, high):
     x = rand.uniform(low, high)
     return x
+
 
 def randomAttrs(*args):
     randomAttrsUI()
