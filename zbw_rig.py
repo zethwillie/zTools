@@ -1,10 +1,10 @@
 ########################
-#file: zbw_rig.py
-#author: zeth willie
-#contact: zeth@catbuks.com, www.williework.blogspot.com
-#date modified: 09/23/12
-#
-#notes: helper scripts for rigging
+# File: zbw_rig.py
+# Date Modified: 16 Mar 2017
+# creator: Zeth Willie
+# Contact: zethwillie@gmail.com, catbuks.com, williework.blogspot.com
+# Description: helper functions for rigging
+# To Run: type "import zTools.zbw_rig as zbw_rig; reload(zbw_rig);zbw_rig.zbw_rig()"
 ########################
 
 import maya.cmds as cmds
@@ -357,6 +357,7 @@ def groupOrient(target='none',orig='none', group="GRP"):
 
     return(grpName)
 
+
 def stripToRotate(first="none", *args):
     attrs = ["tx", "ty", "tz", "sx", "sy", "sz", "visibility"]
     objs = []
@@ -372,6 +373,7 @@ def stripToRotate(first="none", *args):
         for attr in attrs:
             objAttr = me + "." + attr
             cmds.setAttr(objAttr, lock=True, k=False)
+
 
 def stripToTranslate(first="none", *args):
     """strips for all selected or entered as args, sets all attrs but translate to locked and hidden"""
@@ -390,6 +392,7 @@ def stripToTranslate(first="none", *args):
             objAttr = me + "." + attr
             cmds.setAttr(objAttr, lock=True, k=False)
 
+
 def stripToRotateTranslate(first="none", *args):
     """strips for all selected or entered as args, sets all attrs but translate to locked and hidden"""
     attrs = ["sx", "sy", "sz", "visibility"]
@@ -406,6 +409,7 @@ def stripToRotateTranslate(first="none", *args):
         for attr in attrs:
             objAttr = me + "." + attr
             cmds.setAttr(objAttr, lock=True, k=False)
+
 
 def lockTranslate(first="none", *args):
     attrs = ["tx", "ty", "tz"]
@@ -870,7 +874,12 @@ def isType(obj, typeCheck, *args):
 
 
 def snapTo(target, obj):
-
+    """
+    snaps position and rotation of obj to target
+    :param target: string
+    :param obj: string
+    :return:
+    """
     pos = cmds.xform(target, q=True, ws=True, rp=True)
     rot = cmds.xform(target, q=True, ws=True, ro=True)
 
@@ -910,9 +919,10 @@ def swapDupe(obj, target, delete = True, name="", *args):
 
     return(dupe[0])
 
+
 def positionsAlongCurve(crv="", numPts = 3, *args):
     """
-    returns list of numPts evenly distributed world positions along given nurbs crv
+    returns list (length=numPts) of evenly distributed world positions along given nurbs crv
     """
     if not crv:
         return
@@ -951,7 +961,6 @@ def rebuildCurve(curve="", num=5, keep=False, ch=False, name="", *args):
     Returns:
         string: the name of the created curves (could be same as original!)
     """
-
     newCurve = ""
     if curve:
         if isType(curve, "nurbsCurve"):
@@ -1006,12 +1015,12 @@ def groupFreeze(obj="", *arg):
     Returns:
         string: returns the new group
     """
-
     grp = cmds.group(empty=True, name="{0}_GRP".format(obj))
     snapTo(obj, grp)
     cmds.parent(obj, grp)
 
     return(grp)
+
 
 def connectTransforms(source="", target = "", t=True, r=True, s=True, *args):
     """
@@ -1048,8 +1057,6 @@ def insertGroupAbove(obj, *args):
     
     grp = cmds.group(em=True, n="{}_Grp".format(obj))
     
-    # grp = nameCheck(grp)
-
     pos = cmds.xform(obj, q=True, ws=True, rp=True)
     rot = cmds.xform(obj, q=True, ws=True, ro=True)
     
@@ -1069,7 +1076,6 @@ def boundingBoxCtrl(sel=[], prnt=True, *args):
     selList (list) - list of obj to use to create control
     prnt (bool) - whether you want to parent the obj to the ctrl
     """
-
     if not sel:
         sel = cmds.ls(sl=True, type="transform")
 
@@ -1133,6 +1139,7 @@ def scaleNurbsCtrl(ctrl=None, x=1, y=1, z=1, *args):
     piv = cmds.xform(ctrl, q=True, ws=True, rp=True)
     cvs = cmds.ls("{0}.cv[*]".format(ctrl), fl=True)
     cmds.scale(x, y, z, cvs, pivot=piv)
+
 
 def assignColor(obj=None, clr="yellow", *args):
     
