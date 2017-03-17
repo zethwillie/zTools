@@ -12,7 +12,6 @@ import zTools.zbw_rig as rig
 
 widgets = {}
 
-
 def shapeScaleUI():
     """
     UI for the script
