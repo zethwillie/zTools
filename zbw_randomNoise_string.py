@@ -109,14 +109,17 @@ def irnDo(*args):
         offsetZ = cmds.shadingNode("addDoubleLinear", asUtility=True, name="{0}_animOffsetZ_add".format(obj))
         cmds.connectAttr("{0}.output".format(anim), "{0}.input1".format(offsetZ))
 
-        rawSpeedMult = cmds.shadingNode("multiplyDivide", asUtility=True, name="{0}_spdMult".format(obj))
+        rawSpeedMult = cmds.shadingNode("multiplyDivide", asUtility=True, name="{0}_rawSpdMult".format(obj))
         cmds.setAttr("{0}.input1".format(rawSpeedMult), .002, 0.002, 0.002)
         cmds.connectAttr("{0}.output".format(offsetX), "{0}.input2X".format(rawSpeedMult))
         cmds.connectAttr("{0}.output".format(offsetY), "{0}.input2Y".format(rawSpeedMult))
         cmds.connectAttr("{0}.output".format(offsetZ), "{0}.input2Z".format(rawSpeedMult))
 
+        mstrSpeedMult = cmds.shadingNode("multiplyDivide", asUtility=True, name="{0}_mstrSpdMult".format(obj))
+        cmds.connectAttr("{0}.output".format(rawSpeedMult), "{0}.input2".format(mstrSpeedMult))
+
         usrSpeedMult = cmds.shadingNode("multiplyDivide", asUtility=True, name="{0}_usrMult".format(obj))
-        cmds.connectAttr("{0}.output".format(rawSpeedMult), "{0}.input2".format(usrSpeedMult))
+        cmds.connectAttr("{0}.output".format(mstrSpeedMult), "{0}.input2".format(usrSpeedMult))
 
         rampX = cmds.shadingNode("ramp", asTexture=True, name="{0}_rampX".format(obj))
         rampY = cmds.shadingNode("ramp", asTexture=True, name="{0}_rampZ".format(obj))
@@ -155,7 +158,8 @@ def irnDo(*args):
 
         cmds.addAttr(obj, ln="randomMotionCtrls", at="enum", k=True, en="------")
         cmds.setAttr("{0}.randomMotionCtrls".format(obj), l=True)
-        cmds.addAttr(obj, ln="envelope", at="float", min=0, max=1, dv=1, k=True)
+        cmds.addAttr(obj, ln="masterAmp", at="float", min=0, max=1, dv=1, k=True)
+        cmds.addAttr(obj, ln="masterSpeed", at="float", min=0, max=1, dv=1, k=True)
         cmds.addAttr(obj, ln="offsetFrameX", at="long", dv=0, k=True)
         cmds.addAttr(obj, ln="offsetFrameY", at="long", dv=0, k=True)
         cmds.addAttr(obj, ln="offsetFrameZ", at="long", dv=0, k=True)
@@ -198,9 +202,12 @@ def irnDo(*args):
 
         # add controls to selected obj, "motion(Speed)", "motionAmplitude"
         cmds.connectAttr("{0}.message".format(ramp), "{0}.rampTxt".format(obj))
-        cmds.connectAttr("{0}.envelope".format(obj), "{0}.input2X".format(envelopeMult))
-        cmds.connectAttr("{0}.envelope".format(obj), "{0}.input2Y".format(envelopeMult))
-        cmds.connectAttr("{0}.envelope".format(obj), "{0}.input2Z".format(envelopeMult))
+        cmds.connectAttr("{0}.masterAmp".format(obj), "{0}.input2X".format(envelopeMult))
+        cmds.connectAttr("{0}.masterAmp".format(obj), "{0}.input2Y".format(envelopeMult))
+        cmds.connectAttr("{0}.masterAmp".format(obj), "{0}.input2Z".format(envelopeMult))
+        cmds.connectAttr("{0}.masterSpeed".format(obj),"{0}.input1X".format(mstrSpeedMult))
+        cmds.connectAttr("{0}.masterSpeed".format(obj),"{0}.input1Y".format(mstrSpeedMult))
+        cmds.connectAttr("{0}.masterSpeed".format(obj),"{0}.input1Z".format(mstrSpeedMult))
         cmds.connectAttr("{0}.offsetFrameX".format(obj), "{0}.input2".format(offsetX))
         cmds.connectAttr("{0}.offsetFrameY".format(obj), "{0}.input2".format(offsetY))
         cmds.connectAttr("{0}.offsetFrameZ".format(obj), "{0}.input2".format(offsetZ))

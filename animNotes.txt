@@ -1,0 +1,33 @@
+anim stuff
+
+tween machine
+shape scale
+key all (beneath)
+tangents
+cleanKey
+animPushDown
+bakeSequence
+cam exporter
+randomAttrs
+transformBuffer
+randomSelection
+snap
+selectionCenterLoc
+softDeformers
+selectionBuffer
+shapeScale
+makeFollicle
+latticeFix (flowPath)
+morphAttr
+insertRandomNoise
+animNoise
+animShift
+audioManager
+dupeSwap
+huddle
+curveTools
+
+
+anim tools
+get frame range
+get list of keys:values
