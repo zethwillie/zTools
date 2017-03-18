@@ -1,3 +1,13 @@
+########################
+# File: zbw_jointsOnCurveSetup.py
+# Date Modified: 17 Mar 2017
+# creator: Zeth Willie
+# Contact: zethwillie@gmail.com, catbuks.com, williework.blogspot.com
+# Description: puts joints along a curve and binds them. Fine ctrls and large ctrls.
+# To Run: type "import zTools.zbw_jointsOnCurveSetup as zbw_jointsOnCurveSetup; reload(zbw_jointsOnCurveSetup);zbw_jointsOnCurveSetup.jointsOnCurveSetup()"
+########################
+
+
 import maya.cmds as cmds
 import maya.mel as mel
 import zTools.zbw_rig as rig
@@ -5,8 +15,8 @@ import zTools.zbw_rig as rig
 #---------------- first bind to a joint with post weighting
 #---------------- after all, then set initial joint to zero
 
-#---------------- clean up init joint stuff now that we're making it
 #---------------- ui should have the abil to change num of cv's per fine ctrl, and num of fine ctrls per large ctrl and weight all accordingly
+#================= need to orient the joints along the curve
 
 def create_ctrls():
     sel = cmds.ls(sl=True)[0]

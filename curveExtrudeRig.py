@@ -1,66 +1,81 @@
 import maya.cmds as cmds
 import zbw_rig as rig
+
 reload(rig)
 
-#---------------- length drives which file texture we use
+# ---------------- length drives which file texture we use
 
 widgets = {}
 
+
 def curveExtrudeUI():
-    if cmds.window("crvExtrRigWin", exists = True):
+    if cmds.window("crvExtrRigWin", exists=True):
         cmds.deleteUI("crvExtrRigWin")
 
     width = 300
     widgets["win"] = cmds.window("crvExtrRigWin", t="curveExtrudeRig", w=width, sizeable=True, resizeToFitChildren=True)
     widgets["CLO"] = cmds.columnLayout()
 
-#---------------- cap rig should be optional
+    # ---------------- cap rig should be optional
     ##### extrude ########
-    widgets["extrudeFLO"] = cmds.frameLayout("1. Extrude Curve", w=300, cll=True, cl=False, bgc=(0,0,0), cc=resizeWindow)
-    widgets["extrCLO"] = cmds.columnLayout()    
-    cmds.text(l = "select the profile curve, cap rig, and curves to\nhook up in that order!\nWARNING: This won't undo cleanly so use 'deleteRig'\nbelow!", al="left")
-    widgets["recoIFBG"] = cmds.intFieldGrp(l="Points/Unit:", nf = 1, cal = [(1, "left"), (2, "left")], v1= .1, en = False, cw=[(1, 70), (2, 50)])
-    widgets["ctrlFFG"] = cmds.floatFieldGrp(l="Control Size (units)", nf=1, cal = [(1, "left"), (2, "left")], v1=2, cw=[(1, 100), (2, 50)])
-    #widgets["keepCBG"] = cmds.checkBoxGrp(l="keep originals?", v1 = True, cal=[(1, "left"), (2, "left")], cw=[(1, 70), (2, 40)])
-    widgets["rebuildBut"] = cmds.button(l="Build Rigs!", w = 300, h=35, bgc = (.5, .4, .4), c = extrude)
+    widgets["extrudeFLO"] = cmds.frameLayout("1. Extrude Curve", w=300, cll=True, cl=False, bgc=(0, 0, 0),
+                                             cc=resizeWindow)
+    widgets["extrCLO"] = cmds.columnLayout()
+    cmds.text(
+        l="select the profile curve, cap rig, and curves to\nhook up in that order!\nWARNING: This won't undo cleanly so use 'deleteRig'\nbelow!",
+        al="left")
+    widgets["recoIFBG"] = cmds.intFieldGrp(l="Points/Unit:", nf=1, cal=[(1, "left"), (2, "left")], v1=.1, en=False,
+                                           cw=[(1, 70), (2, 50)])
+    widgets["ctrlFFG"] = cmds.floatFieldGrp(l="Control Size (units)", nf=1, cal=[(1, "left"), (2, "left")], v1=2,
+                                            cw=[(1, 100), (2, 50)])
+    # widgets["keepCBG"] = cmds.checkBoxGrp(l="keep originals?", v1 = True, cal=[(1, "left"), (2, "left")], cw=[(1, 70), (2, 40)])
+    widgets["rebuildBut"] = cmds.button(l="Build Rigs!", w=300, h=35, bgc=(.5, .4, .4), c=extrude)
     cmds.separator(h=10)
     cmds.text("To delete a rig(s), select ctrl(s) and click below")
-    widgets["deleteBut"] = cmds.button(l="Delete Rigs!", w= 300, h=25, bgc =(.3, .2, .2), c=deleteRig)
+    widgets["deleteBut"] = cmds.button(l="Delete Rigs!", w=300, h=25, bgc=(.3, .2, .2), c=deleteRig)
     cmds.separator(h=10)
 
     ###### create textures #########
     cmds.setParent(widgets["CLO"])
-    widgets["textureFLO"] = cmds.frameLayout("2. Create Textures and Switch", w=300, cll=True, cl=True, bgc=(0,0,0), cc=resizeWindow)
+    widgets["textureFLO"] = cmds.frameLayout("2. Create Textures and Switch", w=300, cll=True, cl=True, bgc=(0, 0, 0),
+                                             cc=resizeWindow)
     widgets["textCLO"] = cmds.columnLayout()
-    cmds.text(l="Select the shader node THEN shift select all curve ctrls,\nThis will assign the shader and create a txt node for each\nand create a 3switch, then connect ctl 'rptHolder' to place2d's", al="left")
+    cmds.text(
+        l="Select the shader node THEN shift select all curve ctrls,\nThis will assign the shader and create a txt node for each\nand create a 3switch, then connect ctl 'rptHolder' to place2d's",
+        al="left")
     cmds.separator(h=10)
-    widgets["textBut"] = cmds.button(l="Create shader connections!", w=300, h=35, bgc=(.3,.5,.4), c=texture)    
+    widgets["textBut"] = cmds.button(l="Create shader connections!", w=300, h=35, bgc=(.3, .5, .4), c=texture)
 
     ####### fill file textures ######
     cmds.setParent(widgets["CLO"])
-    widgets["fileFLO"] = cmds.frameLayout("3. Replace File Textures", w=300, cll=True, cl=True, bgc=(0,0,0), cc=resizeWindow)
+    widgets["fileFLO"] = cmds.frameLayout("3. Replace File Textures", w=300, cll=True, cl=True, bgc=(0, 0, 0),
+                                          cc=resizeWindow)
     widgets["fileCLO"] = cmds.columnLayout()
-#---------------- option to select from file instead of just from existing, change UI and function
-    #widgets["fileRBG"] = cmds.radioButtonGrp(l="Where from?", nrb=2, sl=1, l1="existing txtr", l2="explore", cal=[(1, "left"),(2, "left"),(3, "left")], cw=[(1, 70), (2, 60),(3, 50)], cc=toggleFile)
-    #cmds.separator(h=10)
+    # ---------------- option to select from file instead of just from existing, change UI and function
+    # widgets["fileRBG"] = cmds.radioButtonGrp(l="Where from?", nrb=2, sl=1, l1="existing txtr", l2="explore", cal=[(1, "left"),(2, "left"),(3, "left")], cw=[(1, 70), (2, 60),(3, 50)], cc=toggleFile)
+    # cmds.separator(h=10)
     # widgets["fileFile"] = cmds.text(l="Select file from right side and then ctrl objs")
     # cmds.separator(h=10)
-    widgets["selFile"] = cmds.text(l="Will populate the file nodes on textures.\nSelect a 'file' node with the correct file\n and then ctrl objs for curves", al="left")
+    widgets["selFile"] = cmds.text(
+        l="Will populate the file nodes on textures.\nSelect a 'file' node with the correct file\n and then ctrl objs for curves",
+        al="left")
     cmds.separator(h=10)
-    widgets["fileBut"] = cmds.button(l="Populate connections!", w=300, h=35, bgc=(.5,.5,.4), c=fileLoad)    
+    widgets["fileBut"] = cmds.button(l="Populate connections!", w=300, h=35, bgc=(.5, .5, .4), c=fileLoad)
 
     ####### replace caps ######
     cmds.setParent(widgets["CLO"])
-    widgets["capFLO"] = cmds.frameLayout("4. Replace cap rigs", w=300, cll=True, cl=True, bgc=(0,0,0), cc=resizeWindow)
+    widgets["capFLO"] = cmds.frameLayout("4. Replace cap rigs", w=300, cll=True, cl=True, bgc=(0, 0, 0),
+                                         cc=resizeWindow)
     widgets["capCLO"] = cmds.columnLayout()
     widgets["capText"] = cmds.text(l="Select the cap replacement obj, then ctrl objs\nfor curves. ", al="left")
     cmds.separator(h=10)
-    widgets["capBut"] = cmds.button(l="Replace caps!", w=300, h=35, bgc=(.4,.5,.5), c=capReplace)
+    widgets["capBut"] = cmds.button(l="Replace caps!", w=300, h=35, bgc=(.4, .5, .5), c=capReplace)
     cmds.separator(h=10)
-    widgets["baseCapBut"] = cmds.button(l="Add Base Caps!", w=300, h=35, bgc=(.5,.4,.5), c=addBaseCap)  
+    widgets["baseCapBut"] = cmds.button(l="Add Base Caps!", w=300, h=35, bgc=(.5, .4, .5), c=addBaseCap)
 
     cmds.showWindow(widgets["win"])
     resizeWindow()
+
 
 def resizeWindow(*args):
     cmds.window(widgets["win"], e=True, rtf=True, w=100, h=100)
@@ -75,19 +90,19 @@ def toggleFile(*args):
 
 def curveCheck(obj):
     """ takes object and returns true if it's a curve"""
-    shpList = cmds.listRelatives(obj, shapes = True)
+    shpList = cmds.listRelatives(obj, shapes=True)
     if (not shpList) or (cmds.objectType(shpList[0]) != "nurbsCurve"):
         return False
     else:
         return True
 
+
 def extrude(*args):
+    sel = cmds.ls(sl=True, exactType="transform")
 
-    sel = cmds.ls(sl=True, exactType = "transform")
+    # keep = cmds.checkBoxGrp(widgets["keepCBG"], q=True, v1=True)
 
-    #keep = cmds.checkBoxGrp(widgets["keepCBG"], q=True, v1=True)
-
-    if len(sel)<3:
+    if len(sel) < 3:
         cmds.warning("You need to select the profile, then cap, then path curve in order!")
         return
 
@@ -104,15 +119,15 @@ def extrude(*args):
         return
 
     if not cmds.objExists("curveRebuild_originals_grp"):
-        cmds.group(empty=True, name = "curveRebuild_originals_grp")
+        cmds.group(empty=True, name="curveRebuild_originals_grp")
 
     # do some checks for parenting
     tempPList = [profileOrig, cap, "curveRebuild_originals_grp"]
     for n in tempPList:
-        par = rig.parentCheck(n) 
+        par = rig.parentCheck(n)
         if par != "pastaRigSetupComponents_Grp":
-                cmds.parent(n, "pastaRigSetupComponents_Grp")
-    
+            cmds.parent(n, "pastaRigSetupComponents_Grp")
+
     for curve in curves:
         if not curveCheck(curve):
             cmds.warning("{0} is not a curve, skipping!".format(curve))
@@ -141,13 +156,13 @@ def extrude(*args):
             deadGrp = cmds.group(empty=True, name="{0}_noInherit_grp".format(curve))
 
             cmds.parent(deadGrp, ctrl)
-            #cmds.parent(ctrl, rigGrp)
+            # cmds.parent(ctrl, rigGrp)
             cmds.parent(newCap, capGrp)
 
             # add attrs to control
             cmds.addAttr(ctrl, ln="__mainCtrls__", nn="__mainCtrls__", at="bool", k=True)
             cmds.setAttr("{0}.__mainCtrls__".format(ctrl), l=True)
-            cmds.addAttr(ctrl, ln="alongPath", at="float", min=0, max=100, k=True, dv=100.0)    
+            cmds.addAttr(ctrl, ln="alongPath", at="float", min=0, max=100, k=True, dv=100.0)
             cmds.setAttr("{0}.alongPath".format(ctrl), 100)
             cmds.addAttr(ctrl, ln="geoVis", at="long", min=0, max=1, k=True, dv=1)
             cmds.addAttr(ctrl, ln="pathCurveVis", at="long", min=0, max=1, k=True, dv=1)
@@ -156,12 +171,12 @@ def extrude(*args):
             cmds.addAttr(ctrl, ln="__curveStuff__", nn="__curveStuff__", at="bool", k=True)
             cmds.setAttr("{0}.__curveStuff__".format(ctrl), l=True)
             cmds.addAttr(ctrl, ln="density", at="float", min=0.02, max=30, k=True, dv=0.1)
-            cmds.addAttr(ctrl, ln="radiusDivisions", at="float", k=True, min=1, max=3, dv=1.0)      
+            cmds.addAttr(ctrl, ln="radiusDivisions", at="float", k=True, min=1, max=3, dv=1.0)
             cmds.addAttr(ctrl, ln="reverseNormals", at="long", min=0, max=1, k=True)
             cmds.addAttr(ctrl, ln="offsetCap", at="float", k=True, dv=0.0, min=-1.0, max=1.0)
 
-            cmds.addAttr(ctrl, ln="profileWidth", at="float", k=True, min=.001, max=3.0, dv=1.0)    
-            cmds.addAttr(ctrl, ln="capWidth", at="float", k=True, min=.001, max=3.0, dv=1.0)    
+            cmds.addAttr(ctrl, ln="profileWidth", at="float", k=True, min=.001, max=3.0, dv=1.0)
+            cmds.addAttr(ctrl, ln="capWidth", at="float", k=True, min=.001, max=3.0, dv=1.0)
             cmds.addAttr(ctrl, ln="baseCapWidth", at="float", k=True, dv=1, min=.001, max=3.0)
             cmds.addAttr(ctrl, ln="capHeight", at="float", k=True, min=.01, max=2.0, dv=1.0)
             cmds.addAttr(ctrl, ln="baseCapHeight", at="float", k=True, dv=1, min=0, max=3.0)
@@ -171,7 +186,7 @@ def extrude(*args):
 
             cmds.addAttr(ctrl, ln="__textureAndRef__", nn="__textureAndRef__", at="bool", k=True)
             cmds.setAttr("{0}.__textureAndRef__".format(ctrl), l=True)
-            cmds.addAttr(ctrl, ln="textureRepeatMult", at="float", min = 0.01, dv= 1.0, k=True) 
+            cmds.addAttr(ctrl, ln="textureRepeatMult", at="float", min=0.01, dv=1.0, k=True)
             # cmds.addAttr(ctrl, ln="textureRepeatU", at="float", min = 0.01, max =10,dv=1, k=True)
             # cmds.addAttr(obj, ln="offsetU", at="float", min=0, max=1, dv=0, k=True)
             # cmds.addAttr(obj, ln="offsetV", at="float", min=0, max=1, dv=0, k=True)
@@ -198,7 +213,7 @@ def extrude(*args):
             # reference/driver attrs
             cmds.addAttr(ctrl, ln="prmHolder", at="float", k=True)
             cmds.addAttr(ctrl, ln="rptHolder", at="float", k=True)
-            #cmds.setAttr("{0}.radiusDivisions".format(ctrl), l=True)           
+            # cmds.setAttr("{0}.radiusDivisions".format(ctrl), l=True)
 
             # connect mult to path
             mult = cmds.shadingNode("multiplyDivide", asUtility=True, name="{0}_paraMult".format(curve))
@@ -206,7 +221,7 @@ def extrude(*args):
             cmds.setAttr("{0}.input2X".format(mult), 0.01)
             cmds.connectAttr("{0}.profileWidth".format(ctrl), "{0}.scaleX".format(profile))
             cmds.connectAttr("{0}.profileWidth".format(ctrl), "{0}.scaleZ".format(profile))
-            cmds.connectAttr("{0}.message".format(mult), "{0}.paraMult".format(ctrl))           
+            cmds.connectAttr("{0}.message".format(mult), "{0}.paraMult".format(ctrl))
 
             # reverse for normals
             reverse = cmds.shadingNode("reverse", asUtility=True, name="{0}_reverse".format(curve))
@@ -222,14 +237,14 @@ def extrude(*args):
             cmds.connectAttr("{0}.pathCurveVis".format(ctrl), "{0}.visibility".format(newCrv))
             cmds.connectAttr("{0}.message".format(repeatMult), "{0}.rptMult".format(ctrl))
 
-            #connect the rebuild density
+            # connect the rebuild density
             densityMult = cmds.shadingNode("multiplyDivide", asUtility=True, name="{0}_DensityMult".format(curve))
             cmds.connectAttr("{0}.density".format(ctrl), "{0}.input1X".format(densityMult))
             cmds.connectAttr("{0}.length".format(ctrl), "{0}.input2X".format(densityMult))
             cmds.connectAttr("{0}.outputX".format(densityMult), "{0}.spans".format(rebuild))
             cmds.connectAttr("{0}.message".format(densityMult), "{0}.densMult".format(ctrl))
 
-            #cap offest mult and connection
+            # cap offest mult and connection
             offsetAdd = cmds.shadingNode("addDoubleLinear", asUtility=True, name="{0}_OffsetAdd".format(curve))
             cmds.connectAttr("{0}.outputX".format(mult), "{0}.input1".format(offsetAdd))
             cmds.connectAttr("{0}.offsetCap".format(ctrl), "{0}.input2".format(offsetAdd))
@@ -248,13 +263,16 @@ def extrude(*args):
             cmds.connectAttr("{0}.baseCapHeight".format(ctrl), "{0}.scaleY".format(baseCapGrp))
 
             # position control at start of curve
-            startPos = cmds.pointOnCurve(curve, parameter = 0, position = True)
+            startPos = cmds.pointOnCurve(curve, parameter=0, position=True)
             cmds.xform(ctrl, ws=True, t=startPos)
 
-            moPath = cmds.pathAnimation(capGrp, newCrv, fractionMode=True, follow=True, followAxis=capAxis, upAxis=capUp, worldUpType="scene", startTimeU=0.0, endTimeU=100.0)
+            moPath = cmds.pathAnimation(capGrp, newCrv, fractionMode=True, follow=True, followAxis=capAxis,
+                                        upAxis=capUp, worldUpType="scene", startTimeU=0.0, endTimeU=100.0)
             moPathAnimAttr = cmds.listConnections("{0}.uValue".format(moPath), d=False, p=True)[0]
 
-            baseMoPath = cmds.pathAnimation(baseCapGrp, newCrv, fractionMode=True, inverseFront=True, follow=True, followAxis=capAxis, upAxis=capUp, worldUpType="scene", startTimeU=0.0, endTimeU=100.0)
+            baseMoPath = cmds.pathAnimation(baseCapGrp, newCrv, fractionMode=True, inverseFront=True, follow=True,
+                                            followAxis=capAxis, upAxis=capUp, worldUpType="scene", startTimeU=0.0,
+                                            endTimeU=100.0)
             baseMoPathAnimAttr = cmds.listConnections("{0}.uValue".format(baseMoPath), d=False, p=True)[0]
 
             start, end = getSliderRange()
@@ -269,7 +287,8 @@ def extrude(*args):
             cmds.currentTime(current)
 
             # extrude the curve
-            extr = cmds.extrude(profile, newCrv, ch=True, range=True, polygon=True, extrudeType=2, useComponentPivot=True,
+            extr = cmds.extrude(profile, newCrv, ch=True, range=True, polygon=True, extrudeType=2,
+                                useComponentPivot=True,
                                 fixedPath=True, useProfileNormal=True, reverseSurfaceIfPathReversed=True)
             extrGeo, extrNode = extr[0], extr[1]
 
@@ -282,8 +301,7 @@ def extrude(*args):
             cmds.setAttr("{0}.vType".format(tess), 3)
             cmds.setAttr("{0}.uNumber".format(tess), 1)
             cmds.setAttr("{0}.vNumber".format(tess), 1)
-            cmds.setAttr("{0}.useChordHeight".format(tess), 0)          
-
+            cmds.setAttr("{0}.useChordHeight".format(tess), 0)
 
             normal = cmds.polyNormal(extrGeo, normalMode=4, userNormalMode=0, ch=1)[0]
             cmds.connectAttr("{0}.outputX".format(reverse), "{0}.normalMode".format(normal))
@@ -301,7 +319,7 @@ def extrude(*args):
             cmds.parent(newCrv, ctrl)
             cmds.setAttr("{0}.inheritsTransform".format(deadGrp), 0)
             cmds.parent(extrGeo, deadGrp)
-            cmds.parent(profile, deadGrp)   
+            cmds.parent(profile, deadGrp)
             cmds.setAttr("{0}.v".format(profile), 0)
             cmds.parent(capGrp, deadGrp)
             cmds.parent(baseCapGrp, deadGrp)
@@ -314,10 +332,11 @@ def extrude(*args):
             cmds.connectAttr("{0}.output".format(offsetAdd), "{0}.uValue".format(moPath))
 
             selectList.append(ctrl)
-        
+
     cmds.setAttr("{0}.visibility".format(cap), 0)
     cmds.setAttr("{0}.visibility".format(profileOrig), 0)
     cmds.select(selectList, r=True)
+
 
 def deleteRig(*args):
     # check for ctrl
@@ -336,19 +355,23 @@ def deleteRig(*args):
 
             # check for file node, grab it, then find p2d from that and delete it
             fTextFull = cmds.connectionInfo("{0}.fileTexture".format(ctrl), sfd=True)
-            print "fTextFull:", fTextFull
+            print
+            "fTextFull:", fTextFull
             if fTextFull:
                 fText = fTextFull.partition(".")[0]
-                print fText
+                print
+                fText
                 p2dFull = cmds.connectionInfo("{0}.uvCoord".format(fText), sfd=True)
-                print p2dFull
+                print
+                p2dFull
                 if p2dFull:
                     p2d = p2dFull.partition(".")[0]
                     cmds.delete(p2d)
-                print "ready to delete"
+                print
+                "ready to delete"
                 cmds.delete(fText)
 
-            cmds.delete([ctrl, rpt, dens, para])                
+            cmds.delete([ctrl, rpt, dens, para])
 
 
 def getSliderRange(*args):
@@ -358,11 +381,11 @@ def getSliderRange(*args):
     startF = cmds.playbackOptions(query=True, min=True)
     endF = cmds.playbackOptions(query=True, max=True)
 
-    return(startF, endF)
+    return (startF, endF)
 
 
 def ctrlScale(ctrl):
-    scl = cmds.floatFieldGrp(widgets["ctrlFFG"], q=True, v1=True)/2
+    scl = cmds.floatFieldGrp(widgets["ctrlFFG"], q=True, v1=True) / 2
     cvs = cmds.ls("{0}.cv[*]".format(ctrl), fl=True)
     cmds.select(cvs)
     cmds.scale(scl, scl, scl)
@@ -372,7 +395,7 @@ def ctrlScale(ctrl):
 def calculatePts(crv, *args):
     """
     uses the window to get the number of pts that should be in the curve
-    """ 
+    """
     cLen = cmds.arclen(crv, ch=False)
     perUnit = cmds.intFieldGrp(widgets["recoIFBG"], q=True, v1=True)
     total = cLen * perUnit
@@ -385,14 +408,14 @@ def rebuildCurve(curve, *args):
         rebuilds selected curves to specs in window
     """
     num = calculatePts(curve)
-    newCrv = cmds.rebuildCurve(curve, rebuildType = 0, ch=1, spans = num, keepRange = 0, replaceOriginal = 0, name = "{0}_RB".format(curve))
+    newCrv = cmds.rebuildCurve(curve, rebuildType=0, ch=1, spans=num, keepRange=0, replaceOriginal=0,
+                               name="{0}_RB".format(curve))
     cmds.setAttr("{0}.v".format(curve), 0)
 
     return newCrv
 
 
 def texture(*args):
-    
     sel = cmds.ls(sl=True)
     shd = sel[0]
     ctrls = sel[1:]
@@ -401,31 +424,35 @@ def texture(*args):
 
     tNode = cmds.shadingNode("file", asTexture=True, name="fileTemplate", isColorManaged=True)
     pNode = cmds.shadingNode("place2dTexture", asUtility=True, name="placeTemplate")
-    pAttrs = ["coverage", "translateFrame", "rotateFrame", "mirrorU", "mirrorV", "stagger", "wrapU", "wrapV", "repeatUV", "offset", "rotateUV", "noiseUV", "vertexUvOne", "vertexUvTwo", "vertexUvThree", "vertexCameraOne", "outUV", "outUvFilterSize"]
-    tAttrs = ["coverage", "translateFrame", "rotateFrame", "mirrorU", "mirrorV", "stagger", "wrapU", "wrapV", "repeatUV", "offset", "rotateUV", "noiseUV", "vertexUvOne", "vertexUvTwo", "vertexUvThree", "vertexCameraOne", "uv", "uvFilterSize"]
+    pAttrs = ["coverage", "translateFrame", "rotateFrame", "mirrorU", "mirrorV", "stagger", "wrapU", "wrapV",
+              "repeatUV", "offset", "rotateUV", "noiseUV", "vertexUvOne", "vertexUvTwo", "vertexUvThree",
+              "vertexCameraOne", "outUV", "outUvFilterSize"]
+    tAttrs = ["coverage", "translateFrame", "rotateFrame", "mirrorU", "mirrorV", "stagger", "wrapU", "wrapV",
+              "repeatUV", "offset", "rotateUV", "noiseUV", "vertexUvOne", "vertexUvTwo", "vertexUvThree",
+              "vertexCameraOne", "uv", "uvFilterSize"]
 
     ts = "{0}_TripleSwitch".format(shd)
     if not cmds.objExists(ts):
         ts = cmds.shadingNode("tripleShadingSwitch", asUtility=True, name="{0}_TripleSwitch".format(shd))
-        cmds.connectAttr("{0}.output".format(ts), "{0}.color".format(shd))      
+        cmds.connectAttr("{0}.output".format(ts), "{0}.color".format(shd))
 
     for x in range(len(pAttrs)):
         cmds.connectAttr("{0}.{1}".format(pNode, pAttrs[x]), "{0}.{1}".format(tNode, tAttrs[x]))
 
     for i in range(len(ctrls)):
         geo = cmds.connectionInfo("{0}.geo".format(ctrls[i]), sfd=True).partition(".")[0]
-        
+
         # clear old connections from this to the triple switch
         clearShaderConnections(ts, geo)
 
         # don't do if the attr doesn't exist:
-        if not cmds.attributeQuery("textureRepeatU", n=ctrls[i], exists=True):      
-            cmds.addAttr(ctrls[i], ln="textureRepeatU", at="float", min = 0.01, max =10,dv=1, k=True)
-        if not cmds.attributeQuery("offsetU", n=ctrls[i], exists=True):     
+        if not cmds.attributeQuery("textureRepeatU", n=ctrls[i], exists=True):
+            cmds.addAttr(ctrls[i], ln="textureRepeatU", at="float", min=0.01, max=10, dv=1, k=True)
+        if not cmds.attributeQuery("offsetU", n=ctrls[i], exists=True):
             cmds.addAttr(ctrls[i], ln="offsetU", at="float", min=0, max=1, dv=0, k=True)
-        if not cmds.attributeQuery("offsetV", n=ctrls[i], exists=True):     
-            cmds.addAttr(ctrls[i], ln="offsetV", at="float", min=0, max=1, dv=0, k=True)        
-        
+        if not cmds.attributeQuery("offsetV", n=ctrls[i], exists=True):
+            cmds.addAttr(ctrls[i], ln="offsetV", at="float", min=0, max=1, dv=0, k=True)
+
         cmds.sets(geo, e=True, forceElement=sg)
 
         # delete file textures and p2d's with the name (and number at end)
@@ -437,7 +464,7 @@ def texture(*args):
         cmds.connectAttr("{0}.rptHolder".format(ctrls[i]), "{0}.repeatUV.repeatV".format(placeNode))
         cmds.connectAttr("{0}.textureRepeatU".format(ctrls[i]), "{0}.repeatUV.repeatU".format(placeNode))
         cmds.connectAttr("{0}.offsetU".format(ctrls[i]), "{0}.offsetU".format(placeNode))
-        cmds.connectAttr("{0}.offsetV".format(ctrls[i]), "{0}.offsetV".format(placeNode))       
+        cmds.connectAttr("{0}.offsetV".format(ctrls[i]), "{0}.offsetV".format(placeNode))
 
         # what if there's already some stuff in the triple switch?
         tsList = cmds.listAttr(ts, m=True, st="*inShape*")
@@ -446,19 +473,20 @@ def texture(*args):
             last = tsList[-1]
             lastIndex = int(last.partition("[")[2].partition("]")[0]) + 1
 
-
         geoShp = cmds.listRelatives(geo, s=True)[0]
         tsShp = "{0}.instObjGroups[0]".format(geoShp)
         cmds.connectAttr(tsShp, "{0}.input[{1}].inShape".format(ts, lastIndex))
-        cmds.connectAttr("{0}.outColor".format(fileNode), "{0}.input[{1}].inTriple".format(ts, lastIndex)) 
-        print "connected {0}!".format(geo)
-        
+        cmds.connectAttr("{0}.outColor".format(fileNode), "{0}.input[{1}].inTriple".format(ts, lastIndex))
+        print
+        "connected {0}!".format(geo)
+
         cmds.connectAttr("{0}.message".format(fileNode), "{0}.fileTexture".format(ctrls[i]), f=True)
 
     # delete pNode and tNode
     cmds.delete(pNode, tNode)
 
     # worry about length switch later when we populate the file node itself 
+
 
 def clearShaderConnections(ts="", geo="", *args):
     myShape = cmds.listRelatives(geo, s=True)[0]
@@ -472,7 +500,7 @@ def clearShaderConnections(ts="", geo="", *args):
 
         for tsInput in tsList:
             shpList = cmds.connectionInfo("{0}.{1}.inShape".format(ts, tsInput), sfd=True).partition(".")
-            shp=""
+            shp = ""
             if shpList:
                 shp = shpList[0]
             if shp == myShape:
@@ -486,7 +514,6 @@ def clearShaderConnections(ts="", geo="", *args):
 
 
 def fileLoad(*args):
-    
     sel = cmds.ls(sl=True)
     origTexture = sel[0]
     ctrls = sel[1:]
@@ -527,6 +554,7 @@ def capReplace(*args):
 
     cmds.setAttr("{0}.v".format(newCap), 0)
     cmds.select(ctrls, r=True)
+
 
 def addBaseCap(*args):
     sel = cmds.ls(sl=True, type="transform")

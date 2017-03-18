@@ -1,6 +1,7 @@
 import maya.cmds as cmds
 
 ########this works but need to make it generic for s, t, or u being the direction along the path
+#todo: autoguess option to get highest val and make it the main axis?
 
 def latticeFixDo(*args):
     """grab lattice and need a ctrl named 'ctrl'"""

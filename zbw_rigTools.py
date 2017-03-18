@@ -7,6 +7,10 @@
 #Notes/Descriptions: some rigging tools. require zTools folder in a python path.
 ########################
 
+#todo: add type finder
+#todo: maybe add space buffer?
+#todo: deformer weights
+#todo: refactor all others to use this as much as possible
 
 import maya.cmds as cmds
 import maya.mel as mel

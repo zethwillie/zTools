@@ -26,8 +26,11 @@ audioManager
 dupeSwap
 huddle
 curveTools
-
+link two curves?
+delay
 
 anim tools
 get frame range
 get list of keys:values
+get light list (chrlx funcs)
+get cam list (chrlx funcs)

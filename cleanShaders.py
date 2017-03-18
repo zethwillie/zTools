@@ -5,7 +5,7 @@ import maya.cmds as cmds
 materials = cmds.ls(materials=True)
 materials.remove("lambert1")
 materials.remove("particleCloud1")
-print materials
+# print materials
 for m in materials:
     sg = []
     outs = list(set(cmds.listConnections(m, destination =True)))
