@@ -1,10 +1,11 @@
+
 ########################
-# file: zbw_shapeScale.py
-# Author: zeth willie
-# Contact: zeth@catbuks.com, www.williework.blogspot.com
-# Date Modified: 04/27/13
-# To Use: type in python window  "import zbw_shapeScale as zss; zss.shapeScale()"
-# Notes/Descriptions: Use to change the shape of a nurbsCurve by scaling the cv's
+# File: zbw_shapeScale.py
+# Date Modified: 18 Mar 2017
+# creator: Zeth Willie
+# Contact: zethwillie@gmail.com, catbuks.com, williework.blogspot.com
+# Description: scales an obj at the component level
+# To Run: type "import zTools.zbw_shapeScale as zbw_shapeScale; reload(zbw_shapeScale);zbw_shapeScale.zbw_shapeScale()"
 ########################
 
 import maya.cmds as cmds
