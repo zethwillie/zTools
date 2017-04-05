@@ -16,6 +16,8 @@ def hideArnoldAttrs(*args):
     crvAttrs = [".ai_curve_shaderb", ".ai_curve_shaderg", ".ai_curve_shaderr", ".srate", ".cwdth", ".rcurve"]
     meshAttrs = [".emitSpecular", ".emitDiffuse", ".intensity", ".scb", ".scg", ".scr", ".ai_color_temperature", ".ai_use_color_temperature", ".ai_volume", ".ai_indirect", ".ai_sss", ".ai_specular", ".ai_diffuse", ".ai_exposure", ".ai_shadow_density"]
     
+    octaneAttrs = [".octGeoType", ".octGenVis", ".octCamVis", ".octShVis", ".octLayerId", ".octBakGrId", ".octRandomSeed", ".octRPassColorR", ".octRPassColorG", ".octRPassColorB", ".octConstTopology", ".octMergeUnweldedVert", ".octSubdLevel", ".octSubdSharpness", ".octSubdBoundInterp", ".octSubdSceme"]
+    
     meshes = cmds.ls(type="mesh")
     if meshes:
         for m in meshes:

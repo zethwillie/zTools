@@ -52,26 +52,26 @@ def rigToolsUI(*args):
     widgets["mainFLO"] = cmds.formLayout(w=280, h=610, bgc = (0.1,0.1,0.1))
 
 #controls layout
-    widgets["ctrlFLO"] = cmds.formLayout(w=110, h=380, bgc = (0.3,0.3,0.3))
-    widgets["ctrlFrLO"] = cmds.frameLayout(l="CONTROLS", w=110, h=380, bv=True, bgc = (0.3,0.3,0.3))
+    widgets["ctrlFLO"] = cmds.formLayout(w=113, h=380, bgc = (0.3,0.3,0.3))
+    widgets["ctrlFrLO"] = cmds.frameLayout(l="CONTROLS", w=113, h=380, bv=True, bgc = (0.3,0.3,0.3))
     widgets["ctrlCLO"] = cmds.columnLayout(bgc = (0.3,0.3,0.3))
 
-    widgets["circleBut"] = cmds.button(l="circle", w=110, h=20, bgc=(.7, .7, .5), c = partial(control, "circle"))
-    widgets["sphereBut"] = cmds.button(l="sphere", w=110, h=20, bgc=(.7, .7, .5), c = partial(control, "sphere"))
-    widgets["squareBut"] = cmds.button(l="square", w=110, h=20, bgc=(.7, .7, .5), c = partial(control, "square"))
-    widgets["boxBut"] = cmds.button(l="box", w=110, h=20, bgc=(.7, .7, .5), c = partial(control, "box"))
-    widgets["lolBut"] = cmds.button(l="lollipop", w=110, h=20, bgc=(.7, .7, .5), c = partial(control, "lollipop"))
-    widgets["barbellBut"] = cmds.button(l="barbell", w=110, h=20, bgc=(.7, .7, .5), c = partial(control, "barbell"))
-    widgets["crossBut"] = cmds.button(l="cross", w=110, h=20, bgc=(.7, .7, .5), c = partial(control, "cross"))
-    widgets["bentXBut"] = cmds.button(l="bent cross", h=20, w=110, bgc=(.7, .7, .5), c = partial(control, "bentCross"))
-    widgets["arrowBut"] = cmds.button(l="arrow", w=110, h=20, bgc=(.7, .7, .5), c = partial(control, "arrow"))
-    widgets["bentArrowBut"] = cmds.button(l="bent arrow", h=20, w=110, bgc=(.7, .7, .5), c = partial(control, "bentArrow"))
-    widgets["splitOBut"] = cmds.button(l="split circle", h=20, w=110, bgc=(.7, .7, .5), c = partial(control, "splitCircle"))
-    widgets["cylinderBut"] = cmds.button(l="cylinder", h=20, w=110, bgc=(.7, .7, .5), c = partial(control, "cylinder"))
-    widgets["starBut"] = cmds.button(l="star", w=110, h=20, bgc=(.7, .7, .5), c = partial(control, "star"))
-    widgets["octagonBut"] = cmds.button(l="octagon", h=20, w=110, bgc=(.7, .7, .5), c = partial(control, "octagon"))
-    widgets["halfCircBut"] = cmds.button(l="half circle", h=20, w=110, bgc=(.7, .7, .5), c = partial(control, "halfCircle"))
-    widgets["crossArrow"] = cmds.button(l="arrow cross", h=20, w=110, bgc=(.7, .7, .5), c = partial(control, "arrowCross"))	
+    widgets["circleBut"] = cmds.button(l="circle", w=113, h=20, bgc=(.7, .7, .5), c = partial(control, "circle"))
+    widgets["sphereBut"] = cmds.button(l="sphere", w=113, h=20, bgc=(.7, .7, .5), c = partial(control, "sphere"))
+    widgets["squareBut"] = cmds.button(l="square", w=113, h=20, bgc=(.7, .7, .5), c = partial(control, "square"))
+    widgets["boxBut"] = cmds.button(l="box", w=113, h=20, bgc=(.7, .7, .5), c = partial(control, "box"))
+    widgets["lolBut"] = cmds.button(l="lollipop", w=113, h=20, bgc=(.7, .7, .5), c = partial(control, "lollipop"))
+    widgets["barbellBut"] = cmds.button(l="barbell", w=113, h=20, bgc=(.7, .7, .5), c = partial(control, "barbell"))
+    widgets["crossBut"] = cmds.button(l="cross", w=113, h=20, bgc=(.7, .7, .5), c = partial(control, "cross"))
+    widgets["bentXBut"] = cmds.button(l="bent cross", h=20, w=113, bgc=(.7, .7, .5), c = partial(control, "bentCross"))
+    widgets["arrowBut"] = cmds.button(l="arrow", w=113, h=20, bgc=(.7, .7, .5), c = partial(control, "arrow"))
+    widgets["bentArrowBut"] = cmds.button(l="bent arrow", h=20, w=113, bgc=(.7, .7, .5), c = partial(control, "bentArrow"))
+    widgets["splitOBut"] = cmds.button(l="split circle", h=20, w=113, bgc=(.7, .7, .5), c = partial(control, "splitCircle"))
+    widgets["cylinderBut"] = cmds.button(l="cylinder", h=20, w=113, bgc=(.7, .7, .5), c = partial(control, "cylinder"))
+    widgets["starBut"] = cmds.button(l="star", w=113, h=20, bgc=(.7, .7, .5), c = partial(control, "star"))
+    widgets["octagonBut"] = cmds.button(l="octagon", h=20, w=113, bgc=(.7, .7, .5), c = partial(control, "octagon"))
+    widgets["halfCircBut"] = cmds.button(l="half circle", h=20, w=113, bgc=(.7, .7, .5), c = partial(control, "halfCircle"))
+    widgets["crossArrow"] = cmds.button(l="arrow cross", h=20, w=113, bgc=(.7, .7, .5), c = partial(control, "arrowCross"))	
     cmds.separator(h=10, style="none")
     widgets["ctrlAxisRBG"] = cmds.radioButtonGrp(nrb=3, la3=("x", "y", "z"), cw=([1, 33], [2, 33], [3, 33]), cal=([1, "left"], [2, "left"], [3, "left"]), sl=1)
 
@@ -91,6 +91,7 @@ def rigToolsUI(*args):
     widgets["cpSkinWtsBut"] = cmds.button(l="copy skin & weights", w=150, bgc=(.5, .7, .5), c = copySkinning)	
     widgets["remNSBut"] = cmds.button(l="remove all namespaces", w=150, bgc=(.5, .7, .5), c = remNS)	
     widgets["cntrLoc"] = cmds.button(l="selection center locator", w=150, bgc=(.5, .7, .5), c = centerLoc)
+    widgets["addToLat"] = cmds.button(l="add to lattice", w=150, bgc=(.5, .7, .5), c = addLattice)
 
 #zScript Layout
     cmds.setParent(widgets["mainFLO"])
@@ -136,9 +137,9 @@ def rigToolsUI(*args):
         (widgets["actionFLO"], "left", 125),
         (widgets["actionFLO"], "top", 0),
         (widgets["zScrptFLO"], "left", 0),
-        (widgets["zScrptFLO"], "top", 385),
-        (widgets["colorFLO"], "left", 125),
-        (widgets["colorFLO"], "top", 292),				
+        (widgets["zScrptFLO"], "top", 477),
+        (widgets["colorFLO"], "left", 0),
+        (widgets["colorFLO"], "top", 385),				
         ])
 
     cmds.formLayout(widgets["zScrptFLO"], e=True, af = [
@@ -216,6 +217,17 @@ def remNS(*args):
         for p in ps:
             cmds.rename(p, p.rpartition(":")[2]) 
         cmds.namespace(rm=n)
+
+
+def addLattice(*args):
+    """
+    select lattcie then geo to add to the lattice
+    """
+    sel =  cmds.ls(sl=True)
+    lat = sel[0]
+    geo = sel[1:]
+    rig.addToLattice(lat, geo)
+
 
 def groupFreeze(*args):
     """group freeze an obj"""
