@@ -1,64 +1,83 @@
-# num = number of pts in half
+import maya.cmds as cmds
 
-# gap = space btw (in middle) [so gap5 would be obj + 4 more(.8, .6, .4, . 2)]
+num = 12
+sel = cmds.ls(sl=True)
 
-# firstSecond = num % gap (gap between first second)
+cvs = cmds.ls("{0}.cv[*]".format(sel[0]), fl=True)
 
-# if num is even, then middle pt is two. . . 
-# firstSecond = num % gap-1
+length = len(cvs)
+xtra = len(cvs)%num
 
-# ORRRR. . . maybe better
-# an imaginary full strength one for both middles, they get second-to-full and work down from there. . . so we're one short on the middle ones
-# 1 .8.6.4.20 .2.4.6.81.8.6.4.2     .2.4.6.81
-# # - - - - # - - - - # - - - - (#) - - - - # - - - - # - - - - #
-# 0 .2.4.6.81.8.6.4.2 0.2.4.6.8    .8.6.4.2
-# In this case, beginning/end is half-1 % gap-1
+frstVar = xtra/2
+secVar = xtra-frstVar
 
+wgtDict = {}
 
-# TEST . . . 
-# l = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y"]
-# odd = True
-# num = 5
+# if the diff is only on or two then add that one to one or both ends. . . ?
 
+cvSel = [cvs[0]]
+ind = [0]
+for x in range(frstVar, len(cvs), num):
+    if cvs[x] not in cvSel:
+        cvSel.append(cvs[x])
+        ind.append(x)
+ind.append(len(cvs)-1)
+if cvs[len(cvs)-1] not in cvSel:
+    cvSel.append(cvs[len(cvs)-1])
 
-# if len(l)%2 == 0:
-#     odd = False
-#     print "even"
-#     frst, sec = l[:len(l)/2], l[len(l)/2:]
+# excluding first and last pts, get pts before (w weight), get pts after (w weight). SHOUDL THIS BE A LIST ALSO? [ptName, wgt]
+for y in range(2, len(cvSel)-2):
+    diff = ind[y]-ind[y-1]
+    unit = 1.0/diff
+    tmpCvs = []
+    tmpValues = []
+    for x in range(diff-1, 0, -1):
+        tmpCvs.append(cvs[cvs.index(cvSel[y])-x])
+        tmpValues.append(1-(unit*x))
+
+    tmpCvs.append(cvs[y])
+    tmpValues.append(1)
+
+    for x in range(1, diff):
+        tmpCvs.append(cvs[cvs.index(cvSel[y])+x])
+        tmpValues.append(unit*x)
+
+    wgtList = zip(tmpCvs, tmpValues)
+    wgtDict[cvs.index(cvSel[y])] = wgtList
+
+addCvs = [cvSel[0], cvSel[1], cvSel[-2], cvSel[-1]]
+
+for y in range(len(addCvs)):
+    tmpCvs = []
+    tmpValues = []
     
-
-# else:
-#     print "odd"
-#     frst, sec = l[:len(l)/2], l[len(l)/2:]
-
-# print len(frst), frst
-# print len(sec), sec
-
-# frstSec = len(frst) % (num)
-# print "first:", frstSec
-# secThird = frstSec + num
-# print "second:", secThird
-
-# grp = []
-# grp.append(frst[0])
-# for i in range(len(frst), frstSec, -5): # count from middle to third (first is custom, second is custom to first)
-#     new = []
-#     for j in range(num-1, -1, -1): # add lower values first, then value
-#         new.append(l[i-j])
-#     for j in range(1, num): # add higher values
-#         new.append(l[i+j])
-#     print "{0}: {1}".format(l[i], new)
-
-# # second to third
-# secondL = []
-# y1 =  [l[a] for a in range(1, frstSec)] # first half of second
-# y2 = [l[a] for a in range(frstSec, frstSec+num)] # second half of second
-# for y in y1:
-#     secondL.append(y)   
-# for y in y2:
-#     secondL.append(y)
-
-# print secondL
-
-
+    # get pre- wgts
+    if y != 0:
+        toCvSelInd = cvSel.index(addCvs[y])
+        diff = cvs.index(addCvs[y]) - cvs.index(cvSel[toCvSelInd-1])
+        # print "cv:", addCvs[x], "prev:", cvSel[toCvSelInd-1], "diff",diff
+        unit = 1.0/diff
+        if diff >= 2:
+            for x in range(diff-1, 0, -1):
+                tmpCvs.append(cvs[cvs.index(addCvs[y])-x])
+                tmpValues.append(1-(unit*x))
     
+    # add the cv itself and wgt
+    tmpCvs.append(addCvs[y])
+    tmpValues.append(1)
+    
+    # get post- wgts
+    if y != 3:
+        toCvSelInd = cvSel.index(addCvs[y])
+        diff = cvs.index(cvSel[toCvSelInd+1]) - cvs.index(addCvs[y])
+        unit = 1.0/diff
+        if diff >= 2:
+            for x in range(1, diff):
+                tmpCvs.append(cvs[cvs.index(addCvs[y])+x])
+                tmpValues.append(1-(unit*x))
+
+    wgtList = zip(tmpCvs, tmpValues)
+    wgtDict[cvs.index(addCvs[y])] = wgtList
+
+cmds.select(cvSel, r=True)
+
