@@ -47,9 +47,9 @@ def rigToolsUI(*args):
     if cmds.window("rigToolWin", exists=True):
         cmds.deleteUI("rigToolWin")
 
-    widgets["win"] = cmds.window("rigToolWin", t="zbw_rigTools", w=280, rtf=True, s=False)
-    widgets["mainCLO"] = cmds.columnLayout(w=280, h=570)
-    widgets["mainFLO"] = cmds.formLayout(w=280, h=610, bgc = (0.1,0.1,0.1))
+    widgets["win"] = cmds.window("rigToolWin", t="zbw_rigTools", w=280, rtf=True, s=True)
+    widgets["mainCLO"] = cmds.columnLayout(w=280)
+    widgets["mainFLO"] = cmds.formLayout(w=280, bgc = (0.1,0.1,0.1))
 
 #controls layout
     widgets["ctrlFLO"] = cmds.formLayout(w=113, h=380, bgc = (0.3,0.3,0.3))
@@ -77,8 +77,8 @@ def rigToolsUI(*args):
 
 #action layout
     cmds.setParent(widgets["mainFLO"])
-    widgets["actionFLO"] = cmds.formLayout(w=150, h=288, bgc = (0.3,0.3,0.3))
-    widgets["actionFrLO"] = cmds.frameLayout(l="ACTIONS", w=150, h=288, bv=True, bgc = (0.3,0.3,0.3))
+    widgets["actionFLO"] = cmds.formLayout(w=150, h=380, bgc = (0.3,0.3,0.3))
+    widgets["actionFrLO"] = cmds.frameLayout(l="ACTIONS", w=150, h=380, bv=True, bgc = (0.3,0.3,0.3))
     widgets["actionCLO"] = cmds.columnLayout(bgc = (0.3,0.3,0.3))
     widgets["grpFrzBut"] = cmds.button(l="group freeze selected", w=150, bgc=(.5, .7, .5), c = groupFreeze)
     widgets["grpAbvBut"] = cmds.button(l="insert group above ('Grp')", w=150, bgc=(.5, .7, .5), c = insertGroupAbove)
@@ -95,8 +95,8 @@ def rigToolsUI(*args):
 
 #zScript Layout
     cmds.setParent(widgets["mainFLO"])
-    widgets["zScrptFLO"] = cmds.formLayout(w=280, h=270, bgc = (0.3,0.3,0.3))
-    widgets["zScrptFrLO"] = cmds.frameLayout(l="Z_SCRIPTS", w=280, h=270, bv=True, bgc = (0.3,0.3,0.3))
+    widgets["zScrptFLO"] = cmds.formLayout(w=280, bgc = (0.3,0.3,0.3))
+    widgets["zScrptFrLO"] = cmds.frameLayout(l="Z_SCRIPTS", w=280, bv=True, bgc = (0.3,0.3,0.3))
     cmds.setParent(widgets["zScrptFLO"])	
     widgets["attrBut"] = cmds.button(l="zbw_attrs", w=135, bgc = (.7, .5, .5), c=partial(zAction, "attr"))
     widgets["shpSclBut"] = cmds.button(l="zbw_shapeScale", w=135, bgc = (.7, .5, .5), c=partial(zAction, "shpScl"))
@@ -115,20 +115,20 @@ def rigToolsUI(*args):
 
 #color layout
     cmds.setParent(widgets["mainFLO"])
-    widgets["colorFLO"] = cmds.formLayout(w=150, h=88, bgc = (0.3,0.3,0.3))
-    widgets["colorFrLO"] = cmds.frameLayout(l="COLORS", w=150, h=88, bv=True, bgc = (0.3,0.3,0.3))
-    widgets["colorRCLO"] = cmds.rowColumnLayout(nc=3)
+    widgets["colorFLO"] = cmds.formLayout(w=280, h=66, bgc = (0.3,0.3,0.3))
+    widgets["colorFrLO"] = cmds.frameLayout(l="COLORS", w=280, h=66, bv=True, bgc = (0.3,0.3,0.3))
+    widgets["colorRCLO"] = cmds.rowColumnLayout(nc=6)
     #cmds.setParent(widgets["colorFLO"])
-
-    widgets["redCNV"] = cmds.canvas(w=50, h=20, rgb=(1,0,0), pc=partial(changeColor, colors["red"]))
-    widgets["blueCNV"] = cmds.canvas(w=50, h=20, rgb=(0,0,1), pc=partial(changeColor, colors["blue"]))
-    widgets["greenCNV"] = cmds.canvas(w=50, h=20, rgb=(0,1,0), pc=partial(changeColor, colors["green"]))
-    widgets["yellowCNV"] = cmds.canvas(w=50, h=20, rgb=(1,1,0), pc=partial(changeColor, colors["yellow"]))
-    widgets["pinkCNV"] = cmds.canvas(w=50, h=20, rgb=(1,.8,.965), pc=partial(changeColor, colors["pink"]))
-    widgets["ltBlueCNV"] = cmds.canvas(w=50, h=20, rgb=(.65,.8,1), pc=partial(changeColor, colors["ltBlue"]))
-    widgets["brownCNV"] = cmds.canvas(w=50, h=20, rgb=(.5,.275,0), pc=partial(changeColor, colors["brown"]))
-    widgets["purpleCNV"] = cmds.canvas(w=50, h=20, rgb=(.33,0,.33), pc=partial(changeColor, colors["purple"]))
-    widgets["dkGreenCNV"] = cmds.canvas(w=50, h=20, rgb=(0,.35,0), pc=partial(changeColor, colors["dkGreen"]))
+    widgets["redCNV"] = cmds.canvas(w=48, h=20, rgb=(1,0,0), pc=partial(changeColor, colors["red"]))
+    widgets["blueCNV"] = cmds.canvas(w=48, h=20, rgb=(0,0,1), pc=partial(changeColor, colors["blue"]))
+    widgets["greenCNV"] = cmds.canvas(w=48, h=20, rgb=(0,1,0), pc=partial(changeColor, colors["green"]))
+    widgets["yellowCNV"] = cmds.canvas(w=48, h=20, rgb=(1,1,0), pc=partial(changeColor, colors["yellow"]))
+    widgets["pinkCNV"] = cmds.canvas(w=48, h=20, rgb=(1,.8,.965), pc=partial(changeColor, colors["pink"]))
+    widgets["ltBlueCNV"] = cmds.canvas(w=48, h=20, rgb=(.65,.8,1), pc=partial(changeColor, colors["ltBlue"]))
+    widgets["brownCNV"] = cmds.canvas(w=48, h=20, rgb=(.5,.275,0), pc=partial(changeColor, colors["brown"]))
+    widgets["purpleCNV"] = cmds.canvas(w=48, h=20, rgb=(.33,0,.33), pc=partial(changeColor, colors["purple"]))
+    widgets["dkGreenCNV"] = cmds.canvas(w=48, h=20, rgb=(0,.35,0), pc=partial(changeColor, colors["dkGreen"]))
+#---------------- add three more colors    
 
 #formlayout stuff
     cmds.formLayout(widgets["mainFLO"], e=True, af=[
@@ -137,7 +137,7 @@ def rigToolsUI(*args):
         (widgets["actionFLO"], "left", 125),
         (widgets["actionFLO"], "top", 0),
         (widgets["zScrptFLO"], "left", 0),
-        (widgets["zScrptFLO"], "top", 477),
+        (widgets["zScrptFLO"], "top", 457),
         (widgets["colorFLO"], "left", 0),
         (widgets["colorFLO"], "top", 385),				
         ])

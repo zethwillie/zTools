@@ -202,7 +202,7 @@ def get_source_and_targets(*args):
         tgts = sel[1:]
         return (src, tgts)
     else:
-        return (None)
+        return (None, None)
 
 
 def connectAttrs(attrType=None, *args):

@@ -20,10 +20,10 @@ def getTwoSelection(*args):
         objs = []
     return objs
 
-def getSelection(*arguments):
-    """gets selected objs and returns a list of selections in order"""
-    sel = cmds.ls(sl=True)
-    return sel
+# def getSelection(*arguments):
+#     """gets selected objs and returns a list of selections in order"""
+#     sel = cmds.ls(sl=True)
+#     return sel
 
 def jointFromList(xformList=[], orient="xyz", secAxis="zup", strip="", suffix="", *args):
     """
