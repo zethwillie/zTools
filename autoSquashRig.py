@@ -1,14 +1,16 @@
 import maya.cmds as cmds
 import zTools.zbw_rig as rig
-reload(rig)
 
-# create bbox control
-
-def createSquashRig(*args):
-
+def create_squash_rig(*args):
+    """
+    creates a rig around the selected objects. Two squashes are created (upDown/lfRt)
+    :param args:
+    :return:
+    """
     sel = cmds.ls(sl=True, type="transform")
 
     if not sel:
+        cmds.warning("You need to select some transforms!")
         return()
 
     mainCtrlRaw = rig.boundingBoxCtrl(sel, False)

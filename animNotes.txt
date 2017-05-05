@@ -22,12 +22,14 @@ morphAttr
 insertRandomNoise
 animNoise
 animShift
+huddle
 audioManager
 dupeSwap
-huddle
 curveTools
 link two curves?
 delay
+continue anim (extends last two keys to a new key at current location)
+
 
 anim tools
 get frame range

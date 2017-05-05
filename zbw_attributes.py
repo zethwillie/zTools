@@ -216,7 +216,6 @@ def connectAttrs(attrType=None, *args):
                     "there was an issue connecting to {0} of {1}. Make sure the channels are free!".format(attrType,
                                                                                                            tgt))
 
-
 def get_channel_attributes(obj, chnl):
     """
     gets and returns attributes of given channel on given object
@@ -294,7 +293,9 @@ def enableChannel(source, target, *args):
 
 
 def channelLockHide(*args):
-    """this is the function to actually do the locking and hiding of the attrs selected in the UI"""
+    """
+    this is the function to actually do the locking and hiding of the attrs selected in the UI
+    """
 
     sel = cmds.ls(sl=True, type="transform")
     if sel:
@@ -343,7 +344,6 @@ def lockedAttr(*args):
     creates a locked attr (I use as a separator). Uses the long name as the nice name (literal name in channel box)
     """
     attrName = cmds.textFieldButtonGrp(widgets["lockAttrTFBG"], q=True, tx=True)
-    print attrName
 
     if attrName:
         sel = cmds.ls(sl=True)
@@ -362,7 +362,9 @@ def lockedAttr(*args):
 
 
 def shiftAttr(mode, *args):
-    """shifts the selected attr up or down"""
+    """
+    shifts the selected attr up or down
+    """
 
     obj = cmds.channelBox('mainChannelBox', q=True, mainObjectList=True)
     if obj:
@@ -412,7 +414,9 @@ def shiftAttr(mode, *args):
 
 
 def changeColor(color, *args):
-    """changes the shape node color of the selected objects"""
+    """
+    changes the shape node color of the selected objects
+    """
 
     sel = cmds.ls(sl=True, type="transform")
     if sel:
@@ -465,7 +469,10 @@ def breakConnections(*args):
 
 
 def getChannel(tfbg, *args):
-    """gets the selected channel of the selected objects"""
+    """
+    gets the selected channel of the selected objects
+    tfbg = the key of the widget for the ui (from widgets dict). string
+    """
 
     obj = ""
     channel = ""

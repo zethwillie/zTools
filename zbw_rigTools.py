@@ -232,20 +232,10 @@ def addLattice(*args):
 def groupFreeze(*args):
     """group freeze an obj"""
 
-    sel = cmds.ls(sl=True)
+    sel = cmds.ls(sl=True, type="transform")
 
     for obj in sel:
-        pos = cmds.xform(obj, q=True, ws=True, rp=True)
-        rot = cmds.xform(obj, q=True, ws=True, ro=True)
-        scl = cmds.xform(obj, q=True, r=True, s=True)
-        grp = cmds.group(em=True, n="{}Grp".format(obj))
-        cmds.xform(grp, ws=True, t=pos)
-        cmds.xform(grp, ws=True, ro=rot)
-        cmds.xform(grp, s=scl)
-        
-        cmds.parent(obj, grp)
-        cmds.select(grp, r=True)
-
+        rig.groupFreeze(obj)
 
 def nameCheck(name):
     if cmds.objExists(name):
@@ -402,45 +392,9 @@ def hideShape(*args):
 
 def bBox(*args):
     """creates a control based on the bounding box"""
-    sel = cmds.ls(sl=True)
-
-    box = cmds.exactWorldBoundingBox(sel) #[xmin, ymin, zmin, xmax, ymax, zmax]
-    X = om.MVector(box[0], box[3])
-    Y = om.MVector(box[1], box[4])
-    Z = om.MVector(box[2], box[5])
-
-    #get bbox lengths along axes
-    lenX = (X.y - X.x)
-    lenY = (Y.y - Y.x)
-    lenZ = (Z.y - Z.x)
-
-    print lenX, lenY, lenZ
-
-    ctrl = rig.createControl(name="ctrl", type="cube", color="pink")
-
-    cvs ={"xyz":[5, 15],"-xyz":[0, 4],"xy-z":[10, 14],"x-yz":[6, 8],"-x-yz":[3, 7],"-x-y-z":[2, 12],"x-y-z":[9, 13],"-xy-z":[1, 11]}
-
-    for a in cvs["xyz"]:
-        cmds.xform("{0}.cv[{1}]".format(ctrl, a), ws=True, t=(X.y, Y.y, Z.y))
-    for a in cvs["-xyz"]:
-        cmds.xform("{0}.cv[{1}]".format(ctrl, a), ws=True, t=(X.x, Y.y, Z.y))
-    for a in cvs["x-yz"]:
-        cmds.xform("{0}.cv[{1}]".format(ctrl, a), ws=True, t=(X.y, Y.x, Z.y))
-    for a in cvs["-x-yz"]:
-        cmds.xform("{0}.cv[{1}]".format(ctrl, a), ws=True, t=(X.x, Y.x, Z.y))
-    for a in cvs["xy-z"]:
-        cmds.xform("{0}.cv[{1}]".format(ctrl, a), ws=True, t=(X.y, Y.y, Z.x))
-    for a in cvs["-xy-z"]:
-        cmds.xform("{0}.cv[{1}]".format(ctrl, a), ws=True, t=(X.x, Y.y, Z.x))
-    for a in cvs["-x-y-z"]:
-        cmds.xform("{0}.cv[{1}]".format(ctrl, a), ws=True, t=(X.x, Y.x, Z.x))
-    for a in cvs["x-y-z"]:
-        cmds.xform("{0}.cv[{1}]".format(ctrl, a), ws=True, t=(X.y, Y.x, Z.x))
-    
-    # center pivot on ctrl
-    cmds.xform(ctrl, cp=True)
-    cmds.select(ctrl)
-    return(ctrl)
+    sel = cmds.ls(sl=True, type="transform")
+    if sel:
+        rig.boundingBoxCtrl(sel)
 
 ##########
 # load function

@@ -38,6 +38,6 @@ for l in range(1, len(relObjs)-1):
         if x in common:
             common.remove(x)
     
-print common
+print(common)
 
 

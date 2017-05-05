@@ -32,7 +32,12 @@ def spaceBufferUI(*args):
 
 
 def createJointFromObj(objs = [], *args):
-    """creates a joint at obj location/orientation. Can be arg[list] or selection"""
+    """
+    creates a joint at obj location/orientation. Can be arg[list] or selection
+    :param objs: a list of objects to operate on
+    :param args:
+    :return:
+    """
     
     if not objs:
         objs = cmds.ls(sl=True, type="transform")
