@@ -45,7 +45,9 @@ colors["orange"] = 12
 
 
 def attrUI(*args):
-    """UI for the script"""
+    """
+    UI for the script
+    """
 
     if cmds.window("attrWin", exists=True):
         cmds.deleteUI("attrWin")
@@ -60,13 +62,13 @@ def attrUI(*args):
 
     # switch to Row column layout to break up the channels
     widgets["attrRCLO"] = cmds.rowColumnLayout(nc=2, cw=([1, 100], [2, 150]))
-    widgets["transCB"] = cmds.checkBox(l="Translates", v=0, cc=partial(enableChannel, "transCB", "translateCBG"))
+    widgets["transCB"] = cmds.checkBox(l="Translates", v=0, cc=partial(enable_channel, "transCB", "translateCBG"))
     widgets["translateCBG"] = cmds.checkBoxGrp(w=150, cw3=(50, 50, 50), ncb=3, l1="TX", l2="TY", l3="TZ", l4="Vis",
                                                va3=(0, 0, 0), bgc=(.5, .5, .5), en=False)
-    widgets["rotCB"] = cmds.checkBox(l="Rotates", v=0, cc=partial(enableChannel, "rotCB", "rotateCBG"))
+    widgets["rotCB"] = cmds.checkBox(l="Rotates", v=0, cc=partial(enable_channel, "rotCB", "rotateCBG"))
     widgets["rotateCBG"] = cmds.checkBoxGrp(w=150, cw3=(50, 50, 50), ncb=3, l1="RX", l2="RY", l3="RZ", l4="Vis",
                                             va3=(0, 0, 0), bgc=(.5, .5, .5), en=False)
-    widgets["scaleCB"] = cmds.checkBox(l="Scales", v=1, cc=partial(enableChannel, "scaleCB", "scaleCBG"))
+    widgets["scaleCB"] = cmds.checkBox(l="Scales", v=1, cc=partial(enable_channel, "scaleCB", "scaleCBG"))
     widgets["scaleCBG"] = cmds.checkBoxGrp(w=150, cw3=(50, 50, 50), ncb=3, l1="SX", l2="SY", l3="SZ", l4="Vis",
                                            va3=(1, 1, 1), bgc=(.5, .5, .5), en=True)
     widgets["visCB"] = cmds.checkBox(l="Visibility", v=1)
@@ -78,17 +80,32 @@ def attrUI(*args):
     widgets["lockRBG"] = cmds.radioButtonGrp(nrb=2, l1="Unlock", l2="Lock", sl=2)
     widgets["hideRBG"] = cmds.radioButtonGrp(nrb=2, l1="Show", l2="Hide", sl=2)
     widgets["channelsBut"] = cmds.button(l="Lock/Hide Channels", w=250, h=30, bgc=(.5, .5, .5), rs=True,
-                                         c=channelLockHide)
+                                         c=channel_lock_hide)
     cmds.separator(h=5, st="none")
-    widgets["lockAttrTFBG"] = cmds.textFieldButtonGrp(l="Locked Attr", tx="__xtraAttrs__", bl="Create",
-                                                      cal=[(1, "left"), (2, "left"), (3, "left")], cw3=[60, 135, 50],
-                                                      bc=lockedAttr)
+
     cmds.separator(h=5, st="none")
     widgets["channelsBut"] = cmds.button(l="Move Selected Attr Up", w=250, h=30, bgc=(.5, .7, .5), rs=True,
-                                         c=partial(shiftAttr, 1))
+                                         c=partial(shift_attr, 1))
     widgets["channelsBut"] = cmds.button(l="Move Selected Attr Down", w=250, h=30, bgc=(.7, .5, .5), rs=True,
-                                         c=partial(shiftAttr, 0))
+                                         c=partial(shift_attr, 0))
     cmds.separator(h=5, st="none")
+
+    cmds.setParent(widgets["channelColLO"])
+    widgets["addAttrFrLO"] = cmds.frameLayout(l="Add Attrs", cll=True, w=250, bgc=(.7, .6, .6))
+    widgets["addAttrLockCLO"] = cmds.columnLayout()
+    widgets["lockAttrTFBG"] = cmds.textFieldButtonGrp(l="Locked Attr", tx="__xtraAttrs__", bl="Create",
+                                                      cal=[(1, "left"), (2, "left"), (3, "left")], cw3=[60, 135, 50],
+                                                      bc=locked_attr)
+
+    cmds.text("Add an attribute with a range of 0-1. . . ")
+    cmds.separator(h=5)
+    widgets["newAttrTFG"] = cmds.textFieldGrp(l="Attr Name:", w=250, cal=(1, "left"), cw=[(1, 55), (2,185)])
+    cmds.setParent(widgets["addAttrFrLO"])
+    widgets["addAttrRCLO"] = cmds.rowColumnLayout(nc = 2, cs = [(1, 0), (2,5)])
+    widgets["addIntBut"] = cmds.button(l="Add 0-1 Int Attr", w= 120, h=30, bgc = (.5, .5, .5), c= partial(
+        add_zero_one_attribute, "short"))
+    widgets["addFltBut"] = cmds.button(l="Add 0-1 Float Attr", w= 120, h=30, bgc = (.5, .5, .5), c=partial(
+        add_zero_one_attribute, "float"))
 
     # back to columnLayout
     cmds.setParent(widgets["channelColLO"])
@@ -96,30 +113,30 @@ def attrUI(*args):
     widgets["colorRCLO"] = cmds.rowColumnLayout(nr=4, bgc=(.8, .8, .8))
 
     # color controls (red, green, blue, yellow, other)
-    cmds.canvas(w=50, h=30, rgb=(1, 0, 0), pc=partial(changeColor, colors["red"]))
-    cmds.canvas(w=50, h=30, rgb=(.5, .1, .1), pc=partial(changeColor, colors["darkRed"]))
-    cmds.canvas(w=50, h=30, rgb=(.659, .275, .449), pc=partial(changeColor, colors["lightRed"]))
-    cmds.canvas(w=50, h=30, rgb=(1, .8, .965), pc=partial(changeColor, colors["pink"]))
+    cmds.canvas(w=50, h=20, rgb=(1, 0, 0), pc=partial(change_color, colors["red"]))
+    cmds.canvas(w=50, h=20, rgb=(.5, .1, .1), pc=partial(change_color, colors["darkRed"]))
+    cmds.canvas(w=50, h=20, rgb=(.659, .275, .449), pc=partial(change_color, colors["lightRed"]))
+    cmds.canvas(w=50, h=20, rgb=(1, .8, .965), pc=partial(change_color, colors["pink"]))
 
-    cmds.canvas(w=50, h=30, rgb=(0, 1, 0), pc=partial(changeColor, colors["green"]))
-    cmds.canvas(w=50, h=30, rgb=(0, .35, 0), pc=partial(changeColor, colors["darkGreen"]))
-    cmds.canvas(w=50, h=30, rgb=(0, .55, .335), pc=partial(changeColor, colors["medGreen"]))
-    cmds.canvas(w=50, h=30, rgb=(.35, .635, .15), pc=partial(changeColor, colors["yellowGreen"]))
+    cmds.canvas(w=50, h=20, rgb=(0, 1, 0), pc=partial(change_color, colors["green"]))
+    cmds.canvas(w=50, h=20, rgb=(0, .35, 0), pc=partial(change_color, colors["darkGreen"]))
+    cmds.canvas(w=50, h=20, rgb=(0, .55, .335), pc=partial(change_color, colors["medGreen"]))
+    cmds.canvas(w=50, h=20, rgb=(.35, .635, .15), pc=partial(change_color, colors["yellowGreen"]))
 
-    cmds.canvas(w=50, h=30, rgb=(0, 0, 1), pc=partial(changeColor, colors["blue"]))
-    cmds.canvas(w=50, h=30, rgb=(0, 0, .35), pc=partial(changeColor, colors["darkBlue"]))
-    cmds.canvas(w=50, h=30, rgb=(0, .2, .6), pc=partial(changeColor, colors["medBlue"]))
-    cmds.canvas(w=50, h=30, rgb=(.65, .8, 1), pc=partial(changeColor, colors["lightBlue"]))
+    cmds.canvas(w=50, h=20, rgb=(0, 0, 1), pc=partial(change_color, colors["blue"]))
+    cmds.canvas(w=50, h=20, rgb=(0, 0, .35), pc=partial(change_color, colors["darkBlue"]))
+    cmds.canvas(w=50, h=20, rgb=(0, .2, .6), pc=partial(change_color, colors["medBlue"]))
+    cmds.canvas(w=50, h=20, rgb=(.65, .8, 1), pc=partial(change_color, colors["lightBlue"]))
 
-    cmds.canvas(w=50, h=30, rgb=(1, 1, 0), pc=partial(changeColor, colors["yellow"]))
-    cmds.canvas(w=50, h=30, rgb=(.225, .1, 0), pc=partial(changeColor, colors["darkBrown"]))
-    cmds.canvas(w=50, h=30, rgb=(.5, .275, 0), pc=partial(changeColor, colors["brown"]))
-    cmds.canvas(w=50, h=30, rgb=(.922, .707, .526), pc=partial(changeColor, colors["darkYellow"]))
+    cmds.canvas(w=50, h=20, rgb=(1, 1, 0), pc=partial(change_color, colors["yellow"]))
+    cmds.canvas(w=50, h=20, rgb=(.225, .1, 0), pc=partial(change_color, colors["darkBrown"]))
+    cmds.canvas(w=50, h=20, rgb=(.5, .275, 0), pc=partial(change_color, colors["brown"]))
+    cmds.canvas(w=50, h=20, rgb=(.922, .707, .526), pc=partial(change_color, colors["darkYellow"]))
 
-    cmds.canvas(w=50, h=30, rgb=(.33, 0, .33), pc=partial(changeColor, colors["purple"]))
-    cmds.canvas(w=50, h=30, rgb=(.2, 0, .25), pc=partial(changeColor, colors["darkPurple"]))
-    cmds.canvas(w=50, h=30, rgb=(.0, 0, .0), pc=partial(changeColor, colors["black"]))
-    cmds.canvas(w=50, h=30, rgb=(1, 1, 1), pc=partial(changeColor, colors["white"]))
+    cmds.canvas(w=50, h=20, rgb=(.33, 0, .33), pc=partial(change_color, colors["purple"]))
+    cmds.canvas(w=50, h=20, rgb=(.2, 0, .25), pc=partial(change_color, colors["darkPurple"]))
+    cmds.canvas(w=50, h=20, rgb=(.0, 0, .0), pc=partial(change_color, colors["black"]))
+    cmds.canvas(w=50, h=20, rgb=(1, 1, 1), pc=partial(change_color, colors["white"]))
 
     cmds.setParent(widgets["tabLO"])
     widgets["connectColLO"] = cmds.columnLayout("Connections", w=250, bgc=(.8, .8, .8))
@@ -130,12 +147,12 @@ def attrUI(*args):
     cmds.text("Select a source object and a channel:")
     widgets["connector"] = cmds.textFieldButtonGrp(l="Connector", w=250, bl="<<<",
                                                    cal=[(1, "left"), (2, "left"), (3, "left")], cw3=[60, 140, 30],
-                                                   bc=partial(getChannel, "connector"))
+                                                   bc=partial(get_selected_channel, "connector"))
     cmds.separator(h=3, st="none")
     cmds.text("Select a target object and channel:")
     widgets["connectee"] = cmds.textFieldButtonGrp(l="Connectee", w=250, bl="<<<",
                                                    cal=[(1, "left"), (2, "left"), (3, "left")], cw3=[60, 140, 30],
-                                                   bc=partial(getChannel, "connectee"))
+                                                   bc=partial(get_selected_channel, "connectee"))
     cmds.separator(h=3, st="none")
     widgets["connectBut"] = cmds.button(l="Connect Two Channels", w=240, h=20, bgc=(.5, .5, .5), c=connectChannels)
     cmds.separator(h=3, st="none")
@@ -146,7 +163,7 @@ def attrUI(*args):
 
     widgets["toShapeVis"] = cmds.textFieldButtonGrp(l="Vis Driver", w=250, bl="<<<",
                                                     cal=[(1, "left"), (2, "left"), (3, "left")], cw3=[60, 140, 30],
-                                                    bc=partial(getChannel, "toShapeVis"))
+                                                    bc=partial(get_selected_channel, "toShapeVis"))
     cmds.separator(h=5, st="none")
     cmds.text("Now select the objs to drive:")
     widgets["shapeBut"] = cmds.button(l="Connect to Shapes' vis", w=240, h=20, bgc=(.5, .5, .5), c=connectShapeVis)
@@ -166,15 +183,15 @@ def attrUI(*args):
     widgets["functionFrame"] = cmds.frameLayout(l="Some functions", cll=True, bgc=(.6, .8, .6))
     widgets["inOutColLO"] = cmds.columnLayout(bgc=(.8, .8, .8))
     widgets["hideShapeVisBut"] = cmds.button(l="Toggle selected shape vis", w=240, h=20, bgc=(.5, .5, .5),
-                                             c=toggleSelShapeVis)
+                                             c=toggle_sel_shape_vis)
     cmds.separator(h=3, st="none")
     widgets["segSclBut"] = cmds.button(l="toggle JntSegmentScaleComp", w=240, h=20, bgc=(.5, .5, .5), c=JntSegScl)
     cmds.separator(h=3, st="none")
     cmds.text("First sel is source, next are targets:")
     widgets["connectRCL"] = cmds.rowColumnLayout(nc=3, cs=[(1, 0), (2, 5), (3, 5)])
-    widgets["cnctTBut"] = cmds.button(l="conn Transl", w=75, h=20, bgc=(.7, .5, .5), c=partial(connectAttrs, "t"))
-    widgets["cnctRBut"] = cmds.button(l="conn Rot", w=75, h=20, bgc=(.5, .7, .5), c=partial(connectAttrs, "r"))
-    widgets["cnctSBut"] = cmds.button(l="conn Scl", w=75, h=20, bgc=(.5, .5, .7), c=partial(connectAttrs, "s"))
+    widgets["cnctTBut"] = cmds.button(l="conn Transl", w=75, h=20, bgc=(.7, .5, .5), c=partial(connect_attrs, "t"))
+    widgets["cnctRBut"] = cmds.button(l="conn Rot", w=75, h=20, bgc=(.5, .7, .5), c=partial(connect_attrs, "r"))
+    widgets["cnctSBut"] = cmds.button(l="conn Scl", w=75, h=20, bgc=(.5, .5, .7), c=partial(connect_attrs, "s"))
     cmds.setParent(widgets["inOutColLO"])
     cmds.separator(h=3, st="none")
     widgets["trnsfrAttrBut"] = cmds.button(l="Transfer Attributes (tgt, src)", w=240, bgc=(.5, .5, .5),
@@ -195,22 +212,22 @@ def get_source_and_targets(*args):
         or 
         None
     """
-
     sel = cmds.ls(sl=True)
     if sel and len(sel) > 1:
         src = sel[0]
         tgts = sel[1:]
         return (src, tgts)
     else:
+        cmds.warning("You need to select at least two objects!")
         return (None, None)
 
 
-def connectAttrs(attrType=None, *args):
+def connect_attrs(attrType=None, force = False, *args):
     src, tgts = get_source_and_targets()
     if src:
         for tgt in tgts:
             try:
-                cmds.connectAttr("{0}.{1}".format(src, attrType), "{0}.{1}".format(tgt, attrType))
+                cmds.connectAttr("{0}.{1}".format(src, attrType), "{0}.{1}".format(tgt, attrType), force=force)
             except:
                 cmds.warning(
                     "there was an issue connecting to {0} of {1}. Make sure the channels are free!".format(attrType,
@@ -281,8 +298,13 @@ def transfer_attrs(*args):
                 cmds.connectAttr("{0}.{1}".format(tgt, attr), conn, force=True)
 
 
-def enableChannel(source, target, *args):
-    """This function enables or disables the indiv channel checkboxes when attr is toggled"""
+def enable_channel(source, target, *args):
+    """
+    This function enables or disables the indiv channel checkboxes when attr is toggled
+    Args:
+        source - widgets key for checkbox grp that switches the targets checkbox grps
+        target - the target checkbox grp to have values toggled
+    """
 
     CBG = widgets[target]
     on = cmds.checkBox(widgets[source], q=True, v=True)
@@ -292,7 +314,7 @@ def enableChannel(source, target, *args):
         cmds.checkBoxGrp(CBG, e=True, en=False, va3=(0, 0, 0))
 
 
-def channelLockHide(*args):
+def channel_lock_hide(*args):
     """
     this is the function to actually do the locking and hiding of the attrs selected in the UI
     """
@@ -339,7 +361,7 @@ def channelLockHide(*args):
         cmds.warning("You haven't selected anything!")
 
 
-def lockedAttr(*args):
+def locked_attr(*args):
     """
     creates a locked attr (I use as a separator). Uses the long name as the nice name (literal name in channel box)
     """
@@ -361,7 +383,29 @@ def lockedAttr(*args):
         cmds.warning("Please enter a name for the attr!")
 
 
-def shiftAttr(mode, *args):
+def add_zero_one_attribute(attrType, *args):
+    """
+    adds an attribute with range of 0 to 1 to each selected obj
+    :param attrType: either "short" or "float"
+    :param args:
+    :return:
+    """
+    sel = cmds.ls(sl=True)
+    if not sel:
+        cmds.warning("You need to select an object add attrs to!")
+        return()
+    attrName = cmds.textFieldGrp(widgets["newAttrTFG"], q=True, tx=True)
+    if not attrName:
+        cmds.warning("Please enter a name for the attribute in the field!")
+        return()
+    for obj in sel:
+        try:
+            cmds.addAttr(obj, ln=attrName, at=attrType, min=0, max=1, dv=0, k=True)
+        except:
+            cmds.warning("Couldn't add attr: {0} to object: {1}. Skipping.".format(attrName, obj))
+
+
+def shift_attr(mode, *args):
     """
     shifts the selected attr up or down
     """
@@ -413,7 +457,7 @@ def shiftAttr(mode, *args):
                         cmds.setAttr(eachObj + '.' + alck, lock=1)
 
 
-def changeColor(color, *args):
+def change_color(color, *args):
     """
     changes the shape node color of the selected objects
     """
@@ -427,7 +471,7 @@ def changeColor(color, *args):
                 cmds.setAttr("%s.overrideColor" % shape, color)
 
 
-def toggleSelShapeVis(*args):
+def toggle_sel_shape_vis(*args):
     """toggles the selected transforms' shape visibility"""
     sel = cmds.ls(sl=True, type="transform")
     if sel:
@@ -468,7 +512,7 @@ def breakConnections(*args):
     pass
 
 
-def getChannel(tfbg, *args):
+def get_selected_channel(tfbg, *args):
     """
     gets the selected channel of the selected objects
     tfbg = the key of the widget for the ui (from widgets dict). string
@@ -511,7 +555,7 @@ def connectChannels(*args):
     connectee = cmds.textFieldButtonGrp(widgets["connectee"], q=True, tx=True)
     try:
         cmds.connectAttr(connector, connectee, f=True)
-        print "Connected %s -----> %s" % (connector, connectee)
+        print("Connected {0} -----> {1}".format(connector, connectee))
     except:
         cmds.warning("Couldn't connect those attrs. . . Sorry!")
 
@@ -626,5 +670,4 @@ def connectShapeVis(*args):
 
 def attributes(*args):
     """Use this to start the script!"""
-
     attrUI()

@@ -8,7 +8,7 @@
 ########################
 
 import maya.cmds as cmds
-import math
+import maya.mel as mel
 import maya.OpenMaya as om
 
 def getTwoSelection(*args):
@@ -1013,7 +1013,7 @@ def groupFreeze(obj="", suffix = "GRP", *arg):
 
     return(grp)
 
-def connectTransforms(source="", target = "", t=True, r=True, s=True, *args):
+def connect_transforms(source="", target = "", t=True, r=True, s=True, *args):
     """
     simple direct connection between transform attrs
     Args:
@@ -1122,12 +1122,12 @@ def boundingBoxCtrl(sel=[], prnt=True, *args):
         return(ctrl)
 
 
-def scaleNurbsCtrl(ctrl=None, x=1, y=1, z=1, *args):
+def scale_nurbs_control(ctrl=None, x=1, y=1, z=1, *args):
     """
     scales cvs from rotate pivot of obj
     """
-
-    if not ctrl:
+    if not ctrl or not isType(ctrl, "nurbsCurve"):
+        cmds.warning("zbw_rig.scaleNurbsCtrl: I wsan't passed a nurbsCurve object")
         return()
 
     piv = cmds.xform(ctrl, q=True, ws=True, rp=True)
@@ -1184,3 +1184,155 @@ def addToLattice(lat, geo, *args):
 
     for g in geo:
         cmds.lattice(lat, e=True, g=g)
+
+def get_selected_channels(*args):
+    """
+    for ONE object selected, return all selected channels from channel box
+    :param args:
+    :return: list of full obj.channel names selected
+    """
+    cBox = mel.eval('$temp=$gChannelBoxName')
+
+    sel = cmds.ls(sl=True, l=True)
+    if len(sel) != 1:
+        cmds.warning("You have to select ONE node!")
+        return(None)
+
+    obj = sel[0]
+
+    channels = cmds.channelBox(cBox, q=True, selectedMainAttributes=True, selectedShapeAttributes=True,
+                               selectedHistoryAttributes=True,
+                               selectedOutputAttributes=True)
+
+    returnList = []
+    if obj and channels:
+        for c in channels:
+            full = "{0}.{1}".format(obj, c)
+            returnList.append(full)
+
+        return(returnList)
+
+
+def average_vectors(vecList, *args):
+    """
+    returns the average (x, y, z, . . . ) of a list of given vectors
+    :param vecList: a list of vectors
+    :param args:
+    :return:
+    """
+    avg = [float(sum(x)/len(x)) for x in zip(*vecList)]
+    return(avg)
+
+def integer_test(obj, *args):
+    """
+    tests whether obj is an integer or not
+    :param obj: some value
+    :param args:
+    :return:  boolean
+    """
+    try:
+        int(obj)
+        return True
+    except:
+        return False
+
+def increment_name(name, *args):
+    """
+    increments the given name string
+    :param name:
+    :param args:
+    :return:
+    """
+    split = name.rpartition("_")
+    end = split[2]
+    isInt = integer_test(end)
+
+    if isInt:
+        newNum = int(end) + 1
+        newName = "%s%s%02d" % (split[0], split[1], newNum)
+    else:
+        newName = "{0}_01".format(name)
+
+    return(newName)
+
+
+def get_soft_selection():
+    """
+    should be a softSelection already selected (components). This returns list of cmpts and list of weights
+    :return: list of components, and list of weights
+    """
+    # Grab the soft selection
+    selection = om.MSelectionList()
+    softSelection = om.MRichSelection()
+    om.MGlobal.getRichSelection(softSelection)
+    softSelection.getSelection(selection)
+
+    dagPath = om.MDagPath()
+    component = om.MObject()
+
+    # Filter Defeats the purpose of the else statement
+    iter = om.MItSelectionList(selection, om.MFn.kMeshVertComponent)
+    elements, weights = [], []
+    while not iter.isDone():
+        iter.getDagPath(dagPath, component)
+        dagPath.pop()  # Grab the parent of the shape node
+        node = dagPath.fullPathName()
+        fnComp = om.MFnSingleIndexedComponent(component)
+        getWeight = lambda i: fnComp.weight(i).influence() if fnComp.hasWeights() else 1.0
+
+        for i in range(fnComp.elementCount()):
+            elements.append('%s.vtx[%i]' % (node, fnComp.element(i)))
+            weights.append(getWeight(i))
+        iter.next()
+
+    return elements, weights
+
+def closest_pt_on_mesh_position(object, mesh, *args):
+    """rtrns position of closest pt
+        #--------------------
+        #inputs and outputs for "closestPointOnMesh":
+
+        #inputs:
+        #"mesh"->"inputMesh" (mesh node of transform)
+        #"clusPos"->"inPosition"
+        #"worldMatrix"(transform of object)->"inputMatrix"
+
+        #outputs:
+        #"position"->surfacepoint in space
+        #"u"->parameter u
+        #"v"->parameter v
+        #"normal"->normal vector
+        #"closestFaceIndex"->index of closest face
+        #"closestVertexIndex"->index of closet vertex
+        #---------------------
+    """
+    cmds.select(object, r=True)
+
+    cpomNode = cmds.shadingNode("closestPointOnMesh", asUtility=True, n="%s_CPOM" % object)
+    clusPos = cmds.xform(object, ws=True, q=True, rp=True)
+
+    cmds.connectAttr("{0}.outMesh".format(mesh), "{0}.inMesh".format(cpomNode))
+    cmds.setAttr("{0}.inPosition".format(cpomNode), clusPos[0], clusPos[1], clusPos[2])
+    cmds.connectAttr("{0}.worldMatrix".format(mesh), "{0}.inputMatrix".format(cpomNode))
+
+    cpomPos = cmds.getAttr("{0}.position".format(cpomNode))[0]
+    cmds.delete(cpomNode)
+
+    return (cpomPos)
+
+def closest_pt_on_mesh_rotation(pos, tform, *args):
+# TODO - generalize for various orientations
+    """
+    takes a position and a poly transform and gives the rotation [rot order xyz] (for aim along y) align to surface of
+    the xform at
+    that point
+    """
+    # get the rotations to align to normal at this point
+    loc = cmds.spaceLocator()
+    cmds.xform(loc, ws=True, t=pos)
+    aimVec = (0, 1, 0)
+    upVec = (0, 1, 0)
+    nc = cmds.normalConstraint(tform, loc, aim=aimVec, upVector=upVec)
+    rot = cmds.xform(loc, ws=True, q=True, ro=True)
+    cmds.delete(nc, loc)
+    return (rot)

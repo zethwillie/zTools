@@ -90,7 +90,7 @@ def rigToolsUI(*args):
     widgets["bBox"] = cmds.button(l="bounding box control", w=150, bgc=(.5, .7, .5), c=bBox)	
     widgets["cpSkinWtsBut"] = cmds.button(l="copy skin & weights", w=150, bgc=(.5, .7, .5), c = copySkinning)	
     widgets["remNSBut"] = cmds.button(l="remove all namespaces", w=150, bgc=(.5, .7, .5), c = remNS)	
-    widgets["cntrLoc"] = cmds.button(l="selection center locator", w=150, bgc=(.5, .7, .5), c = centerLoc)
+    widgets["cntrLoc"] = cmds.button(l="selection center locator", w=150, bgc=(.5, .7, .5), c = center_locator)
     widgets["addToLat"] = cmds.button(l="add to lattice", w=150, bgc=(.5, .7, .5), c = addLattice)
 
 #zScript Layout
@@ -361,7 +361,7 @@ def copySkinning(*args):
         cmds.warning("couldn't copy skin weights from {0} to {1}".format(orig, target))
 
 
-def centerLoc(*args):
+def center_locator(*args):
     """creates a center loc on the avg position"""
 
     sel = cmds.ls(sl=True, fl=True)
@@ -373,7 +373,7 @@ def centerLoc(*args):
         # this is cool!
         center = [sum(y)/len(y) for y in zip(*ps)]
 
-        loc = cmds.spaceLocator(name="centerLoc")
+        loc = cmds.spaceLocator(name="center_locator")
         cmds.xform(loc, ws=True, t=center)
 
 def hideShape(*args):
