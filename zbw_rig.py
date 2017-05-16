@@ -21,7 +21,6 @@ def getTwoSelection(*args):
     return objs
 
 
-
 def jointFromList(xformList=[], orient="xyz", secAxis="zup", strip="", suffix="", *args):
     """
     uses the xformlist arg (a list of transforms in scene) to create a joint chain in order.
@@ -1398,7 +1397,8 @@ def closest_pt_on_mesh_rotation(point, mesh, *args):
 
     # get the rotations to align to normal at this point
     loc = cmds.spaceLocator()
-    cmds.xform(loc, ws=True, t=ptPos)
+    CPOMesh = closest_pt_on_mesh_position(point, mesh)
+    cmds.xform(loc, ws=True, t=CPOMesh)
     aimVec = (0, 1, 0)
     upVec = (0, 1, 0)
     nc = cmds.normalConstraint(mesh, loc, aim=aimVec, upVector=upVec)
