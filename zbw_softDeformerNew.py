@@ -10,96 +10,83 @@
 
 import maya.cmds as cmds
 import zTools.zbw_rig as rig
+import maya.OpenMaya as om
 import zTools.mayaDecorators as decor
+from functools import partial
+import maya.mel as mel
 
 widgets = {}
 
 
 def softDeformerUI():
     """UI for the whole thing"""
+# TODO - add some kind of help text to each tab
     if cmds.window("softModWin", exists=True):
         cmds.deleteUI("softModWin")
     widgets["window"] = cmds.window("softModWin", t="zbw_softDeformer", w=300, h=130)
     widgets["tabLO"] = cmds.tabLayout()
-    widgets["smCLO"] = cmds.columnLayout("SoftModDeformer", w=300)
+    widgets["smCLO"] = cmds.columnLayout("SoftMod", w=300)
 
     cmds.separator(h=10)
     widgets["smdTFG"] = cmds.textFieldGrp(l="Deformer Name", w=300, cw=[(1, 100), (2, 190)],
                                           cal=[(1, "left"), (2, "left")], tx="softMod_DEF")
-    widgets["firstVertCBG"] = cmds.checkBoxGrp(l="Use only 1st vert (vs. avg pos)", v1=0, cw=[(1, 200)],
-                                               cal=[(1, "left"), (2, "left")])
-    widgets["parentCBG"] = cmds.checkBoxGrp(l="Parent Ctrl Under Geo?", v1=0, cw=[(1, 200)],
-                                            cal=[(1, "left"), (2, "left")])
-    widgets["incrCBG"] = cmds.checkBoxGrp(l="Increment name after creation?", v1=1, cw=[(1, 200)],
-                                          cal=[(1, "left"), (2, "left")])
     widgets["checkCBG"] = cmds.checkBoxGrp(l="AutoCheck if there are deformers?", v1=1, cw=[(1, 200)],
+                                           cal=[(1, "left"), (2, "left")])
+    widgets["frontCBG"] = cmds.checkBoxGrp(l="Auto move to front of chain", v1=1, cw=[(1, 200)],
                                            cal=[(1, "left"), (2, "left")])
     widgets["scaleFFG"] = cmds.floatFieldGrp(l="Control Scale", v1=1, pre=2, cw=[(1, 100), (2, 50)],
                                              cal=[(1, "left"), (2, "left")])
-    widgets["bpFrameIFG"] = cmds.intFieldGrp(l="Bind Pose Frame", cw=[(1, 100), (2, 50)],
+    widgets["autoscaleCBG"] = cmds.checkBoxGrp(l="autoscale control?", v1=1, cw=[(1, 200)],
+                                           cal=[(1, "left"), (2, "left")])
+    widgets["bpFrameIFG"] = cmds.intFieldGrp(l="BindPose/origin Frame", cw=[(1, 100), (2, 50)],
                                              cal=[(1, "left"), (2, "left")])
-    # widgets["mainCtrlTFBG"] = cmds.textFieldButtonGrp(l="main control", cw=[(1, 75), (2, 175), (3, 75)],
-    #                                                  cal=[(1, "left"), (2, "left"), (3, "left")], bl="<<<",
-    # bc=getCtrl)
-
+    widgets["mainCtrlTFBG"] = cmds.textFieldButtonGrp(l="Parent Object:", cw=[(1, 75), (2, 175), (3, 75)], cal=[(1,
+                            "left"), (2, "left"), (3, "left")], bl="<<<", bc=partial(set_parent_object, "mainCtrlTFBG"))
     cmds.separator(h=10, style="single")
-    widgets["button"] = cmds.button(l="Create Deformer", w=300, h=40, bgc=(.6, .8, .6), c=create_soft_mod_deformer)
-    # widgets["button"] = cmds.button(l="Soft Wave (scale to drive falloff)", w=300, h=40, bgc=(.8, .8, .6), c=softWave)
+    widgets["smbutton"] = cmds.button(l="Create Deformer", w=300, h=40, bgc=(.6, .8, .6),
+                                    c=partial(create_soft_mod_deformer, False))
+    cmds.separator(h=5)
+    widgets["wavebutton"] = cmds.button(l="Soft Wave (use falloff to scale wave)", w=300, h=30, bgc=(.8, .8, .6),
+                                    c=partial(create_soft_mod_deformer, True))
 
     # second tab to softselect deformer
     cmds.setParent(widgets["tabLO"])
-    widgets["ssCLO"] = cmds.columnLayout("SoftSelectDeformer", w=300)
+    widgets["ssCLO"] = cmds.columnLayout("SoftSelect", w=300)
     widgets["ssdTFG"] = cmds.textFieldGrp(l="Deformer Name", w=300, cw=[(1, 100), (2, 190)],
                                           cal=[(1, "left"), (2, "left")], tx="softSelect_DEF")
     widgets["ssCPOMCBG"] = cmds.checkBoxGrp(l="Control to closest point on mesh?", v1=1, cw=[(1, 200)],
-                                            cal=[(1, "left"), (2, "left")])
-    widgets["ssParentCBG"] = cmds.checkBoxGrp(l="Parent Ctrl Under Geo?", v1=0, cw=[(1, 200)],
-                                              cal=[(1, "left"), (2, "left")])
-    widgets["ssIncrCBG"] = cmds.checkBoxGrp(l="Increment name after creation?", v1=1, cw=[(1, 200)],
                                             cal=[(1, "left"), (2, "left")])
     widgets["ssCheckCBG"] = cmds.checkBoxGrp(l="AutoCheck if there are deformers?", v1=1, cw=[(1, 200)],
                                              cal=[(1, "left"), (2, "left")])
     widgets["ssScaleFFG"] = cmds.floatFieldGrp(l="Control Scale", v1=1, pre=2, cw=[(1, 100), (2, 50)],
                                                cal=[(1, "left"), (2, "left")])
-    cmds.separator(h=10, style="single")
-    widgets["button"] = cmds.button(l="Create Deformer", w=300, h=40, bgc=(.6, .8, .6), c=softSelectDef)
+    cmds.separator(h=10)
+    widgets["ssdbutton"] = cmds.button(l="Create Deformer", w=300, h=40, bgc=(.6, .8, .6), c=soft_select_deformer)
 
+    # third tab to do softselect to joint
+    cmds.setParent(widgets["tabLO"])
+    widgets["jointCLO"] = cmds.columnLayout("softJoint", w=300)
+    widgets["jntNameTFG"] = cmds.textFieldGrp(l="Joint Name", w=300, cw=[(1, 100), (2, 190)],
+                                          cal=[(1, "left"), (2, "left")], tx="softSelect_JNT")
+    widgets["jntCPOMCBG"] = cmds.checkBoxGrp(l="Joint to closest point on mesh?", v1=1, cw=[(1, 200)],
+                                            cal=[(1, "left"), (2, "left")])
+    widgets["jntRotCBG"] = cmds.checkBoxGrp(l="Joint orient to surface?", v1=1, cw=[(1, 200)],
+                                            cal=[(1, "left"), (2, "left")])
+    widgets["jntAutoCBG"] = cmds.checkBoxGrp(l="Create initial jnt if not bound?", v1=1, cw=[(1, 200)],
+                                            cal=[(1, "left"), (2, "left")])
+    cmds.separator(h=10)
+    widgets["jntbutton"] = cmds.button(l="Create Joint", w=300, h=40, bgc=(.6, .8, .6), c=soft_selection_to_joint)
+
+
+
+    cmds.window(widgets["window"], e=True, w=5, h=5, rtf=True)
     cmds.showWindow(widgets["window"])
-
 
 # --------------------------
 # softMod deformer
 # --------------------------
-
-@decor.d_unifyUndo
-def softWave(*args):
-    bpf = cmds.intFieldGrp(widgets["bpFrameIFG"], q=True, v1=True)
-    currentTime = cmds.currentTime(q=True)
-    cmds.currentTime(bpf)
-
-    sftmod, ctrl, geo, defGroup = create_soft_mod_deformer()
-
-    main = cmds.textFieldButtonGrp(widgets["mainCtrlTFBG"], q=True, tx=True)
-    if not main:
-        cmds.warning("You need to have a main control selected to hook things up!")
-        return ()
-
-    if not cmds.objExists("{0}_waveDeformer_GRP".format(geo)):
-        waveGrp = cmds.group(name="{0}_waveDeformer_GRP".format(geo), em=True)
-    p = cmds.listRelatives("{0}_waveDeformer_GRP".format(geo), p=True)
-    if not p:
-        cmds.parent("{0}_waveDeformer_GRP".format(geo), main)
-
-    ctrlPos = cmds.xform(ctrl, q=True, ws=True, rp=True)
-    arrow = rig.createControl(name="{0}_ptrCtrl".format(ctrl), type="arrow", axis="z", color="yellow")
-    grp = rig.groupFreeze(arrow)
-    cmds.xform(grp, ws=True, t=ctrlPos)
-    nc = cmds.normalConstraint(geo, grp)
-    cmds.delete(nc)
-    pc = cmds.parentConstraint(arrow, ctrl, mo=True)
-
-    # hide control
-    cmds.setAttr("{0}.v".format(ctrl), 0)
+# TODO - Add 'wave' to name . . .
+def softWave(sftmod, arrow, ctrl,  *args):
     # add values to positions in graph
     positions = [0.0, 0.3, 0.6, 0.9, 0.95]
     values = [1.0, -0.3, 0.1, -0.05, 0.01]
@@ -108,16 +95,8 @@ def softWave(*args):
         cmds.setAttr("{0}.falloffCurve[{1}].falloffCurve_FloatValue".format(sftmod, i), values[i])
         cmds.setAttr("{0}.falloffCurve[{1}].falloffCurve_Interp".format(sftmod, i), 2)
 
-    # connect falloff
-    mult = cmds.shadingNode("multiplyDivide", asUtility=True, name="{0}_mult".format(ctrl))
-    cmds.setAttr("{0}.input2".format(mult), 5, 5, 5)
-    cmds.connectAttr("{0}.scale".format(arrow), "{0}.input1".format(mult))
-    cmds.connectAttr("{0}.outputX".format(mult), "{0}.falloff".format(ctrl))
-
     cmds.addAttr(arrow, ln="WaveAttrs", at="enum", k=True)
-    cmds.addAttr(arrow, ln="waveStrength", at="float", min=0, max=1, dv=1, k=True)
     cmds.setAttr("{0}.WaveAttrs".format(arrow), l=True)
-    cmds.connectAttr("{0}.waveStrength".format(arrow), "{0}.envelope".format(ctrl))
 
     # expose these on the control
     for j in range(5):
@@ -132,125 +111,153 @@ def softWave(*args):
         cmds.setAttr("{0}.position{1}".format(arrow, j), l=True)
         cmds.setAttr("{0}.value{1}".format(arrow, j), l=True)
 
-    # group the whole thing
-    cmds.parent(defGroup, grp)
-    cmds.parent(grp, "{0}_waveDeformer_GRP".format(geo))
-    cmds.currentTime(currentTime)
 
-# ---------------- get list of all softMod defs, then figure out how to pop these into the front of the deformer stack
-
-def getCtrl(*args):
+def set_parent_object(tfbg, *args):
+    """
+    gets selection and puts it in the given text field button grp
+    :param tfbg: the key for widget dict for the textFieldButtonGrp
+    :param args:
+    :return:
+    """
     ctrl = None
-    sel = cmds.ls(sl=True, type="transform")
+    sel = cmds.ls(sl=True, type="transform", l=True)
     if sel and (len(sel) == 1):
         ctrl = sel[0]
 
     if ctrl:
-        cmds.textFieldButtonGrp(widgets["mainCtrlTFBG"], e=True, tx=ctrl)
+        cmds.textFieldButtonGrp(widgets[tfbg], e=True, tx=ctrl)
 
 
-# TODO option to throw deformer to front of chain? (should just be arg in deformer creation)
-def create_soft_mod_deformer(*args):
+def add_top_level_ctrl(origCtrl, type, geo, *args):
+    """
+    creates a new ctrl, orients it to the geo and parent constrains the orig ctrl rig under itself
+    :param origCtrl: the control we're working from
+    :param type: the ctrl type of shape see zbw_rig.createControl for options
+    :param geo: the geo to orient to
+    :param args:
+    :return: topCtrl (the new ctrl), grp (the top ctrl grp freeze grp)
+    """
+    # THIS IS THE XTRA CTRL LAYER, THIS ORIENTS CTRL AND CONNECTS ORIG CTRL TO THE NEW CTRL
+    origCtrlPos = cmds.xform(origCtrl, q=True, ws=True, rp=True)
+    topCtrl = rig.createControl(name="{0}_moveCtrl".format(origCtrl.rpartition("_")[0]), type=type, axis="z",
+                              color="yellow")
+    grp = rig.groupFreeze(topCtrl)
+    cmds.xform(grp, ws=True, t=origCtrlPos)
+    nc = cmds.normalConstraint(geo, grp, worldUpType="vector", upVector=(0, 1, 0))
+    cmds.delete(nc)
+    pc = cmds.parentConstraint(topCtrl, origCtrl, mo=True)
+    sc = cmds.scaleConstraint(topCtrl, origCtrl, mo=True)
+    return(topCtrl, grp)
+
+
+def create_soft_mod_deformer(wave=False, *args):
     """
     creates and sets up the softmod deformer
     """
+    bpf = cmds.intFieldGrp(widgets["bpFrameIFG"], q=True, v1=True)
+    currentTime = cmds.currentTime(q=True)
+    cmds.currentTime(bpf)
+
     check = cmds.checkBoxGrp(widgets["checkCBG"], q=True, v1=True)
-    increment = cmds.checkBoxGrp(widgets["incrCBG"], q=True, v1=True)
-    toParent = cmds.checkBoxGrp(widgets["parentCBG"], q=True, v1=True)
-    # get deformer name
     defName = cmds.textFieldGrp(widgets["smdTFG"], tx=True, q=True)
     scaleFactor = cmds.floatFieldGrp(widgets["scaleFFG"], q=True, v1=True)
+    front = cmds.checkBoxGrp(widgets["frontCBG"], q=True, v1=True)
+    auto = cmds.checkBoxGrp(widgets["autoscaleCBG"], q=True, v1=True)
 
     if (cmds.objExists(defName)):
         cmds.warning("An object of this name, {0}, already exists! Choose a new name!".format(defName))
         return()
 
-# TODO - check that we've got only verts (or cv's?) selected
-    vertsRaw = cmds.ls(sl=True, fl=True)
-
-    if not vertsRaw:
+# TODO - check that we've got only verts (or cv's?) selected - always do average?
+    vertex = cmds.ls(sl=True, fl=True)
+    if not vertex:
         cmds.warning("Must select at least one vertex")
         return()
-    else:
-        if (cmds.checkBoxGrp(widgets["firstVertCBG"], q=True, v1=True)):
-            vertex = [vertsRaw[0]]
-        else:
-            vertex = vertsRaw
 
+    # get objects - in no parent object (to parent rig to) then parent to the object itself
     obj = vertex[0].partition(".")[0]
 
-    # get vert position then select the geo
-    positions = []
-    for vert in vertex:
-        positions.append(cmds.pointPosition(vert))
+# TODO below is if we have a mesh . . . broaden to nurbs? or curve?
+    if cmds.objectType(obj) == "mesh":
+        obj = cmds.listRelatives(obj, p=True)[0]
+    parentObject = cmds.textFieldButtonGrp(widgets["mainCtrlTFBG"], q=True, tx=True)
+    if not parentObject:
+        parentObject = obj
 
-    vertPos = rig.average_vectors(positions)
+    vertPos = rig.average_point_positions(vertex)
 
     # check if there are other deformers on the obj
-    if check:
-        deformers = getDeformers(obj)
+    if check and (not front):
+        deformers = rig.get_deformers(obj)
         if deformers:
             cmds.confirmDialog(title='Deformer Alert!',
-                               message='Found some deformers on %s.\nYou may want to put the softmod\n early in the input list' % obj,
+                               message='Found some deformers on {0}.\nYou may want to put the softmod\n early in the '
+                                       'input list\n or check "front of chain"'.format(obj),
                                button=['OK'], defaultButton='OK', cancelButton='OK', dismissString='OK')
 
     cmds.select(obj)
-
-    # create a soft mod at vert position (avg)
-# TODO - generalize the name bit - create a passthrough function that parses stuff
     softMod = defName
     softModAll = cmds.softMod(relative=False, falloffCenter=vertPos, falloffRadius=5.0, n=softMod,
-                              frontOfChain=True)
-
+                              frontOfChain=front)
     cmds.rename(softModAll[0], softMod)
     softModXform = cmds.listConnections(softModAll[0], type="transform")[0]
 
-    # create a control at the position of the softmod
-    control = defName + "_CTRL"
-    rig.createControl(name=control, axis="x", type="sphere", color="red")
-# TODO - pick a random color choice for this control - later on make a little swatch to set the color of the control
+    ctrlName = defName + "_zeroed_GRP"
+    control = cmds.group(name=ctrlName, em=True)
 
-    controlGrp = cmds.group(control, n="{0}_GRP".format(control))
+# TODO - make a little swatch to set the color of the control
+    controlGrp = cmds.group(control, n="{0}_static_GRP".format(control.rpartition("_")[0]))
     cmds.xform(controlGrp, ws=True, t=vertPos)
+    if wave:
+        ctrlType = "arrow"
+    else:
+        ctrlType = "cube"
+    topCtrl, topGrp = add_top_level_ctrl(control, ctrlType, cmds.listRelatives(obj, s=True)[0])
 
-    # connect the pos, rot, scale of the control to the softModHandle
+# TODO figure out how to transpose the space for just the scale
     rig.connect_transforms(control, softModXform)
 
-    cmds.addAttr(control, ln="__XTRA__", at="enum", k=True)
-    cmds.setAttr("{0}.__XTRA__".format(control), l=True)
-
-    cmds.addAttr(control, ln="envelope", at="float", min=0, max=1, k=True, dv=1)
-    cmds.addAttr(control, ln="falloff", at="float", min=0, max=100, k=True, dv=5)
-    cmds.addAttr(control, ln="mode", at="enum", enumName= "volume=0:surface=1", k=True)
+    cmds.addAttr(topCtrl, ln="__XTRA__", at="enum", k=True)
+    cmds.setAttr("{0}.__XTRA__".format(topCtrl), l=True)
+    cmds.addAttr(topCtrl, ln="envelope", at="float", min=0, max=1, k=True, dv=1)
+    cmds.addAttr(topCtrl, ln="falloff", at="float", min=0, max=100, k=True, dv=5)
+    cmds.addAttr(topCtrl, ln="mode", at="enum", enumName= "volume=0:surface=1", k=True)
 
     # connect that attr to the softmod falloff radius
-    cmds.connectAttr("{0}.envelope".format(control), "{0}.envelope".format(softMod))
-    cmds.connectAttr("{0}.falloff".format(control), "{0}.falloffRadius".format(softMod))
-    cmds.connectAttr("{0}.mode".format(control), "{0}.falloffMode".format(softMod))
-
+    cmds.connectAttr("{0}.envelope".format(topCtrl), "{0}.envelope".format(softMod))
+    cmds.connectAttr("{0}.falloff".format(topCtrl), "{0}.falloffRadius".format(softMod))
+    cmds.connectAttr("{0}.mode".format(topCtrl), "{0}.falloffMode".format(softMod))
     cmds.setAttr("{0}.inheritsTransform".format(softModXform), 0)
-
     cmds.setAttr("{0}.visibility".format(softModXform), 0)
 
-    # group the group and the softmod xform
+    if auto:
+        calsz = rig.calibrate_size(obj, .15)
+        if calsz:
+            rig.scale_nurbs_control(topCtrl, calsz, calsz, calsz)
+            cmds.setAttr("{0}.falloff".format(topCtrl), 2*calsz)
+        else:
+            cmds.warning("I had an issue getting the calibrated scale of {0}".format(obj))
+    rig.scale_nurbs_control(topCtrl, scaleFactor, scaleFactor, scaleFactor)
+
     defGroup = cmds.group(empty=True, n=(defName + "_deform_GRP"))
     cmds.xform(defGroup, ws=True, t=vertPos)
     cmds.parent(softModXform, controlGrp, defGroup)
 
-# TODO - make a text field button group to get this. if it's blank parent to world (or not at all)
-    if toParent:
-        cmds.parent(defGroup, obj)
+# TODO - use the name of the deformer instead. . .
+    masterGrp = cmds.group(name="{0}_mstr_GRP".format(obj), em=True)
+    cmds.parent(topGrp, defGroup, masterGrp)
 
-    rig.scale_nurbs_control(control, scaleFactor, scaleFactor, scaleFactor)
+    if wave:
+        softWave(softMod, topCtrl, control)
 
-# TODO - write incremenet name function in zbw_rig
-    # increment name
-    if increment:
-        newName = rig.increment_name(defName)
-        cmds.textFieldGrp(widgets["smdTFG"], tx=newName, e=True)
+    cmds.parent(masterGrp, parentObject)
 
-    # select the control to wrap up
-    cmds.select(control)
+    newName = rig.increment_name(defName)
+    cmds.textFieldGrp(widgets["smdTFG"], tx=newName, e=True)
+
+    cmds.select(topCtrl)
+    cmds.currentTime(currentTime)
+
     return (softMod, control, obj, defGroup)
 
 
@@ -259,10 +266,13 @@ def create_soft_mod_deformer(*args):
 # --------------------------
 
 # TO-DO----------------checks on whether a) something is selected b) vertices are selected
-def softSelectDef(*args):
+def soft_select_deformer(*args):
     """
     calls on get_soft_selection() to get the weights of the softSelect and then puts it all under a cluster and a control
     """
+# TODO - getting double transforms here. How to deal with that? CREATE A BLENDSHAPE AND CONNECT IT? FOR MULTIPLE,
+    #TODO - CHECK IF THERE ALREADY IS ONE AND ADD TO IT?
+
 # TODO - see what we can use from above script down here. . . Then we can reuse maybe for the other two (joints, wave)
     ssDefName = cmds.textFieldGrp(widgets["ssdTFG"], q=True, tx=True)
 
@@ -279,7 +289,7 @@ def softSelectDef(*args):
     # this gets the verts selected and their respective weights in the soft selection
     elements, weights = rig.get_soft_selection()
     if not elements:
-        cmds.warning("zbw_softDeformere.softSelectDef: There was a problem getting the soft selection!")
+        cmds.warning("zbw_softDeformere.soft_select_deformer: There was a problem getting the soft selection!")
         return()
 
     # get transform and mesh
@@ -289,8 +299,7 @@ def softSelectDef(*args):
 
     # check if there are other deformers on the obj
     if ssCheck:
-        deformers = []
-        deformers = getDeformers(xform)
+        deformers = rig.get_deformers(xform)
         if deformers:
             cmds.confirmDialog(title='Deformer Alert!',
                                message='Found some deformers on %s.\nYou may want to put the softmod\n early in the input list' % xform,
@@ -301,8 +310,6 @@ def softSelectDef(*args):
     for elem in elements:
         cmds.select(elem, add=True)
 
-    # ---------------- put a control for this to be either relative or not (relative should NOT orient to surface if
-    # you're going to parent)
     # ---------------- ORRRRR just keept the cluster around and drive it from the ws xforms of the controls
 
     # ---------------- BEST SOLUTION - keep the cluseter relative, group it, orient the ctrl, then parent group to control and then PARENT CONSTRAIN the cluster itself to the control
@@ -318,7 +325,7 @@ def softSelectDef(*args):
     # get cluster position
     clusPos = cmds.xform(clus[1], ws=True, q=True, rp=True)
 
-    cpomPos = avgElementPos(elements)
+    cpomPos = average_vert_positions(elements)
 
     if ssCPOM:
         cpomPos = rig.closest_pt_on_mesh_position(clus[1], mesh)
@@ -355,81 +362,58 @@ def softSelectDef(*args):
         cmds.textFieldGrp(widgets["ssdTFG"], tx=newName, e=True)
 
 
-# ------------------------
-# helper functions
-# ------------------------
-
-def getDeformers(obj, *args):
-    """gets a list of deformers on the passed obj"""
-    history = cmds.listHistory(obj)
-    deformerList = []
-    for node in history:
-        types = cmds.nodeType(node, inherited=True)
-        if "geometryFilter" in types:
-            deformerList.append(types[1])
-    return deformerList
-
-
-def avgElementPos(verts, *args):
-    """uses a list of verts and gets the average position"""
-    xVal = []
-    yVal = []
-    zVal = []
-    xAll = 0.0
-    yAll = 0.0
-    zAll = 0.0
-
-    for vert in verts:
-        pos = cmds.pointPosition(vert)
-        xVal.append(pos[0])
-        yVal.append(pos[1])
-        zVal.append(pos[2])
-
-    for x in xVal:
-        xAll += x
-    for y in yVal:
-        yAll += y
-    for z in zVal:
-        zAll += z
-
-    avgX = xAll / len(xVal)
-    avgY = yAll / len(yVal)
-    avgZ = zAll / len(zVal)
-
-    avgPos = (avgX, avgY, avgZ)
-
-    return avgPos
-
-
 #########
 # joint stuff 
 #########
-def applyWeights(*args):
-    vtxs, wts = get_soft_selection()
+def soft_selection_to_joint(*args):
+    """
+    takes a soft selection of verts and creates a joint to bind & wieght them in that proportion
+    :param args:
+    :return:
+    """
+# TODO - check for selection of verts!
+    selVtx = cmds.ls(sl=True, fl=True) # to get center for joint
+    vtxs, wts = rig.get_soft_selection() # to get weights for jnt
+
     tform = vtxs[0].partition(".")[0]
-    mesh = cmds.listRelatives(tform, f=True, s=True)[0]
+    mesh = cmds.listRelatives(tform, s=True)[0]
+    ptOnSurface = cmds.checkBoxGrp(widgets["jntCPOMCBG"], q=True, v1=True)
+    auto = cmds.checkBoxGrp(widgets["jntAutoCBG"], q=True, v1=True)
+    jntName = cmds.textFieldGrp(widgets["jntNameTFG"], q=True, tx=True)
+    rotOnSurface = cmds.checkBoxGrp(widgets["jntRotCBG"], q=True, v1=True)
 
-    ps = []
-    center = []
-    for vtx in vtxs:
-        ps.append(cmds.pointPosition(vtx))
-        center = [sum(y) / len(y) for y in zip(*ps)]
+    cls = mel.eval("findRelatedSkinCluster " + tform)
+    if not cls:
+        if auto:
+            baseJnt, cls = rig.new_joint_bind_at_center(tform)
+        else:
+            cmds.warning("There isn't an initial bind on this geometry. Either create one or check 'auto'")
+            return()
 
-    # create joint at location
-    # ----------- should get closest point on surface   
+    center = rig.average_point_positions(selVtx)
+    rot = (0,0,0)
+    if ptOnSurface:
+        center = rig.closest_pt_on_mesh_position(center, mesh)
+    if rotOnSurface:
+        rot = rig.closest_pt_on_mesh_rotation(center, mesh)
+
     cmds.select(cl=True)
-    jnt = cmds.joint()
+    jnt = cmds.joint(name = jntName)
     cmds.xform(jnt, ws=True, t=center)
+    cmds.xform(jnt, ws=True, ro=rot)
 
     # add influence to skin Cluster
     cmds.select(tform, r=True)
     cmds.skinCluster(e=True, ai=jnt, wt=0)
 
     # apply weights to that joint
-    cls = mel.eval("findRelatedSkinCluster " + tform)
     for v in range(len(vtxs)):
         cmds.skinPercent(cls, vtxs[v], transformValue=[jnt, wts[v]])
 
+    newName = rig.increment_name(jntName)
+    cmds.textFieldGrp(widgets["jntNameTFG"], tx=newName, e=True)
+
+    return(jnt)
 
 def softDeformer():
     """Use this to start the script!"""

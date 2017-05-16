@@ -9,6 +9,7 @@
 
 #create a follicle on the specified uv location
 import maya.cmds as cmds
+import zbw_rig as rig
 import maya.mel as mel
 
 widgets = {}
@@ -44,7 +45,6 @@ def getUV(*args):
     sel = cmds.ls(sl=True)
     #------filter for vertices (or cvs?)
     vertices = cmds.filterExpand(sm=(31), fp=True, ex=True)
-    print "verts = %s"%vertices
     try:
         if len(vertices)>2:
             cmds.warning("You've selected more than two verts. Two is the max number I can take")
@@ -61,7 +61,6 @@ def getUV(*args):
         else:
             cmds.warning("You haven't selected any verts! Select one or two to place a follicle")
 
-        print "uvs = %s"%uvs
         #convert vertices to uvs and get their value
         if uvs:
             uvList = []
@@ -88,25 +87,18 @@ def getUV(*args):
                 x = x + a
             for b in V:
                 y = y + b
-
             u = x/sizeUV
             v = y/sizeUV
-
             uvVal = [u,v]
-            print uvVal
 
             cmds.select(vertices)
-            print "THESE ARE THE OUTPUTS"
-            print "vertex is: %s"%vertices[0]
+
             shapeName = vertices[0].rpartition(".vtx")[0]
             meshName = cmds.listRelatives(shapeName, p=True)[0]
-            print meshName
             folName = cmds.textFieldGrp(widgets["nameTFG"], q=True, tx=True)
-            print folName
             uValue = uvVal[0]
-            print uValue
             vValue = uvVal[1]
-            print vValue
+
             follicle(meshName, folName, uValue, vValue)
 
         else:
@@ -133,7 +125,7 @@ def follicle(surface="none", folName="none", u=0.5, v=0.5, *args):
             folShapeName = "myFollicleShape"
             folXformName = "myFollicle"
         else:
-            folShapeName = "%sShape"%folName
+            folShapeName = "{0}Shape".format(folName)
             folXformName = folName
 
         #create the follicle
@@ -141,41 +133,36 @@ def follicle(surface="none", folName="none", u=0.5, v=0.5, *args):
         folXform = cmds.listRelatives(folShape, p=True, type="transform")[0]
         cmds.rename(folXform, folXformName)
 
-        #connect up the follicle!
-        #connect the matrix of the surface to the matrix of the follicle
-        cmds.connectAttr("%s.worldMatrix[0]"%surfaceShape, "%s.inputWorldMatrix"%folShape)
+        cmds.connectAttr("{0}.worldMatrix[0]".format(surfaceShape), "{0}.inputWorldMatrix".format(folShape))
 
         #check for surface type, poly or nurbs and connect the matrix into the follicle
         if (cmds.nodeType(surfaceShape)=="nurbsSurface"):
-            cmds.connectAttr("%s.local"%surfaceShape, "%s.inputSurface"%folShape)
+            cmds.connectAttr("{0}.local".format(surfaceShape), "{0}.inputSurface".format(folShape))
         elif (cmds.nodeType(surfaceShape)=="mesh"):
             cmds.connectAttr("%s.outMesh"%surfaceShape, "%s.inputMesh"%folShape)
         else:
             cmds.warning("not the right kind of selection. Need a poly or nurbs surface")
 
         #connect the transl, rots from shape to transform of follicle
-        cmds.connectAttr("%s.outTranslate"%folShape, "%s.translate"%folXform)
-        cmds.connectAttr("%s.outRotate"%folShape, "%s.rotate"%folXform)
+        cmds.connectAttr("{0}.outTranslate".format(folShape), "{0}.translate".format(folXform))
+        cmds.connectAttr("{0}.outRotate".format(folShape), "{0}.rotate".format(folXform))
 
-        cmds.setAttr("%s.parameterU"%folShape, u)
-        cmds.setAttr("%s.parameterV"%folShape, v)
+        cmds.setAttr("{0}.parameterU".format(folShape), u)
+        cmds.setAttr("{0}.parameterV".format(folShape), v)
 
-        cmds.setAttr("%s.translate"%folXform, l=True)
-        cmds.setAttr("%s.rotate"%folXform, l=True)
+        cmds.setAttr("{0}.translate".format(folXform), l=True)
+        cmds.setAttr("{0}.rotate".format(folXform), l=True)
 
-        #increment name
-        print "trying to rename"
-        split = folName.rpartition("_")
-        end = split[2]
-        isInt = integerTest(end)
+        attrsToHide = ["restPose", "pointLock", "simulationMethod", "startDirection", "flipDirection",
+                         "overrideDynamics", "collide", "damp", "stiffness", "lengthFlex", "clumpWidthMult",
+                         "startCurveAttract", "attractionDamp", "densityMult", "curlMult", "clumpTwistOffset",
+                         "braid", "colorBlend", "colorR", "colorG", "colorB", "fixedSegmentLength", "segmentLength",
+                         "sampleDensity", "degree", "clumpWidth"]
+        for attr in attrsToHide:
+            cmds.setAttr("{0}.{1}".format(folShape, attr), k=False)
 
-        if isInt:
-            newNum = int(end) + 1
-            newName = "%s%s%02d"%(split[0], split[1], newNum)
-            cmds.textFieldGrp(widgets["nameTFG"], tx=newName, e=True)
-        else:
-            newName = "%s_01"%folName
-            cmds.textFieldGrp(widgets["nameTFG"], tx=newName, e=True)
+        newName = rig.increment_name(folName)
+        cmds.textFieldGrp(widgets["nameTFG"], tx=newName, e=True)
 
     else:
         cmds.warning("That name already exists! Choose another name!")

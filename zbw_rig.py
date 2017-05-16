@@ -20,10 +20,7 @@ def getTwoSelection(*args):
         objs = []
     return objs
 
-# def getSelection(*arguments):
-#     """gets selected objs and returns a list of selections in order"""
-#     sel = cmds.ls(sl=True)
-#     return sel
+
 
 def jointFromList(xformList=[], orient="xyz", secAxis="zup", strip="", suffix="", *args):
     """
@@ -107,6 +104,7 @@ def follicle(surface="none", folName="none", u=0.5, v=0.5, *args):
 
     return(folXform, folShape)
 
+
 def axisToVector(axis="+x"):
     """
     takes an arg ("+x", "-x", "+y", "-y", "+z", "-z") and converts it to a vector (ex. (1,0,0))
@@ -116,6 +114,7 @@ def axisToVector(axis="+x"):
         return(axisDict[axis])
     else:
         cmds.error("you need to enter an axis (i.e. '+x' or '-x'")
+
 
 def fkChain(ctrlType="circle", color="red", axis="x", *args):
     """
@@ -294,11 +293,13 @@ def createControl(name="default",type="circle", axis="x", color="darkBlue", *arg
     cmds.select(ctrl, r=True)
     return(ctrl)
 
+
 def createMessage(host="none", attr="none", target="none", *args):
     """creates a message attr on object with target as value. Args are: 'host'-some object to hold the message attr, 'attr'-the name of the message attribute to create, and 'target'-the host to be the value of the message attr"""
     cmds.addAttr(host, at='message', ln=attr)
     cmds.connectAttr("%s.message"%target, "%s.%s"%(host, attr))
     return("%s.%s"%(host, attr))
+
 
 def getVertUV(vertsList = [], *args):
     """use a vert input to get the UV value"""
@@ -308,6 +309,7 @@ def getVertUV(vertsList = [], *args):
         uvVal = cmds.polyEditUV(uv, q=True, u=True, v=True)
         uvVals.append(uvVal)
     return(uvVals)
+
 
 def alignToUV(targetObj="none", sourceObj="none", sourceU=0.0, sourceV=0.0, mainAxis="+z", secAxis="+x", UorV="v"):
     """
@@ -336,6 +338,7 @@ def alignToUV(targetObj="none", sourceObj="none", sourceU=0.0, sourceV=0.0, main
     nc = cmds.normalConstraint(sourceObj, targetObj, aimVector=axisDict[mainAxis], upVector=axisDict[secAxis], worldUpVector=(wup))
     cmds.delete(nc) #delete constraint
 
+
 def groupOrient(target='none',orig='none', group="GRP"):
     """
     groups the second object and snaps the group to the second (point and orient). The group arg is to name the suffix you want the group to have (default is '_GRP')
@@ -357,6 +360,7 @@ def groupOrient(target='none',orig='none', group="GRP"):
 
     return(grpName)
 
+
 def stripToRotate(first="none", *args):
     attrs = ["tx", "ty", "tz", "sx", "sy", "sz", "visibility"]
     objs = []
@@ -372,6 +376,7 @@ def stripToRotate(first="none", *args):
         for attr in attrs:
             objAttr = me + "." + attr
             cmds.setAttr(objAttr, lock=True, k=False)
+
 
 def stripToTranslate(first="none", *args):
     """strips for all selected or entered as args, sets all attrs but translate to locked and hidden"""
@@ -390,6 +395,7 @@ def stripToTranslate(first="none", *args):
             objAttr = me + "." + attr
             cmds.setAttr(objAttr, lock=True, k=False)
 
+
 def stripToRotateTranslate(first="none", *args):
     """strips for all selected or entered as args, sets all attrs but translate to locked and hidden"""
     attrs = ["sx", "sy", "sz", "visibility"]
@@ -407,6 +413,7 @@ def stripToRotateTranslate(first="none", *args):
             objAttr = me + "." + attr
             cmds.setAttr(objAttr, lock=True, k=False)
 
+
 def lockTranslate(first="none", *args):
     attrs = ["tx", "ty", "tz"]
     objs = []
@@ -421,6 +428,7 @@ def lockTranslate(first="none", *args):
         for attr in attrs:
             objAttr = me + "." + attr
             cmds.setAttr(objAttr, lock=True)
+
 
 def stripTransforms(first="none", *args):
     """locks and hides all transforms from channel box. can call multiple objs as arguments or use selection of objects"""
@@ -439,6 +447,7 @@ def stripTransforms(first="none", *args):
             objAttr = me + "." + attr
             cmds.setAttr(objAttr, lock=True, k=False)
 
+
 def restoreTransforms(first="none", *args):
     """restores all the default locked and hidden channels back to the channels box"""
     attrs = ["tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz", "visibility"]
@@ -455,12 +464,14 @@ def restoreTransforms(first="none", *args):
             objAttr = me + "." + attr
             cmds.setAttr(objAttr, lock=False, k=True)
 
+
 def createAdd(name, input1, input2):
     """creates an addDoubleLinear node with name, object.attr, object.attr as args"""
     adl = cmds.shadingNode("addDoubleLinear", asUtility=True, name=name)
     cmds.connectAttr(input1, "%s.input1"%adl)
     cmds.connectAttr(input2, "%s.input2"%adl)
     return(adl)
+
 
 def blendRotation(blend="none", sourceA="none", sourceB="none", target="none", sourceValue="none"):
     #add input and *args?
@@ -850,9 +861,13 @@ def isType(obj, typeCheck, *args):
     returns boolean
     give an object and type of object and this will look at a) the node itself and b) if node is transform, will look at shape node
     """
-    
     if cmds.objExists(obj):
         tempType = cmds.objectType(obj)
+        if typeCheck == "transform":
+            if tempType == "transform":
+                return (True)
+            else:
+                return (False)
 
         if not tempType == "transform":
             if tempType == typeCheck:
@@ -1185,11 +1200,12 @@ def addToLattice(lat, geo, *args):
     for g in geo:
         cmds.lattice(lat, e=True, g=g)
 
-def get_selected_channels(*args):
+def get_selected_channels(full=True, long=True, *args):
     """
     for ONE object selected, return all selected channels from channel box
-    :param args:
-    :return: list of full obj.channel names selected
+    :param full: (boolean) return the full name of the object.attr?, if false then returns only the attr names
+    ":param long: (boolean) whether we should get the long name of the attr. False will give us "short" names
+    :return: list of full obj.channel names selected, or (if not "full") just the channnel names
     """
     cBox = mel.eval('$temp=$gChannelBoxName')
 
@@ -1200,18 +1216,35 @@ def get_selected_channels(*args):
 
     obj = sel[0]
 
-    channels = cmds.channelBox(cBox, q=True, selectedMainAttributes=True, selectedShapeAttributes=True,
+    channelsRaw = cmds.channelBox(cBox, q=True, selectedMainAttributes=True, selectedShapeAttributes=True,
                                selectedHistoryAttributes=True,
                                selectedOutputAttributes=True)
 
+    channels = []
+    if channelsRaw:
+        if long:
+            for ch in channelsRaw:
+                newC = cmds.attributeQuery(ch, node=obj, longName=True)
+                channels.append(newC)
+        else:
+            for ch in channelsRaw:
+                newC = cmds.attributeQuery(ch, node=obj, shortName=True)
+                channels.append(newC)
+    else: return(None)
+
     returnList = []
-    if obj and channels:
-        for c in channels:
-            full = "{0}.{1}".format(obj, c)
-            returnList.append(full)
+    if channels:
+        if full:
+            for c in channels:
+                full = "{0}.{1}".format(obj, c)
+                returnList.append(full)
+        else:
+            returnList = channels
 
         return(returnList)
-
+    else:
+        cmds.warning("zbw_rig.get_selected_channels: I didn't detect any channels selected!")
+        return(None)
 
 def average_vectors(vecList, *args):
     """
@@ -1222,6 +1255,7 @@ def average_vectors(vecList, *args):
     """
     avg = [float(sum(x)/len(x)) for x in zip(*vecList)]
     return(avg)
+
 
 def integer_test(obj, *args):
     """
@@ -1235,6 +1269,7 @@ def integer_test(obj, *args):
         return True
     except:
         return False
+
 
 def increment_name(name, *args):
     """
@@ -1287,7 +1322,8 @@ def get_soft_selection():
 
     return elements, weights
 
-def closest_pt_on_mesh_position(object, mesh, *args):
+
+def closest_pt_on_mesh_position(point, mesh, *args):
     """rtrns position of closest pt
         #--------------------
         #inputs and outputs for "closestPointOnMesh":
@@ -1295,7 +1331,7 @@ def closest_pt_on_mesh_position(object, mesh, *args):
         #inputs:
         #"mesh"->"inputMesh" (mesh node of transform)
         #"clusPos"->"inPosition"
-        #"worldMatrix"(transform of object)->"inputMatrix"
+        #"worldMatrix"(transform of point)->"inputMatrix"
 
         #outputs:
         #"position"->surfacepoint in space
@@ -1306,11 +1342,26 @@ def closest_pt_on_mesh_position(object, mesh, *args):
         #"closestVertexIndex"->index of closet vertex
         #---------------------
     """
-    cmds.select(object, r=True)
+    if isinstance(point, basestring):
+        if isType(point, "transform"):
+            cmds.select(point, r=True)
+            clusPos = cmds.xform(point, ws=True, q=True, rp=True)
+            name = point
+        else:
+            cmds.warning("zbw_rig.closest_pt_on_mesh_position: the string you gave me isn't a transform")
+            return()
+    elif isinstance(point, (list, tuple)):
+        if len(point)==3:
+            clusPos = point
+            name = mesh
+        else:
+            cmds.warning("zbw_rig.closest_pt_on_mesh_position: there are not the right number of entries in the "
+                         "list you gave me")
+    else:
+        cmds.warning("zbw_rig.closest_pt_on_mesh_position: You didn't give me a name of transform or position(list)")
+        return()
 
-    cpomNode = cmds.shadingNode("closestPointOnMesh", asUtility=True, n="%s_CPOM" % object)
-    clusPos = cmds.xform(object, ws=True, q=True, rp=True)
-
+    cpomNode = cmds.shadingNode("closestPointOnMesh", asUtility=True, n="{0}_CPOM".format(name))
     cmds.connectAttr("{0}.outMesh".format(mesh), "{0}.inMesh".format(cpomNode))
     cmds.setAttr("{0}.inPosition".format(cpomNode), clusPos[0], clusPos[1], clusPos[2])
     cmds.connectAttr("{0}.worldMatrix".format(mesh), "{0}.inputMatrix".format(cpomNode))
@@ -1320,19 +1371,140 @@ def closest_pt_on_mesh_position(object, mesh, *args):
 
     return (cpomPos)
 
-def closest_pt_on_mesh_rotation(pos, tform, *args):
-# TODO - generalize for various orientations
+
+def closest_pt_on_mesh_rotation(point, mesh, *args):
+# TODO - generalize for various orientations, and various rotation orders
     """
-    takes a position and a poly transform and gives the rotation [rot order xyz] (for aim along y) align to surface of
-    the xform at
-    that point
+    takes a point (can be name of transform or iterable(3) of rotations and a poly mesh and gives the rotation [rot
+    order xyz] (for
+    aim along y) align to surface of
+    the xform at that point
     """
+    if isinstance(point, basestring):
+        if isType(point, "transform"):
+            cmds.select(point, r=True)
+            ptPos = cmds.xform(point, ws=True, q=True, rp=True)
+            name = point
+        else:
+            cmds.warning("zbw_rig.closest_pt_on_mesh_position: the string you gave me isn't a transform")
+            return ()
+    elif isinstance(point, (list, tuple)):
+        if len(point) == 3:
+            ptPos = point
+            name = mesh
+        else:
+            cmds.warning("zbw_rig.closest_pt_on_mesh_position: there are not the right number of entries in the "
+                         "list you gave me")
+
     # get the rotations to align to normal at this point
     loc = cmds.spaceLocator()
-    cmds.xform(loc, ws=True, t=pos)
+    cmds.xform(loc, ws=True, t=ptPos)
     aimVec = (0, 1, 0)
     upVec = (0, 1, 0)
-    nc = cmds.normalConstraint(tform, loc, aim=aimVec, upVector=upVec)
+    nc = cmds.normalConstraint(mesh, loc, aim=aimVec, upVector=upVec)
     rot = cmds.xform(loc, ws=True, q=True, ro=True)
     cmds.delete(nc, loc)
     return (rot)
+
+
+def calibrate_size(xform, scale=0.2, *args):
+    """
+    will take the bounding box of given transform and return *scale it's longest edge
+    or option to do volume and return some portion of that. . .
+    just to give scale factor for controls and such
+    :param xform:
+    :param args:
+    :return:
+    """
+    if not isType(xform, "transform"):
+        cmds.warning("zbw_rig.calibrate_size: You didn't pass me a transform ({0})".format(xform))
+        return(None)
+
+    box = cmds.exactWorldBoundingBox(xform)  # [xmin, ymin, zmin, xmax, ymax, zmax]
+    X = om.MVector(box[0], box[3])
+    Y = om.MVector(box[1], box[4])
+    Z = om.MVector(box[2], box[5])
+
+    # get bbox lengths along axes
+    lenX = (X.y - X.x)
+    lenY = (Y.y - Y.x)
+    lenZ = (Z.y - Z.x)
+    lgst = max([lenX, lenY, lenZ])
+
+    outScale = float(lgst)*float(scale)
+
+    return(outScale)
+
+
+def average_point_positions(points, *args):
+    """
+    uses a list of points and gets the average position
+    :param points: list of points to average
+    :param args:
+    :return: a vector of the average position of given elemenets
+    """
+    positions = []
+
+    for pt in points:
+        pos = cmds.pointPosition(pt)
+        positions.append(pos)
+
+    avgPos = average_vectors(positions)
+    return(avgPos)
+
+
+def get_deformers(obj, *args):
+    """
+    gets a list of deformers on the passed obj
+    :param obj: string - the transform to get deformers on
+    :param args:
+    :return:
+    """
+    history = cmds.listHistory(obj)
+    deformerList = []
+    if history:
+        for node in history:
+            types = cmds.nodeType(node, inherited=True)
+            if "geometryFilter" in types:
+                deformerList.append(types[1])
+
+    return(deformerList)
+
+
+def bounding_box_center(geo, *args):
+    """
+    gets center from bounding box
+    :param geo: string - the transform to get bbox info from
+    :param args:
+    :return: vector/list of bounding box center (or None)
+    """
+
+    if isType(geo, "transform"):
+        box = cmds.exactWorldBoundingBox(geo)  # [xmin, ymin, zmin, xmax, ymax, zmax]
+        X = om.MVector(box[0], box[3])
+        Y = om.MVector(box[1], box[4])
+        Z = om.MVector(box[2], box[5])
+
+        cx = (box[0]+box[3])/2
+        cy = (box[1]+box[4])/2
+        cz = (box[2]+box[5])/2
+
+        return([cx, cy, cz])
+
+    return(None)
+
+
+def new_joint_bind_at_center(tform, *args):
+    """
+    create a new joint at the boudnign box center of pts and bind all pts to 1
+    :param tform - string - the geo to bind
+    :param args:
+    :return: string - skinCluster
+    """
+    cmds.select(cl=True)
+    jnt = cmds.joint(name="{0}_base_JNT".format(tform))
+    center = bounding_box_center(tform)
+    cmds.xform(jnt, ws=True, t=center)
+    skinCl = cmds.skinCluster(jnt, tform, normalizeWeights=1)[0]
+
+    return(jnt, skinCl)
