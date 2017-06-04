@@ -1343,26 +1343,27 @@ def closest_pt_on_mesh_position(point, mesh, *args):
     """
     if isinstance(point, basestring):
         if isType(point, "transform"):
-            cmds.select(point, r=True)
-            clusPos = cmds.xform(point, ws=True, q=True, rp=True)
+            # cmds.select(point, r=True)
+            ptPos = cmds.xform(point, ws=True, q=True, rp=True)
             name = point
         else:
             cmds.warning("zbw_rig.closest_pt_on_mesh_position: the string you gave me isn't a transform")
             return()
     elif isinstance(point, (list, tuple)):
         if len(point)==3:
-            clusPos = point
+            ptPos = point
             name = mesh
         else:
-            cmds.warning("zbw_rig.closest_pt_on_mesh_position: there are not the right number of entries in the "
-                         "list you gave me")
+            cmds.warning("zbw_rig.closest_pt_on_mesh_position: there are not the right number of indices in the "
+                         "iterable you gave me. Need 3, you gave {0}".format(len(point)))
     else:
-        cmds.warning("zbw_rig.closest_pt_on_mesh_position: You didn't give me a name of transform or position(list)")
+        cmds.warning("zbw_rig.closest_pt_on_mesh_position: You didn't give me a name of transform or position(array["
+                     "3])")
         return()
 
     cpomNode = cmds.shadingNode("closestPointOnMesh", asUtility=True, n="{0}_CPOM".format(name))
     cmds.connectAttr("{0}.outMesh".format(mesh), "{0}.inMesh".format(cpomNode))
-    cmds.setAttr("{0}.inPosition".format(cpomNode), clusPos[0], clusPos[1], clusPos[2])
+    cmds.setAttr("{0}.inPosition".format(cpomNode), ptPos[0], ptPos[1], ptPos[2])
     cmds.connectAttr("{0}.worldMatrix".format(mesh), "{0}.inputMatrix".format(cpomNode))
 
     cpomPos = cmds.getAttr("{0}.position".format(cpomNode))[0]
