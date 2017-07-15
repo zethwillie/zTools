@@ -207,7 +207,7 @@ def movePivot(side, *args):
             if check:
                 # get curve info
                 pos = cmds.pointOnCurve(x, parameter = side, position = True)
-                cmds.xform(x, ws=True, rp=pos)
+                cmds.xform(x, ws=True, piv=pos)
             else:
                 cmds.warning("{0} is not a nurbsCurve object. Skipping!".format(x))
 

@@ -1148,6 +1148,7 @@ def scale_nurbs_control(ctrl=None, x=1, y=1, z=1, *args):
     cvs = cmds.ls("{0}.cv[*]".format(ctrl), fl=True)
     cmds.scale(x, y, z, cvs, pivot=piv)
 
+
 def assignColor(obj=None, clr="yellow", *args):
     
     if cmds.objectType(obj) != "transform":
@@ -1509,3 +1510,10 @@ def new_joint_bind_at_center(tform, *args):
     skinCl = cmds.skinCluster(jnt, tform, normalizeWeights=1)[0]
 
     return(jnt, skinCl)
+
+
+def plugin_load(plugin, *args):
+    """checks whether plugin is loaded. Loads it if not"""
+    loaded = cmds.pluginInfo(plugin, q=True, loaded=True)
+    if not loaded:
+        cmds.loadPlugin(plugin)
