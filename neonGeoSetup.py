@@ -29,7 +29,7 @@ def neon_geo_UI(*args):
 	cmds.button(l="seperate abc into xforms based on their shapes", w=350, h=30, bgc=(.7, .7, .5), c=separate_abc)
 	cmds.separator(h=10)
 	cmds.text("select alembic (or static) geo to 'neon-ize'")
-	widgets["lightCBG"] = cmds.checkBoxGrp(l="create a redshift meshlight?", ncb=1, cw=[(1, 150), (2, 50)], cal=[(1, "left"), (1, "left")], v1=False)
+	widgets["lightCBG"] = cmds.checkBoxGrp(l="create a redshift meshlight?", ncb=1, cw=[(1, 150), (2, 50)], cal=[(1, "left"), (1, "left")], v1=True)
 	cmds.separator(h=5)	
 	cmds.button(l="duplicate abc's into neon setup", w=350, h=30, bgc=(.7, .5, .5), c=dupe_abc)	
 
@@ -182,6 +182,7 @@ def dupe_live_geo(*args):
 	"""
 	duplicates geo and adds the texture deformers to it
 	"""
+
 	sel = cmds.ls(sl=True, type="transform")
 	for obj in sel:
 		# dupeSpecial, input cons
@@ -190,7 +191,15 @@ def dupe_live_geo(*args):
 			par = par[0]
 		dupe = cmds.duplicate(obj, rr=True, ic=True)
 		neon = cmds.rename(dupe, "{0}_neonGeo".format(obj))
-		# apply texture defs to each, parent defXforms to parent
+		
+		#glass
+		cmds.select(obj, r=True)
+		gtDef, gtXform = cmds.textureDeformer(strength=0.0, offset=0.0, vectorSpace="Object", direction="Normal", pointSpace="UV", name="{0}_textureDef".format(obj))
+		gtextTrans = cmds.rename(gtXform, "{0}_glass_TextureDef".format(obj))
+		cmds.setAttr("{0}.texture".format(gtDef), 1, 1, 1)
+
+		# neon
+		cmds.select(neon, r=True)
 		tDef, tXform = cmds.textureDeformer(strength=0.02, offset=-0.05, vectorSpace="Object", direction="Normal", pointSpace="UV", name="{0}_textureDef".format(neon))
 		textTrans = cmds.rename(tXform, "{0}_neon_TextureDef".format(obj))
 
@@ -200,10 +209,11 @@ def dupe_live_geo(*args):
 		cmds.connectAttr("{0}.outUvFilterSize".format(noisePlace), "{0}.uvFilterSize".format(noiseText))
 		cmds.connectAttr("{0}.outColor".format(noiseText), "{0}.texture".format(tDef), force=True)
 
+		# lightmesh
 		lightmeshtmp = cmds.duplicate(obj, rr=True, ic=True)
 		lightmesh = cmds.rename(lightmeshtmp, "{0}_lgtMeshGeo".format(obj))
 		cmds.select(lightmesh, r=True)
-		lmTDef, lmTxform = cmds.textureDeformer(offset=0.007, strength=0, vectorSpace="Object", direction="Normal", pointSpace="UV", name="{0}_textureDef".format(lightmesh))
+		lmTDef, lmTxform = cmds.textureDeformer(offset=0.0, strength=0, vectorSpace="Object", direction="Normal", pointSpace="UV", name="{0}_textureDef".format(lightmesh))
 		lmTextTrans = cmds.rename(lmTxform, "{0}_lightmesh_TextureDef".format(obj))
 		cmds.setAttr("{0}.texture".format(lmTDef), 1, 1, 1)
 		outerShpOrig = cmds.listRelatives(lightmesh, s=True, f=True)[0]
@@ -224,11 +234,14 @@ def dupe_live_geo(*args):
 			cmds.parent(physLight, par)
 			cmds.parent(textTrans, par)
 			cmds.parent(lmTextTrans, par)
+			cmds.parent(gtextTrans, par)
 
 		cmds.setAttr("{0}.v".format(physLight), 1)
 		cmds.setAttr("{0}.t".format(physLight), 0, 0, 0)
 		cmds.setAttr("{0}.r".format(physLight), 0, 0, 0)
 		cmds.setAttr("{0}.s".format(physLight), 1, 1, 1)
+
+		#cmds.setAttr("{0}.v".format(lightmesh), 0)
 
 		# cmds.setAttr("{0}.areaShape".format(physLightShp), 4)
 		# link the light with lightmesh (HOW THE HELL TO DO THIS?)

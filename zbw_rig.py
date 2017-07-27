@@ -1513,7 +1513,9 @@ def new_joint_bind_at_center(tform, *args):
 
 
 def plugin_load(plugin, *args):
-    """checks whether plugin is loaded. Loads it if not"""
+    """
+    checks whether plugin is loaded. Loads it if not
+    """
     loaded = cmds.pluginInfo(plugin, q=True, loaded=True)
     if not loaded:
         cmds.loadPlugin(plugin)

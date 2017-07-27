@@ -18,7 +18,7 @@ for obj in objs:
 	gTextTrans = cmds.rename(gTxform, "{0}_glass_TextureDef".format(obj))
 	cmds.setAttr("{0}.texture".format(gTDef), 1, 1, 1)
 
-	neon = cmds.duplicate(obj, rr=True, name="{0}_neon".format(obj))[0]
+	neon = cmds.duplicate(obj, rr=True, ic=True, name="{0}_neon".format(obj))[0]
 	cmds.select(neon, r=True)
 	nTDef, nTxform = cmds.textureDeformer(offset=-0.00, strength=0.00, vectorSpace="Object", direction="Normal", pointSpace="UV", name="{0}_neon_textDef".format(obj))
 	nTextTrans = cmds.rename(nTxform, "{0}_TextureDef".format(neon))
@@ -30,7 +30,7 @@ for obj in objs:
 	cmds.connectAttr("{0}.outColor".format(noiseText), "{0}.texture".format(nTDef), force=True)
 	
 	##### OUTER LIGHT
-	lightmesh = cmds.duplicate(obj, rr=True, name="{0}_lgtMeshGeo".format(obj))[0]
+	lightmesh = cmds.duplicate(obj, rr=True, ic=True, name="{0}_lgtMeshGeo".format(obj))[0]
 	cmds.select(lightmesh, r=True)
 	lmTDef, lmTxform = cmds.textureDeformer(strength=0, offset=0.0075, vectorSpace="Object", direction="Normal", pointSpace="UV", name="{0}_textureDef".format(lightmesh))
 	lmTextTrans = cmds.rename(lmTxform, "{0}_lm_TextDef".format(obj))
