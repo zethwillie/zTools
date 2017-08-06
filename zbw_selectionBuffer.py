@@ -1,3 +1,13 @@
+########################
+# File: zbw_selectionBuffer.py
+# Date Modified: 04 Aug 2017
+# creator: Zeth Willie
+# Contact: zethwillie@gmail.com, catbuks.com, williework.blogspot.com
+# Description: stores your selection and then restores it in add mode (meaning you can select xyz, store it,
+# select a, restore it, and have selection be axyz
+# To Run: type "import zTools.zbw_selectionBuffer as zbw_selectionBuffer; reload(zbw_selectionBuffer);zbw_selectionBuffer.zbw_selectionBuffer()"
+########################
+
 import maya.cmds as cmds
 
 widgets = {}
@@ -20,32 +30,33 @@ def selectionUI(*args):
 	cmds.window(widgets["win"], e=True, w=200, h=135)
 	cmds.showWindow(widgets["win"])
 
+
 def grabSel(*args):
 	
-	del selection[:]   
-	  
+	del selection[:]   # empty the variable
 	sel = cmds.ls(sl=True, fl=True)
-	
 	for obj in sel:
 		selection.append(obj)
 	
 	if selection:
 		cmds.button(widgets["checkBut"], e=True, bgc = (.8, .7, .5),  en = True)
-		
 	else:
 		cmds.button(widgets["checkBut"], e=True, bgc = (.5, .5, .5), en=False)
-	
+
+
 def checkSel(*args):
 	print "\n IN THE SELECTION BUFFER:"
 	for obj in selection:
 		print obj
-	
+
+
 def restoreSel(*args):
-	cmds.select(cl=True)
-	
+	sel = cmds.ls(sl=True)
+
 	if selection:
 		for obj in selection:
-			cmds.select(obj, add=True)
+			sel.append(obj)
+	cmds.select(sel, r=True)
 
 
 def selectionBuffer(*args):

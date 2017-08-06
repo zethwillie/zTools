@@ -33,11 +33,11 @@ def softDeformerUI():
                                            cal=[(1, "left"), (2, "left")])
     widgets["frontCBG"] = cmds.checkBoxGrp(l="Auto move to front of chain", v1=1, cw=[(1, 200)],
                                            cal=[(1, "left"), (2, "left")])
-    widgets["scaleFFG"] = cmds.floatFieldGrp(l="Control Scale", v1=1, pre=2, cw=[(1, 100), (2, 50)],
+    widgets["scaleFFG"] = cmds.floatFieldGrp(l="Control Scale", v1=1, pre=2, cw=[(1, 150), (2, 50)],
                                              cal=[(1, "left"), (2, "left")])
     widgets["autoscaleCBG"] = cmds.checkBoxGrp(l="autoscale control?", v1=1, cw=[(1, 200)],
                                            cal=[(1, "left"), (2, "left")])
-    widgets["bpFrameIFG"] = cmds.intFieldGrp(l="BindPose/origin Frame", cw=[(1, 100), (2, 50)],
+    widgets["bpFrameIFG"] = cmds.intFieldGrp(l="BindPose/origin Frame", cw=[(1, 150), (2, 50)],
                                              cal=[(1, "left"), (2, "left")])
     widgets["mainCtrlTFBG"] = cmds.textFieldButtonGrp(l="Parent Object:", cw=[(1, 75), (2, 175), (3, 75)], cal=[(1,
                             "left"), (2, "left"), (3, "left")], bl="<<<", bc=partial(set_parent_object, "mainCtrlTFBG"))

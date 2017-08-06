@@ -62,6 +62,9 @@ def dupeIt(*args):
                 cmds.xform(dupe, ws=True, t=transforms[key][0])
                 cmds.xform(dupe, ws=True, ro=transforms[key][1])
                 cmds.setAttr("%s.scale"%dupe, transforms[key][2][0], transforms[key][2][1], transforms[key][2][2])
+
+#TODO - checkbox to copy inputs on orig objects to corresponding inputs on top level of duplicates
+
         else:
             cmds.warning("You need to select more than one object in order to swap!")
     else:

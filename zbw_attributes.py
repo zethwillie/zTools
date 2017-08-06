@@ -187,12 +187,19 @@ def attrUI(*args):
     cmds.separator(h=3, st="none")
     widgets["segSclBut"] = cmds.button(l="toggle JntSegmentScaleComp", w=240, h=20, bgc=(.5, .5, .5), c=JntSegScl)
     cmds.separator(h=3, st="none")
+    widgets["inhXformBut"] = cmds.button(l="Toggle inherit transforms", w=240, bgc=(.5, .5, .5),
+                                           c=toggle_inherit_transforms)
+    cmds.separator(h=3, st="none")
     cmds.text("First sel is source, next are targets:")
     widgets["connectRCL"] = cmds.rowColumnLayout(nc=3, cs=[(1, 0), (2, 5), (3, 5)])
     widgets["cnctTBut"] = cmds.button(l="conn Transl", w=75, h=20, bgc=(.7, .5, .5), c=partial(connect_attrs, "t"))
     widgets["cnctRBut"] = cmds.button(l="conn Rot", w=75, h=20, bgc=(.5, .7, .5), c=partial(connect_attrs, "r"))
     widgets["cnctSBut"] = cmds.button(l="conn Scl", w=75, h=20, bgc=(.5, .5, .7), c=partial(connect_attrs, "s"))
     cmds.setParent(widgets["inOutColLO"])
+    cmds.separator(h=3, st="none")
+    widgets["xyzCBG"] = cmds.checkBoxGrp(l="Connect Attr: ", ncb=3, la3=("x", "y", "z"), cal=[(1,"left"),(2,
+                                                                                                            "left")],
+                                         cw=[(1, 100),(2, 40),(3,40), (4,40)], va3=[1, 1, 1])
     cmds.separator(h=3, st="none")
     widgets["trnsfrAttrBut"] = cmds.button(l="Transfer Attributes (tgt, src)", w=240, bgc=(.5, .5, .5),
                                            c=transfer_attrs)
@@ -222,16 +229,38 @@ def get_source_and_targets(*args):
         return (None, None)
 
 
+def connect_param(src, tgt, attrType, prm, force=False, *args):
+    """
+    connects the indiv chnls based on the checkbox sorting in connect_attrs
+    args:
+        src (string): source object
+        tgt (string): target object
+        attrType (string): attr short name (t, r, s)
+        prm (string): specific channel name (x, y, z)
+        force (bool): value for force flag. Defaults to False
+    return:
+        None
+    """
+    try:
+        cmds.connectAttr("{0}.{1}{2}".format(src, attrType, prm), "{0}.{1}{2}".format(tgt, attrType, prm), force=force)
+    except:
+        cmds.warning(
+            "there was an issue connecting to {0}{1} of {2}. Make sure the channels are free!".format(attrType, prm,
+                                                                                                      tgt))
+
 def connect_attrs(attrType=None, force = False, *args):
+    """attrType is 't', 'r', 's'."""
     src, tgts = get_source_and_targets()
+    x, y, z = cmds.checkBoxGrp(widgets["xyzCBG"], q=True, va3=True)
     if src:
         for tgt in tgts:
-            try:
-                cmds.connectAttr("{0}.{1}".format(src, attrType), "{0}.{1}".format(tgt, attrType), force=force)
-            except:
-                cmds.warning(
-                    "there was an issue connecting to {0} of {1}. Make sure the channels are free!".format(attrType,
-                                                                                                           tgt))
+            if x:
+                connect_param(src, tgt, attrType, "x", False)
+            if y:
+                connect_param(src, tgt, attrType, "y", False)
+            if z:
+                connect_param(src, tgt, attrType, "z", False)
+
 
 def get_channel_attributes(obj, chnl):
     """
@@ -487,6 +516,18 @@ def toggle_sel_shape_vis(*args):
                 elif currVal == 1:
                     newVal = 0
                 cmds.setAttr("{0}.visibility".format(s), newVal)
+
+
+def toggle_inherit_transforms(*args):
+    """
+    toggles on/off inherit transforms for each selected object
+    """
+    sel = cmds.ls(sl=True, type="transform")
+    for obj in sel:
+        curr = cmds.getAttr("{0}.inheritsTransform".format(obj))
+        new = not curr
+        cmds.setAttr("{0}.inheritsTransform".format(obj), new)
+
 
 
 def JntSegScl(*args):

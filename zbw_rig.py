@@ -1519,3 +1519,62 @@ def plugin_load(plugin, *args):
     loaded = cmds.pluginInfo(plugin, q=True, loaded=True)
     if not loaded:
         cmds.loadPlugin(plugin)
+
+
+def align_to_curve(crv=None, obj=None, param=None, *args):
+    """
+    places the obj on the curve aligned to . . .
+    Args:
+        obj (string): object to align
+        crv: (string): curve TRANSFORM to align to
+        param (float): parameter along curve to position and orient to
+        *args:
+
+    Returns:
+        void
+
+    """
+#TODO - check on non-orig geo, check the matrix plugin is loaded
+    if not obj and crv and param:
+        cmds.warning("zbw_rig.align_to_curve: Didnt' get all the correct params! (obj, crv, param)")
+        return()
+
+    if not isType(crv, "nurbsCurve"):
+        cmds.warning("zbw_rig.align_to_curve: crv param wasn't a curve!")
+        return()
+
+    crvShp = cmds.listRelatives(crv, s=True)[0]
+    tempObj = cmds.group(empty=True, name="tempCrvNull")
+
+    poci = cmds.shadingNode("pointOnCurveInfo", asUtility=True, name="tempPOCI")
+    cmds.connectAttr("{0}.worldSpace[0]".format(crvShp), "{0}.inputCurve".format(poci))
+    cmds.setAttr("{0}.parameter".format(poci), param)
+    cmds.connectAttr("{0}.position".format(poci), "{0}.translate".format(tempObj))
+    sideVal = cmds.getAttr("{0}.normalizedNormal".format(poci))[0]
+    side = om.MVector(sideVal[0], sideVal[1], sideVal[2])
+    frontVal = cmds.getAttr("{0}.normalizedTangent".format(poci))[0]
+    front = om.MVector(frontVal[0], frontVal[1], frontVal[2])
+
+    up = side ^ front
+
+    mat4 = cmds.shadingNode("fourByFourMatrix", asUtility=True, name="temp4x4")
+    decomp = cmds.shadingNode("decomposeMatrix", asUtility=True, name="tempDM")
+    yrow = [side[0], side[1], side[2], 0]
+    xrow = [front[0], front[1], front[2], 0]
+    zrow = [up[0], up[1], up[2], 0]
+
+    for col in range(3):
+        cmds.setAttr("{0}.in0{1}".format(mat4, col), xrow[col])
+        cmds.setAttr("{0}.in1{1}".format(mat4, col), yrow[col])
+        cmds.setAttr("{0}.in2{1}".format(mat4, col), zrow[col])
+    cmds.setAttr("{0}.in33".format(mat4), 1)
+
+    cmds.connectAttr("{0}.output".format(mat4), "{0}.inputMatrix".format(decomp))
+    cmds.connectAttr("{0}.outputRotate".format(decomp), "{0}.rotate".format(tempObj))
+    snapTo(tempObj, obj)
+
+    cmds.delete(tempObj, poci, decomp, mat4)
+
+
+def get_nonOrig_shapes(*args):
+    pass
