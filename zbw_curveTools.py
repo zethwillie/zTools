@@ -13,15 +13,11 @@ import math
 from functools import partial
 import zTools.zbw_rig as rig
 import zTools.zbw_curveExtrude as cExtrude
-
-#TODO - draw through objs,
-#---------------- draw cv, ep curve buttons
-
-#---------------- on rebuild curves options: have checkbox for keep history, keep original
-#---------------- button to wire def one curve to another 
-#---------------- quick build control rig (using above . . . )
-
-#---------------- use line though object in UI!!!
+reload(cExtrude)
+import zTools.zbw_curveCVControls as zcc
+reload(zcc)
+#TODO---------------- on rebuild curves options: have checkbox for keep history, keep original
+#TODO ------------  extrude curve w options
 
 widgets = {}
 
@@ -45,14 +41,15 @@ def crvToolsUI():
                                         c = reverse_curve)
     widgets["align_attachBut"] = cmds.button(l="Quick align/attach! (2 selected, move 2nd->1st)", w=280, h=30,
                                             bgc = (.5, .5, .4), c= align_attach)
-    widgets["clusterBut"] = cmds.button(l="Control on pts of selected Curves!", width = 280, h=30, bgc = (.4, .5, .4),
-                                        c = controls_on_curve)
     widgets["reparaBut"] = cmds.button(l="Reparameterize Selected Crvs to 0-1!", width = 280, h=30, bgc = (.5, .5,
                                                                                                            .4), c = reparameter)
     widgets["pivStartBut"] = cmds.button(l="Move Pivot to Start!", width = 135, h=30, bgc = (.5, .4, .4),
                                          c = partial(move_pivot, 0))
     widgets["pivEndBut"] = cmds.button(l="Move Pivot to End!", width = 135, h=30, bgc = (.5, .4, .4), c = partial(
         move_pivot, 1))
+    widgets["cvToolBut"] = cmds.button(l="CV Curve Tool!", width = 135, h=30, bgc = (.5, .5, .4),
+                                         c = cmds.CVCurveTool)
+    widgets["epToolBut"] = cmds.button(l="EP Curve Tool!", width = 135, h=30, bgc = (.4, .5, .4), c = cmds.EPCurveTool)
 
     cmds.formLayout(widgets["funcsFLO"], e=True, af = [
         (widgets["cvDisplBut"], "left", 10),
@@ -61,14 +58,16 @@ def crvToolsUI():
         (widgets["reverseBut"], "top", 40),
         (widgets["align_attachBut"], "left", 10),
         (widgets["align_attachBut"], "top", 80),
-        (widgets["clusterBut"], "left", 10),
-        (widgets["clusterBut"], "top", 120),
         (widgets["reparaBut"], "left", 10),
-        (widgets["reparaBut"], "top", 160),
+        (widgets["reparaBut"], "top", 120),
         (widgets["pivStartBut"], "left", 10),
-        (widgets["pivStartBut"], "top", 200),
+        (widgets["pivStartBut"], "top", 160),
         (widgets["pivEndBut"], "left", 155),
-        (widgets["pivEndBut"], "top", 200),
+        (widgets["pivEndBut"], "top", 160),
+        (widgets["cvToolBut"], "left", 10),
+        (widgets["cvToolBut"], "top", 200),
+        (widgets["epToolBut"], "left", 155),
+        (widgets["epToolBut"], "top", 200),
         ])
 
     # create curves
@@ -151,19 +150,15 @@ def crvToolsUI():
 
     # align and extrude
     cmds.setParent(widgets["CLO"])
-    widgets["alExFrLO"] = cmds.frameLayout("Align/Extrude", w=width, cll=True, cl=True, bgc = (0, 0, 0))
+    widgets["alExFrLO"] = cmds.frameLayout("Align/Extrude", w=width, cll=True, cl=True, bgc = (0, 0, 0), cc=resize_window)
     widgets["alExFLO"] = cmds.formLayout(w=width,h=135 , bgc = (.3, .3, .3))
     widgets["alExText"] = cmds.text("Select curve then object to align to curve.\nSet param along curve.", al="left")
     widgets["alExFFG"] = cmds.floatFieldGrp(nf=1, l= "0.0 - 1.0 param along curve", cal=[(1, "left"), (2,"left")],
                                             cw = [(1, 150), (2, 50)], v1=0.0, pre=3)
     widgets["alExBut"] = cmds.button(l="Align object to curve (curve then object selection)",  w=280, h=30, bgc = (.5,
-                                                                                                                 .5,
-                                                                                                                 .4),
-                                     c = align_along_curve)
+                                     .5,.4),  c = align_along_curve)
     widgets["extrudeBut"] = cmds.button(l="create poly extrusion (profile then crv)",  w=280, h=30,
-                                        bgc = (.5,
-                                                                                                                 .4,
-                                                                                                                 .4),
+                                        bgc = (.5,.4,.4),
                                      c = extrude_curve)
     cmds.formLayout(widgets["alExFLO"], e=True, af=[
         (widgets["alExText"], "left", 10),
@@ -180,26 +175,50 @@ def crvToolsUI():
     widgets["rigCLO"] = cmds.columnLayout("Rigs")
     widgets["ctrlCrvFrLO"] = cmds.frameLayout("Ctrls on Curves Setup", w=width, cll=False, bgc = (0, 0, 0),
                                             cc=resize_window)
-    widgets["ctrlCrvCLO"] = cmds.columnLayout()
-    widgets["ctrlCrvBut"] = cmds.button(l="ctrl on crv button", w=280,)
+    widgets["ctrlCrvFLO"] = cmds.formLayout(w=width,h=65 , bgc = (.3, .3, .3))
+    widgets["ctrCrvTxt"] = cmds.text("Select crvs and this will create controls on each pt", al="left")
+    widgets["ctrlCrvBut"] = cmds.button(l="ctrl on crv button", w=280, h=30, bgc=(.5, .5, .4), c=zcc.curveCVControls)
+    cmds.formLayout(widgets["ctrlCrvFLO"], e=True, af=[
+        (widgets["ctrCrvTxt"], "left", 10),
+        (widgets["ctrCrvTxt"], "top", 5),
+        (widgets["ctrlCrvBut"], "left", 10),
+        (widgets["ctrlCrvBut"], "top", 25)])
 
     cmds.setParent(widgets["rigCLO"])
     widgets["spacedRigFrLO"] = cmds.frameLayout("Spaced Ctrls on Curves Setup", w=width, cll=False, bgc = (0, 0, 0),
                                             cc=resize_window)
-    widgets["spacedRigCLO"] = cmds.columnLayout()
-    widgets["spacedRigBut"] = cmds.button(l="spaced ctrl on crv button", w=280,)
+    widgets["spacedRigFLO"] = cmds.formLayout(w=width,h=65 , bgc = (.3, .3, .3))
+    widgets["spacedRigTxt"] = cmds.text("Select Curve stuff", al="left")
+    widgets["spacedRigBut"] = cmds.button(l="spaced ctrl on crv button", w=280,h=30, bgc=(.4, .5, .4))
+    cmds.formLayout(widgets["spacedRigFLO"], e=True, af=[
+        (widgets["spacedRigTxt"], "left", 10),
+        (widgets["spacedRigTxt"], "top", 5),
+        (widgets["spacedRigBut"], "left", 10),
+        (widgets["spacedRigBut"], "top", 25)])
 
     cmds.setParent(widgets["rigCLO"])
     widgets["crvExtrudeFrLO"] = cmds.frameLayout("curve extrusion Setup", w=width, cll=False, bgc = (0, 0, 0),
                                             cc=resize_window)
-    widgets["crvExtrudeCLO"] = cmds.columnLayout()
-    widgets["crvExtrudeBut"] = cmds.button(l="open curve extrusion button", w=280,)
+    widgets["crvExtrudeFLO"] = cmds.formLayout(w=width, h=65, bgc = (.3, .3, .3))
+    widgets["crvExtrudeTxt"] = cmds.text("Open curve_extrusion rig window", al="left")
+    widgets["crvExtrudeBut"] = cmds.button(l="open curve extrusion button", w=280,h=30, bgc=(.4, .4, .5), c=curve_extrude)
+    cmds.formLayout(widgets["crvExtrudeFLO"], e=True, af=[
+        (widgets["crvExtrudeTxt"], "left", 10),
+        (widgets["crvExtrudeTxt"], "top", 5),
+        (widgets["crvExtrudeBut"], "left", 10),
+        (widgets["crvExtrudeBut"], "top", 25)])
 
     cmds.setParent(widgets["rigCLO"])
     widgets["moPathFrLO"] = cmds.frameLayout("moPath builder", w=width, cll=False, bgc = (0, 0, 0),
                                             cc=resize_window)
-    widgets["moPathCLO"] = cmds.columnLayout()
-    widgets["moPathBut"] = cmds.button(l="maybe create mopath rig?", w=280,)
+    widgets["moPathFLO"] = cmds.formLayout(w=width, h=65, bgc = (.3, .3, .3))
+    widgets["moPathTxt"] = cmds.text("Select obj, then crv, create mopath", al="left")
+    widgets["moPathBut"] = cmds.button(l="maybe create mopath rig?", w=280, h=30, bgc=(.5, .4, .4))
+    cmds.formLayout(widgets["moPathFLO"], e=True, af=[
+        (widgets["moPathTxt"], "left", 10),
+        (widgets["moPathTxt"], "top", 5),
+        (widgets["moPathBut"], "left", 10),
+        (widgets["moPathBut"], "top", 25)])
 
     cmds.window(widgets["win"], e=True, w=5, h=5, resizeToFitChildren = True, sizeable=True)
     cmds.showWindow(widgets["win"])
@@ -280,30 +299,6 @@ def move_pivot(end, *args):
                 cmds.xform(x, ws=True, piv=pos)
             else:
                 cmds.warning("{0} is not a nurbsCurve object. Skipping!".format(x))
-
-
-def controls_on_curve(*args):
-    """
-    puts the controls on each point and links the points to the controls
-    Args:
-    Returns:
-    """
-    sel = cmds.ls(sl=True, type="transform")
-
-    for crv in sel:
-        if rig.isType(crv, "nurbsCurve"):
-            cvs = cmds.ls("{0}.cv[*]".format(crv), fl=True)
-            for x in range(0, len(cvs)):
-                pos = cmds.pointPosition(cvs[x])
-                shp = cmds.listRelatives(crv, s=True)[0]
-                ctrl = rig.createControl(type="sphere", name="{0}_{1}_CTRL".format(crv, x), color="red")
-                grp = rig.groupFreeze(ctrl)
-
-                cmds.xform(grp, ws=True, t=pos)
-
-                dm = cmds.shadingNode("decomposeMatrix", asUtility=True, name="{0}_{1}_DM".format(crv, x))
-                cmds.connectAttr("{0}.worldMatrix[0]".format(ctrl), "{0}.inputMatrix".format(dm))
-                cmds.connectAttr("{0}.outputTranslate".format(dm), "{0}.controlPoints[{1}]".format(shp, x))
 
 
 def reparameter(*args):
@@ -657,24 +652,6 @@ def hammer_points(neighbors = 3):
         cmds.xform(tgtPt, ws=True, t=newPos)
 
 
-def line_through_objects(*args):
-    """
-    select objs and this will draw a curve through their pivots (in order)
-    [uniform] is bool that tells whether to rebuild the curve to be uniform
-    """
-    sel = cmds.ls(sl=True, fl=True)
-    pts = []
-
-    for obj in sel:
-        pos = cmds.xform(obj, q=True, ws=True, rp=True)
-        pts.append(pos)
-        
-    crv = cmds.curve(d=3, ep=pts)
-
-#---------------- option to connect objs to ep's
-#---------------- cmds.connectAttr("curveShape1.editPoints[2]", "pSphere3.translate", f=True)
-
-
 def align_along_curve(*args):
     """
     aligns and objet along a curve at given param
@@ -697,8 +674,11 @@ def align_along_curve(*args):
 
     rig.align_to_curve(crv, obj, param)
 
+
 def extrude_curve(*args):
     pass
+# extrude -ch true -rn false -po 1 -et 2 -ucp 1 -fpt 1 -upn 1 -rotation 0 -scale 1 -rsp 1 "nurbsCircle1" "newCurve" ;
+
 
 
 def curveTools():
