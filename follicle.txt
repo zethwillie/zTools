@@ -1,9 +1,0 @@
-string $poly[] = `ls -sl -dag -type mesh`;
-string $fol = `createNode follicle`;
-string $folTrans[] = `listRelatives -parent $fol`;
-connectAttr -f ($poly[0]+".worldMatrix") ($fol+".inputWorldMatrix");
-connectAttr -f ($poly[0]+".outMesh") ($fol + ".inputMesh");
-connectAttr -f ($fol+".outTranslate") ($folTrans[0] + ".translate");
-connectAttr -f ($fol+".outRotate") ($folTrans[0] + ".rotate");
-setAttr ($fol+".parameterU") 0.75;
-setAttr ($fol+".parameterV") 0.75;

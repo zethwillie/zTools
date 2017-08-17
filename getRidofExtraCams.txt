@@ -1,5 +1,0 @@
-for ($camera in `ls -sl -type "camera" -dag`)
-{
-camera -e -startupCamera false $camera;
-delete `listRelatives -p $camera`;
-}

@@ -1,8 +1,0 @@
-
-
-global proc zooToolbox() {
-	python( "import zooToolbox; zooToolbox.ToolboxWindow()" );
-	}
-
-
-//zoo.end

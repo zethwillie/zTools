@@ -1,2 +1,0 @@
-
-    for attr in attrs:
