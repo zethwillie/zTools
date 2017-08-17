@@ -4,7 +4,7 @@ import random
 from functools import partial
 
 # to run: (in python window in maya) import zbw_anim_import as zai; zai.anim_import()
-
+# extra stuff for git check here. .. delete me!
 widgets = {}
 def import_anim_UI():
 	width = 400
