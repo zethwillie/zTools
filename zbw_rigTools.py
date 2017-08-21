@@ -15,13 +15,10 @@
 import maya.cmds as cmds
 import maya.mel as mel
 import maya.OpenMaya as om
-
-########
 import zTools.zbw_rig as rig
 from functools import partial
 
 ########## -------- add some tooltips to these buttons
-
 widgets = {}
 
 zDict = {"attr":"import zTools.zbw_attributes as zat; reload(zat); zat.attributes()", 
@@ -180,6 +177,7 @@ def rigToolsUI(*args):
 # functions
 ##########
 
+
 def control(type="none", *args):
     """gets teh name from the button pushed and the axis from the radio button group"""
     axisRaw = cmds.radioButtonGrp(widgets["ctrlAxisRBG"], q=True, sl=True)
@@ -192,6 +190,7 @@ def control(type="none", *args):
 
     rig.createControl(name = "Ctrl", type = type, axis = axis, color = "yellow")
 
+
 def zAction(action="none", *args):
     """grabs the action key from the dictionary and executes that value"""
     
@@ -202,6 +201,7 @@ def zAction(action="none", *args):
 
     else:
         cmds.warning("zbw_rigTools.zAction: For some reason this script isn't in my dictionary")
+
 
 def remNS(*args):
     """removes namespaces . . . """
@@ -237,6 +237,7 @@ def groupFreeze(*args):
     for obj in sel:
         rig.groupFreeze(obj)
 
+
 def nameCheck(name):
     if cmds.objExists(name):
         name = "{}_GRP".format(name)
@@ -244,6 +245,7 @@ def nameCheck(name):
         nameCheck(name)
     else:
         return(name)
+
 
 def insertGroupAbove(*args):
     sel = cmds.ls(sl=True)
@@ -286,6 +288,7 @@ def freezeAndConnect(*args):
         
         cmds.parentConstraint(ctrl, obj)
 
+
 def parentChain(*args):
     #parent chain (select objs, child first. WIll parent in order selected)
 
@@ -294,8 +297,10 @@ def parentChain(*args):
     for x in range(0, sizeSel-1):
         cmds.parent(sel[x], sel[x+1])
 
+
 def selectHi(*args):
     cmds.select(hi=True)
+
 
 def selectComponents(*args):
     sel = cmds.ls(sl=True)
@@ -314,8 +319,10 @@ def selectComponents(*args):
             else:
                 return
 
+
 def controlsOnCurve(*args):
     pass
+
 
 def changeColor(color, *args):
     """change shape color of selected objs"""
@@ -376,6 +383,7 @@ def center_locator(*args):
         loc = cmds.spaceLocator(name="center_locator")
         cmds.xform(loc, ws=True, t=center)
 
+
 def hideShape(*args):
     """hides the shape nodes of the selected objects"""
 
@@ -389,6 +397,7 @@ def hideShape(*args):
                         cmds.setAttr("{}.visibility".format(s), 0)
                     else:
                         cmds.setAttr("{}.visibility".format(s), 1)
+
 
 def bBox(*args):
     """creates a control based on the bounding box"""
