@@ -1,7 +1,7 @@
 """zbw_shapeClash"""
 
 import maya.cmds as cmds
-import zTools.zbw_clash as clash
+import zTools.resources.zbw_clash as clash
 reload(clash)
 
 # get all shape node clashes

@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-import zTools.zbw_rig as rig
+import zTools.rig.zbw_rig as rig
 from functools import partial
 import maya.OpenMaya as OpenMaya
 #---------------- window with list of deformers from a particular transform (selected component)

@@ -3,7 +3,7 @@
 
 import maya.cmds as cmds
 import maya.mel as mel
-import zTools.zbw_math as mth
+import zTools.resources.zbw_math as mth
 import zTools.zbw_rig as rig
 
 

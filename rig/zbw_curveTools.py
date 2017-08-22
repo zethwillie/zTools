@@ -11,10 +11,10 @@ import maya.cmds as cmds
 import maya.OpenMaya as om
 import math
 from functools import partial
-import zTools.zbw_rig as rig
-import zTools.zbw_curveExtrude as cExtrude
+import zTools.rig.zbw_rig as rig
+import zTools.rig.zbw_curveExtrude as cExtrude
 reload(cExtrude)
-import zTools.zbw_curveCVControls as zcc
+import zTools.rig.zbw_curveCVControls as zcc
 reload(zcc)
 #TODO---------------- on rebuild curves options: have checkbox for keep history, keep original
 #TODO ------------  extrude curve w options
@@ -24,6 +24,7 @@ widgets = {}
 def crvToolsUI():
     if cmds.window("crvToolWin", exists = True):
         cmds.deleteUI("crvToolWin")
+
     width, height = 300, 220
     widgets["win"] = cmds.window("crvToolWin", t="zbw_curveTools", w=width, h=height)
     widgets["mainTLO"] = cmds.tabLayout()

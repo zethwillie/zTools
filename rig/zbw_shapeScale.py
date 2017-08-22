@@ -9,7 +9,7 @@
 ########################
 
 import maya.cmds as cmds
-import zTools.zbw_rig as rig
+import zTools.rig.zbw_rig as rig
 
 widgets = {}
 

@@ -36,7 +36,7 @@ import zbw_rig as rig
 #control that with either dialing the blend shape at the arm angles, or using sdks to drive the clusters at arm angles. probably the latter?
 
 
-import zbw_rig as rig
+import zTools.rig.zbw_rig as rig
 import zbw_window as win
 import maya.OpenMaya as om
 import maya.cmds as cmds

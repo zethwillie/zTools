@@ -9,7 +9,7 @@
 
 #create a follicle on the specified uv location
 import maya.cmds as cmds
-import zbw_rig as rig
+import zTools.rig.zbw_rig as rig
 import maya.mel as mel
 
 widgets = {}

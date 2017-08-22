@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-import zbw_rig as rig
+import zTools.rig.zbw_rig as rig
 
 reload(rig)
 
