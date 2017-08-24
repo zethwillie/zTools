@@ -1,10 +1,10 @@
 ########################
-#file: zbw_rigTools.py
+#file: zbw_tools.py
 #Author: zeth willie
 #Contact: zethwillie@gmail.com, www.williework.blogspot.com
-#Date Modified: 1/17/17
-#To Use: type in python window  "import zbw_rigTools as rigTools; reload(rigTools); rigTools.rigTools()"
-#Notes/Descriptions: some rigging tools. require zTools folder in a python path.
+#Date Modified: 8/17/17
+#To Use: type in python window  "import zbw_tools as tools; reload(tools); tools.tools()"
+#Notes/Descriptions: some rigging, anim, modeling and shading tools. *** requires zTools folder in a python path.
 ########################
 
 # todo: add type finder
@@ -22,9 +22,21 @@ import maya.mel as mel
 import maya.OpenMaya as om
 import zTools.rig.zbw_rig as rig
 from functools import partial
-
+import os
+import zTools.resources.zbw_pipe as pipe
+reload(pipe)
 
 widgets = {}
+
+# make sure maya can see and call mel scripts from zTools (where this is called from)
+zToolsPath = os.path.dirname(os.path.abspath(__file__))
+subpaths = ["", "rig", "resources", "anim", "model", "shaderRender"]
+newPaths = []
+for p in subpaths:
+    thisPath = os.path.join(zToolsPath, p)
+    newPaths.append(thisPath)
+pipe.add_maya_script_paths(newPaths)
+
 
 zRigDict = {
     "attr":"import zTools.rig.zbw_attributes as zat; reload(zat); zat.attributes()",
@@ -42,6 +54,7 @@ zRigDict = {
     "abSym":"mel.eval('abSymMesh')",
     "cmtJntOrnt":"mel.eval('cometJointOrient')"
 }
+
 zAnimDict = {
     "tween":"import zTools.anim.tweenMachine as tm; tm.start()",
     "noise":"import zTools.anim.zbw_animNoise as zAN; reload(zAN); zAN.animNoise()",
@@ -53,6 +66,15 @@ zAnimDict = {
     "randomAttr":"import zTools.anim.zbw_randomAttrs as zRA; reload(zRA); zRA.randomAttrs()",
     "clip":"import zTools.anim.zbw_setClipPlanes as zSC; reload(zSC); zSC.setClipPlanes()",
     "tangents":"import zTools.anim.zbw_tangents as zTan; reload(zTan); zTan.tangents()"
+}
+
+zModelDict = {
+    "extend":"import zTools.model.zbw_polyExtend as zPE; reload(zPE); zPE.polyExtend()",
+    "wrinkle":"import zTools.model.zbw_wrinklePoly as zWP; reload(zWP); zWP.wrinklePoly()"
+}
+
+zShdDict = {
+    "transfer":"import zTools.shaderRender.zbw_shadingTransfer as zST; reload(zST); zST.shadingTransfer()"
 }
 
 colors = {'red':13, 'blue':6, 'green':14, 'yellow':17, 'pink':20, 'ltBlue':18, 'brown':10, 'purple':30, 'dkGreen':7}
@@ -208,9 +230,30 @@ def tools_UI(*args):
     cmds.setParent(widgets["tab"])
     widgets["modelCLO"] = cmds.columnLayout("MODEL", w=280)
     # curve tools, model scripts, add to lattice, select hierarchy, snap selection buffer, transform buffer
+    widgets["MaddToLat"] = cmds.button(l="add to lattice", w=135, bgc=(.5, .7, .5), c=add_lattice)
+    widgets["extend"] = cmds.button(l="zbw_polyExtend", w=135, bgc = (.7, .5, .5), c=partial(zAction, zModelDict,
+                                                                                             "extend"))
+    widgets["wrinkle"] = cmds.button(l="zbw_wrinklePoly", w=135, bgc = (.7, .5, .5), c=partial(zAction, zModelDict,
+                                                                                             "wrinkle"))
+    widgets["McrvTools"] = cmds.button(l="zbw_curveTools", w=135, bgc = (.7, .5, .5), c=partial(zAction,
+                                                                                               zRigDict, "crvTools"))
+    widgets["MtrnBuffer"] = cmds.button(l="zbw_transformBuffer", w=135, bgc = (.7, .5, .5), c=partial(zAction,
+                                                                                                     zRigDict,
+                                                                                                     "trfmBuffer"))
+
+    widgets["MrandomSel"] = cmds.button(l="zhw_randomSel", w=135, bgc = (.7, .5, .5), c=partial(zAction, zAnimDict,
+                                                                                             "randomSel"))
+    widgets["MselBufBut"] = cmds.button(l="zbw_selectionBuffer", w=135, bgc = (.7, .5, .5), c=partial(zAction,
+                                                                                                     zRigDict,
+                                                                                                     "selBuf"))
+    widgets["MsnapBut"] = cmds.button(l="zbw_snap", w=135, bgc = (.7, .5, .5), c=partial(zAction, zRigDict, "snap"))
+    widgets["MabSym"] = cmds.button(l="abSymMesh", w=135, bgc = (.5, .5, .5), c=partial(zAction, zRigDict,
+                                                                                                  "abSym"))
+    widgets["McmtRename"] = cmds.button(l="cometRename", w=135, bgc = (.5, .5, .5), c=partial(zAction,
+                                                                                             zRigDict, "cmtRename"))
+
     cmds.setParent(widgets["tab"])
     widgets["animCLO"] = cmds.columnLayout("ANIM", w=280)
-    # anim scripts and some from rig
     widgets["tween"] = cmds.button(l="tween machine", w=135, bgc = (.5, .5, .5), c=partial(zAction, zAnimDict,"tween"))
     widgets["noise"] = cmds.button(l="zbw_animNoise", w=135, bgc = (.7, .5, .5), c=partial(zAction, zAnimDict,"noise"))
     widgets["audio"] = cmds.button(l="zbw_audioManager", w=135, bgc = (.7, .5, .5), c=partial(zAction, zAnimDict,
@@ -230,6 +273,8 @@ def tools_UI(*args):
 
     cmds.setParent(widgets["tab"])
     widgets["lgtRndCLO"] = cmds.columnLayout("LGTRND", w=280)
+    widgets["transfer"] = cmds.button(l="zbw_shadingTransfer", w=135, bgc = (.7, .5, .5), c=partial(zAction, zShdDict,
+                                                                                             "transfer"))
 
     cmds.window(widgets["win"], e=True, rtf=True, w=5, h=5)
     cmds.showWindow(widgets["win"])

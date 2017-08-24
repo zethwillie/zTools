@@ -1,6 +1,6 @@
 import maya.cmds as cmds
 from functools import partial
-import zTools.mayaDecorators as md
+import zTools.resources.mayaDecorators as md
 # can delete above import if necessary
 
 widgets = {}

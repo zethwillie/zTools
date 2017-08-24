@@ -1200,11 +1200,12 @@ def addToLattice(lat, geo, *args):
     for g in geo:
         cmds.lattice(lat, e=True, g=g)
 
+
 def get_selected_channels(full=True, long=True, *args):
     """
     for ONE object selected, return all selected channels from channel box
     :param full: (boolean) return the full name of the object.attr?, if false then returns only the attr names
-    ":param long: (boolean) whether we should get the long name of the attr. False will give us "short" names
+    :param long: (boolean) whether we should get the long name of the attr. False will give us "short" names
     :return: list of full obj.channel names selected, or (if not "full") just the channnel names
     """
     cBox = mel.eval('$temp=$gChannelBoxName')
@@ -1245,6 +1246,7 @@ def get_selected_channels(full=True, long=True, *args):
     else:
         cmds.warning("zbw_rig.get_selected_channels: I didn't detect any channels selected!")
         return(None)
+
 
 def average_vectors(vecList, *args):
     """
