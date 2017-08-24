@@ -52,7 +52,8 @@ zRigDict = {
     "trfmBuffer":"import zTools.rig.zbw_transformBuffer as ztbuf; reload(ztbuf); ztbuf.transformBuffer()",
     "crvTools":"import zTools.rig.zbw_curveTools as ctool; reload(ctool); ctool.curveTools()",
     "abSym":"mel.eval('abSymMesh')",
-    "cmtJntOrnt":"mel.eval('cometJointOrient')"
+    "cmtJntOrnt":"mel.eval('cometJointOrient')",
+    "autoSquash":"import zTools.rig.zbw_autoSquashRig as zAS; reload(zAS); zAS.autoSquashRig()"
 }
 
 zAnimDict = {
@@ -130,6 +131,9 @@ def tools_UI(*args):
     widgets["remNSBut"] = cmds.button(l="remove all namespaces", w=150, bgc=(.5, .7, .5), c = remove_namespace)
     widgets["cntrLoc"] = cmds.button(l="selection center locator", w=150, bgc=(.5, .7, .5), c = center_locator)
     widgets["addToLat"] = cmds.button(l="add to lattice", w=150, bgc=(.5, .7, .5), c = add_lattice)
+#TODO - buttons for jnt radius? a little field (dv = .1?), little button to execute
+    # widgets["incrJnt"] = cmds.button(l="decrJntRad .1", w=70, bgc=(.5, .7, .5), c = partial(jnt_radius, "decr"))
+    # widgets["decrJnt"] = cmds.button(l="incrJntRad .1", w=70, bgc=(.5, .7, .5), c = parial(jnt_radius, "incr"))
 
 #script Layout
     cmds.setParent(widgets["rigFLO"])
@@ -166,7 +170,11 @@ def tools_UI(*args):
                                                                                                zRigDict, "crvTools"))
     widgets["cmtJntOrnt"] = cmds.button(l="cometJntOrient", w=135, bgc = (.5, .5, .5), c=partial(zAction,
                                                                                               zRigDict, "cmtJntOrnt"))
-
+    widgets["autoSqRig"] = cmds.button(l="zbw_autoStretchRig", w=135, bgc = (.7, .5, .5), c=partial(zAction,
+                                                                                              zRigDict,
+                                                                                                    "autoSquash"))
+    # widgets["cmtJntOrnt"] = cmds.button(l="cometJntOrient", w=135, bgc = (.5, .5, .5), c=partial(zAction,
+    #                                                                                          zRigDict, "cmtJntOrnt"))
 #color layout
     cmds.setParent(widgets["rigFLO"])
     widgets["colorFLO"] = cmds.formLayout(w=280, h=66, bgc = (0.3,0.3,0.3))
@@ -225,6 +233,8 @@ def tools_UI(*args):
         (widgets["crvTools"], "top", 175),	
         (widgets["abSym"], "left", 140),
         (widgets["abSym"], "top", 175),
+        (widgets["autoSqRig"], "left", 0),
+        (widgets["autoSqRig"], "top", 200),
         ])	
 
     cmds.setParent(widgets["tab"])
@@ -306,6 +316,10 @@ def zAction(dict=None, action=None, *args):
     else:
         cmds.warning("zbw_tools.zAction: There was a problem with either the key or the dictionary given! (key: {0}, "
                      "action: {1}".format(action, dict))
+
+
+def jnt_radius(mode=None, *args):
+    pass
 
 
 def remove_namespace(*args):

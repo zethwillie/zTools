@@ -9,6 +9,7 @@
 
 import sys, os
 import maya.cmds as cmds
+import maya.mel as mel
 from functools import partial
 
 widgets = {}
@@ -30,12 +31,13 @@ def appendUI():
     cmds.menuItem(l="Save Add Paths", c=saveValues)
     cmds.menuItem(l="Load Add Paths", c=loadValues)
 
-    widgets["tabLO"] = cmds.tabLayout(h=190)
+    widgets["tabLO"] = cmds.tabLayout(h=210)
     widgets["columnLO"] = cmds.columnLayout("Add Paths", w=500)
     widgets["path1"] = cmds.textFieldButtonGrp(l="path1", cal=[(1, "left"), (2,"left"),(3,"left")], cw3=(40, 410, 50), bl="<<<", bc=partial(addToField, 1))
     widgets["path2"] = cmds.textFieldButtonGrp(l="path2", cal=[(1, "left"), (2,"left"),(3,"left")], cw3=(40, 410, 50), bl="<<<", bc=partial(addToField, 2))
     widgets["path3"] = cmds.textFieldButtonGrp(l="path3", cal=[(1, "left"), (2,"left"),(3,"left")], cw3=(40, 410, 50), bl="<<<", bc=partial(addToField, 3))
-
+    widgets["melCBG"] = cmds.checkBoxGrp(ncb=1, l1="also add to mel path (MAYA_SCRIPT_PATH)", v1=1, cal=[(1, "left"), (2,
+                                                                                                                 "left")], cw = [(1, 100), (2,25)])
     cmds.separator(h=10, st="single")
 
     widgets["buttonRCL"] = cmds.rowColumnLayout(nc=3, w=500, cw=[(1,123),(2,247 ),(3,123)])
@@ -53,7 +55,8 @@ def appendUI():
     cmds.setParent(widgets["tabLO"])
     widgets["columnLO2"] = cmds.columnLayout("View Paths", w=500)
     cmds.text("Double-click to display full path in script editor")
-    widgets["listTSL"] = cmds.textScrollList(w=500, h=100, fn="smallPlainLabelFont", append=["click button below", "to refresh this list!"], dcc=printMe)
+    widgets["listTSL"] = cmds.textScrollList(w=500, h=120, fn="smallPlainLabelFont", append=["click button below",
+                                                                                           "to refresh this list!"], dcc=printMe)
     refresh()
     cmds.separator(h=5, style="single")
 
@@ -142,6 +145,7 @@ def printMe():
 
 def append(*args):
     paths = []
+    melChk = cmds.checkBoxGrp(widgets["melCBG"], q=True, v1=True)
 
     #get paths
     path1 = cmds.textFieldButtonGrp(widgets["path1"], q=True, tx=True)
@@ -165,6 +169,16 @@ def append(*args):
                 cmds.warning("%s is not an existing path and wasn't added to sys.path"%path)
     if check > 0:
         cmds.warning("Added paths! Check the 'View Paths' tab to see them")
+
+    if melChk:
+        # do the mel script path adding
+        scriptPathList = [x for x in os.environ["MAYA_SCRIPT_PATH"].split(";")]
+        for path in paths:
+            if path not in scriptPathList:
+                scriptPathList.append(path)
+        newScriptPathList = ";".join(scriptPathList)
+        os.putenv('MAYA_SCRIPT_PATH', newScriptPathList)
+        mel.eval("rehash;")
 
     #delete the text
     cmds.textFieldButtonGrp(widgets["path1"], e=True, tx="")
