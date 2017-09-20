@@ -1,3 +1,14 @@
+########################
+# File: zbw_autoSquashRig.py
+# Date Modified: 13 Sep 2017
+# creator: Zeth Willie
+# Contact: zethwillie@gmail.com, catbuks.com, williework.blogspot.com
+# Description: creates a little hierarchy with some squash deformers on it in two directions
+# To Run: type "import zTools.rig.zbw_autoSquashRig as zbw_autoSquashRig; reload(
+# zbw_autoSquashRig);zbw_autoSquashRig.zbw_autoSquashRig()"
+########################
+
+
 import maya.cmds as cmds
 import zTools.rig.zbw_rig as rig
 
@@ -7,6 +18,7 @@ def create_squash_rig(*args):
     :param args:
     :return:
     """
+
     sel = cmds.ls(sl=True, type="transform")
 
     if not sel:

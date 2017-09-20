@@ -170,7 +170,7 @@ def tools_UI(*args):
                                                                                                zRigDict, "crvTools"))
     widgets["cmtJntOrnt"] = cmds.button(l="cometJntOrient", w=135, bgc = (.5, .5, .5), c=partial(zAction,
                                                                                               zRigDict, "cmtJntOrnt"))
-    widgets["autoSqRig"] = cmds.button(l="zbw_autoStretchRig", w=135, bgc = (.7, .5, .5), c=partial(zAction,
+    widgets["autoSqRig"] = cmds.button(l="zbw_autoSquashRig", w=135, bgc = (.7, .5, .5), c=partial(zAction,
                                                                                               zRigDict,
                                                                                                     "autoSquash"))
     # widgets["cmtJntOrnt"] = cmds.button(l="cometJntOrient", w=135, bgc = (.5, .5, .5), c=partial(zAction,
