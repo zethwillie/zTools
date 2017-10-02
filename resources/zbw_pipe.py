@@ -4,8 +4,9 @@ import maya.cmds as cmds
 
 # MAKE THIS TAKE A LIST!! OR OVERRIDE STRING IF WE WANT THAT OPTION
 def add_maya_script_paths(pathList=None, *args):
-    #adds given path to MAYA_SCRIPT_PATH temp variable in maya session
-
+    """
+    adds given path to MAYA_SCRIPT_PATH temp variable in maya session
+    """
     scriptPathList = get_maya_script_path_list()
     for path in pathList:
         if path not in scriptPathList:
@@ -29,5 +30,8 @@ def get_current_script_full_path(*args):
 
 
 def get_maya_script_path_list(*args):
+    """
+    returns the list of maya's script paths
+    """
     scriptPathList = [x for x in os.environ["MAYA_SCRIPT_PATH"].split(";")]
     return(scriptPathList)

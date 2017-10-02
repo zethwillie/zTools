@@ -1,8 +1,3 @@
-#
-#to run. . .
-#import zbw_clipPlanes as cp
-#cp.clipPlanes()
-#
 import maya.cmds as cmds
 
 def setClipUI(*args):

@@ -17,12 +17,12 @@
 # todo maybe add shader/uv transfer to rig?
 # TODo move the dictionary to resources and pull it from there
 
+from functools import partial
+import os
 import maya.cmds as cmds
 import maya.mel as mel
 import maya.OpenMaya as om
 import zTools.rig.zbw_rig as rig
-from functools import partial
-import os
 import zTools.resources.zbw_pipe as pipe
 reload(pipe)
 
@@ -294,7 +294,10 @@ def tools_UI(*args):
 ##########
 
 def control(type="none", *args):
-    """gets the name from the button pushed and the axis from the radio button group"""
+    """
+    gets the name from the button pushed and the axis from the radio button group
+    and creates a control at the origin
+    """
     axisRaw = cmds.radioButtonGrp(widgets["ctrlAxisRBG"], q=True, sl=True)
     if axisRaw == 1:
         axis = "x"
@@ -307,7 +310,9 @@ def control(type="none", *args):
 
 
 def zAction(dict=None, action=None, *args):
-    """grabs the action key from the given dictionary and executes that value"""
+    """
+    grabs the action key from the given dictionary and executes that value
+    """
     if action and dict:
         x = dict[action]
         print "executing: {}".format(x)

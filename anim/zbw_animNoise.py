@@ -3,7 +3,7 @@ import random
 from functools import partial
 
 # TODO----------------make sure that it only evaluates on the attrs we want (store the values and add them without having to go the frames for each)
-# TODO ----------- do each channel independently
+# TODO ----------- option to do each channel independently
 
 widgets = {}
 
@@ -17,15 +17,10 @@ def animNoiseUI():
     widgets["ampFFG"] = cmds.floatFieldGrp(cal=(1, 'left'), nf=2, l="set Min/Max Amp", v1=-1.0, v2=1.0)
     #add gradient?
     widgets["freqIFG"] = cmds.intFieldGrp(cal=(1,'left'), l='frequency(frames)', v1=5)
-    #checkbox for random freq
     widgets["randFreqOnCBG"] = cmds.checkBoxGrp(cal=(1,'left'), cw=(1, 175),l='random frequency on', v1=0, cc=animNoiseRandom)
     widgets["randFreqFFG"] = cmds.floatFieldGrp(l='random freq (frames)', v1=1, en=0)
-    #checkbox for avoid keys
     widgets["avoidCBG"] = cmds.checkBoxGrp(cal=(1,'left'), cw=(1, 175),l='buffer existing keys (by freq)', v1=0)
-    #radiobutton group for tangents
-    #checkbox for timeline range
     widgets["rangeRBG"] = cmds.radioButtonGrp(nrb=2,l="Frame Range:", l1="Timeslider", l2="Frame Range", sl=1, cw=[(1,100),(2,75),(3,75)],cc=enableFrameRange)
-    #floatFieldGrp for range
     widgets["frameRangeIFG"] = cmds.intFieldGrp(nf=2, l='start/end frames', v1=1, v2=10, en=0)
 
     widgets["goBut"] = cmds.button(l='Add Noise', width=300, h=30, bgc=(.6,.8,.6), command=addNoise)
