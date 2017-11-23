@@ -1,8 +1,7 @@
 import sys
 import maya.cmds as cmds
 import os
-
-"""run findScript()"""
+ 
 
 widgets = {}
 

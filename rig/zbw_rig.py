@@ -313,7 +313,7 @@ def getVertUV(vertsList = [], *args):
 def alignToUV(targetObj="none", sourceObj="none", sourceU=0.0, sourceV=0.0, mainAxis="+z", secAxis="+x", UorV="v"):
     """
     inputs should be 1. targetObj 2. sourceObj 3. sourceU 4. sourceV 5. mainAxis(lowerCase, + or -, i.e."-x" 8. secAxis (lowcase, + or -) 7, UorV ("u" or "v" for the direction along surface for the sec axis)
-"""
+    """
 
     axisDict = {"+x":(1,0,0), "+y":(0,1,0), "+z":(0,0,1), "-x":(-1,0,0), "-y":(0,-1,0), "-z":(0,0,-1)}
 
@@ -640,16 +640,6 @@ def reverseSetup(inAttr, strAttr, revAttr, rName, *args):
 # ##    cmds.expression(object=obj, string=expr)
 #   pass
 
-# def snapToVertex():
-# ##    get the selection of vertex (flatten it?)
-# ##    get the worldspace location of the vertex
-# ##    move the obj to the location of the vertex
-#   pass
-
-# def nameTypeSelection():
-# ##    get wildcard selection and type selection
-# ##    loop selection to select add
-#   pass
 
 # def createQSS(name="none", *args):
 # ##    if name == "none":
@@ -1266,11 +1256,8 @@ def integer_test(obj, *args):
     :param args:
     :return:  boolean
     """
-    try:
-        int(obj)
-        return True
-    except:
-        return False
+    x = isinstance(obj, int)
+    return(x)
 
 
 def increment_name(name, *args):
@@ -1517,6 +1504,8 @@ def new_joint_bind_at_center(tform, *args):
 def plugin_load(plugin, *args):
     """
     checks whether plugin is loaded. Loads it if not
+    Args: 
+        plugin (string): actual name of plugin to check for
     """
     loaded = cmds.pluginInfo(plugin, q=True, loaded=True)
     if not loaded:
