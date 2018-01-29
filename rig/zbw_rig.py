@@ -1570,10 +1570,10 @@ def align_to_curve(crv=None, obj=None, param=None, *args):
 def get_nonOrig_shapes(*args):
     pass
 
-def increment_names(name, nameList?, *args):
-    """
-    2 different ways at the moment to increment some names
-    """
+# def increment_names(name, nameList?, *args):
+#     """
+#     2 different ways at the moment to increment some names
+#     """
     # backfilling
 
     # import fnmatch
