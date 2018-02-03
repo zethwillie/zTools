@@ -25,6 +25,7 @@ import maya.OpenMaya as om
 import zTools.rig.zbw_rig as rig
 import zTools.resources.zbw_pipe as pipe
 reload(pipe)
+import zTools.resources.zbw_removeNamespaces as rmns
 
 widgets = {}
 
@@ -35,6 +36,8 @@ newPaths = []
 for p in subpaths:
     thisPath = os.path.join(zToolsPath, p)
     newPaths.append(thisPath)
+
+# set up these zTools paths for maya to recognize mel scripts
 pipe.add_maya_script_paths(newPaths)
 
 
@@ -53,7 +56,8 @@ zRigDict = {
     "crvTools":"import zTools.rig.zbw_curveTools as ctool; reload(ctool); ctool.curveTools()",
     "abSym":"mel.eval('abSymMesh')",
     "cmtJntOrnt":"mel.eval('cometJointOrient')",
-    "autoSquash":"import zTools.rig.zbw_autoSquashRig as zAS; reload(zAS); zAS.autoSquashRig()"
+    "autoSquash":"import zTools.rig.zbw_autoSquashRig as zAS; reload(zAS); zAS.autoSquashRig()",
+    "BSpirit":"mel.eval('BSpiritCorrectiveShape')"
 }
 
 zAnimDict = {
@@ -110,11 +114,13 @@ def tools_UI(*args):
     widgets["starBut"] = cmds.button(l="star", w=113, h=20, bgc=(.7, .7, .5), c = partial(control, "star"))
     widgets["octagonBut"] = cmds.button(l="octagon", h=20, w=113, bgc=(.7, .7, .5), c = partial(control, "octagon"))
     widgets["halfCircBut"] = cmds.button(l="half circle", h=20, w=113, bgc=(.7, .7, .5), c = partial(control, "halfCircle"))
-    widgets["crossArrow"] = cmds.button(l="arrow cross", h=20, w=113, bgc=(.7, .7, .5), c = partial(control, "arrowCross"))	
+    widgets["crossArrow"] = cmds.button(l="arrow cross", h=20, w=113, bgc=(.7, .7, .5), c = partial(control, "arrowCross")) 
     cmds.separator(h=10, style="none")
     widgets["ctrlAxisRBG"] = cmds.radioButtonGrp(nrb=3, la3=("x", "y", "z"), cw=([1, 33], [2, 33], [3, 33]), cal=([1, "left"], [2, "left"], [3, "left"]), sl=1)
 
-#action layout
+# TODO - add scale factor field for control creation
+
+    #action layout
     cmds.setParent(widgets["rigFLO"])
     widgets["actionFLO"] = cmds.formLayout(w=150, h=380, bgc = (0.3,0.3,0.3))
     widgets["actionFrLO"] = cmds.frameLayout(l="ACTIONS", w=150, h=380, bv=True, bgc = (0.3,0.3,0.3))
@@ -124,22 +130,23 @@ def tools_UI(*args):
     widgets["grpCnctBut"] = cmds.button(l="group freeze connect", w=150, bgc=(.5, .7, .5), c = freeze_and_connect)
     widgets["slctHiBut"] = cmds.button(l="select hierarchy", w=150, bgc=(.5, .7, .5), c = select_hi)
     widgets["prntChnBut"] = cmds.button(l="parent chain selected", w=150, bgc=(.5, .7, .5), c = parent_chain)
-    widgets["hideShp"] = cmds.button(l="selection toggle shape vis", w=150, bgc=(.5, .7, .5), c=hide_shape)
+    widgets["hideShp"] = cmds.button(l="selection shape vis toggle", w=150, bgc=(.5, .7, .5), c=hide_shape)
     widgets["slctCmptBut"] = cmds.button(l="select components", w=150, bgc=(.5, .7, .5), c = select_components)
-    widgets["bBox"] = cmds.button(l="bounding box control", w=150, bgc=(.5, .7, .5), c=bBox)	
+    widgets["bBox"] = cmds.button(l="bounding box control", w=150, bgc=(.5, .7, .5), c=bBox)    
     widgets["cpSkinWtsBut"] = cmds.button(l="copy skin & weights", w=150, bgc=(.5, .7, .5), c = copy_skinning)
     widgets["remNSBut"] = cmds.button(l="remove all namespaces", w=150, bgc=(.5, .7, .5), c = remove_namespace)
     widgets["cntrLoc"] = cmds.button(l="selection center locator", w=150, bgc=(.5, .7, .5), c = center_locator)
     widgets["addToLat"] = cmds.button(l="add to lattice", w=150, bgc=(.5, .7, .5), c = add_lattice)
-#TODO - buttons for jnt radius? a little field (dv = .1?), little button to execute
-    # widgets["incrJnt"] = cmds.button(l="decrJntRad .1", w=70, bgc=(.5, .7, .5), c = partial(jnt_radius, "decr"))
-    # widgets["decrJnt"] = cmds.button(l="incrJntRad .1", w=70, bgc=(.5, .7, .5), c = parial(jnt_radius, "incr"))
+    widgets["snapto"] = cmds.button(l="snap B to A", w=150, bgc=(.5, .7, .5), c = snap_b_to_a)
+    widgets["sclPrntCnstr"] = cmds.button(l="Parent+Scl Constrain", w=150, bgc=(.5, .7, .5), c = parent_scale_constrain)
+# todo - group freeze connect AND parent ctrls into a hierarchy
+# todo - group freeze should leave object in place in hierarchy?
 
-#script Layout
+    #script Layout
     cmds.setParent(widgets["rigFLO"])
     widgets["zScrptFLO"] = cmds.formLayout(w=280, bgc = (0.3,0.3,0.3))
     widgets["zScrptFrLO"] = cmds.frameLayout(l="SCRIPTS", w=280, bv=True, bgc = (0.3,0.3,0.3))
-    cmds.setParent(widgets["zScrptFLO"])	
+    cmds.setParent(widgets["zScrptFLO"])    
 
     widgets["attrBut"] = cmds.button(l="zbw_attrs", w=135, bgc = (.7, .5, .5), c=partial(zAction, zRigDict, "attr"))
     widgets["shpSclBut"] = cmds.button(l="zbw_shapeScale", w=135, bgc = (.7, .5, .5), c=partial(zAction,
@@ -173,14 +180,14 @@ def tools_UI(*args):
     widgets["autoSqRig"] = cmds.button(l="zbw_autoSquashRig", w=135, bgc = (.7, .5, .5), c=partial(zAction,
                                                                                               zRigDict,
                                                                                                     "autoSquash"))
-    # widgets["cmtJntOrnt"] = cmds.button(l="cometJntOrient", w=135, bgc = (.5, .5, .5), c=partial(zAction,
-    #                                                                                          zRigDict, "cmtJntOrnt"))
-#color layout
+    widgets["BSpirit"] = cmds.button(l="BSpirtCorrective", w=135, bgc = (.5, .5, .5), c=partial(zAction,
+                                                                                          zRigDict, "BSpirit"))
+    #color layout
     cmds.setParent(widgets["rigFLO"])
     widgets["colorFLO"] = cmds.formLayout(w=280, h=66, bgc = (0.3,0.3,0.3))
     widgets["colorFrLO"] = cmds.frameLayout(l="COLORS", w=280, h=66, bv=True, bgc = (0.3,0.3,0.3))
     widgets["colorRCLO"] = cmds.rowColumnLayout(nc=6)
-    #cmds.setParent(widgets["colorFLO"])
+
     widgets["redCNV"] = cmds.canvas(w=48, h=20, rgb=(1,0,0), pc=partial(changeColor, colors["red"]))
     widgets["blueCNV"] = cmds.canvas(w=48, h=20, rgb=(0,0,1), pc=partial(changeColor, colors["blue"]))
     widgets["greenCNV"] = cmds.canvas(w=48, h=20, rgb=(0,1,0), pc=partial(changeColor, colors["green"]))
@@ -192,7 +199,7 @@ def tools_UI(*args):
     widgets["dkGreenCNV"] = cmds.canvas(w=48, h=20, rgb=(0,.35,0), pc=partial(changeColor, colors["dkGreen"]))
 #---------------- add three more colors    
 
-#formlayout stuff
+    #formlayout stuff
     cmds.formLayout(widgets["rigFLO"], e=True, af=[
         (widgets["ctrlFLO"], "left", 0),
         (widgets["ctrlFLO"], "top", 0), 
@@ -201,41 +208,27 @@ def tools_UI(*args):
         (widgets["zScrptFLO"], "left", 0),
         (widgets["zScrptFLO"], "top", 457),
         (widgets["colorFLO"], "left", 0),
-        (widgets["colorFLO"], "top", 385),				
+        (widgets["colorFLO"], "top", 385),              
         ])
 
     cmds.formLayout(widgets["zScrptFLO"], e=True, af = [
-        (widgets["attrBut"], "left", 0),
-        (widgets["attrBut"], "top", 25),
-        (widgets["selBufBut"], "left", 140),
-        (widgets["selBufBut"], "top", 25),
-        (widgets["shpSclBut"], "left", 0),
-        (widgets["shpSclBut"], "top", 50),
-        (widgets["snapBut"], "left", 140),
-        (widgets["snapBut"], "top", 50),
-        (widgets["smIKBut"], "left", 0),
-        (widgets["smIKBut"], "top", 75),
-        (widgets["sftDefBut"], "left", 140),
-        (widgets["sftDefBut"], "top", 75),
-        (widgets["follBut"], "left", 0),
-        (widgets["follBut"], "top", 100),
-        (widgets["ribbonBut"], "left", 140),
-        (widgets["ribbonBut"], "top", 100),	
-        (widgets["jntRadBut"], "left", 0),
-        (widgets["jntRadBut"], "top", 125),
-        (widgets["cmtRename"], "left", 140),
-        (widgets["cmtRename"], "top", 125),
-        (widgets["trnBuffer"], "left", 0),
-        (widgets["trnBuffer"], "top", 150),						
-        (widgets["cmtJntOrnt"], "left", 140),
-        (widgets["cmtJntOrnt"], "top", 150),
-        (widgets["crvTools"], "left", 0),
-        (widgets["crvTools"], "top", 175),	
-        (widgets["abSym"], "left", 140),
-        (widgets["abSym"], "top", 175),
-        (widgets["autoSqRig"], "left", 0),
-        (widgets["autoSqRig"], "top", 200),
-        ])	
+        (widgets["attrBut"], "left", 0),(widgets["attrBut"], "top", 25),
+        (widgets["selBufBut"], "left", 140), (widgets["selBufBut"], "top", 25),
+        (widgets["shpSclBut"], "left", 0), (widgets["shpSclBut"], "top", 50),
+        (widgets["snapBut"], "left", 140), (widgets["snapBut"], "top", 50),
+        (widgets["smIKBut"], "left", 0), (widgets["smIKBut"], "top", 75),
+        (widgets["sftDefBut"], "left", 140), (widgets["sftDefBut"], "top", 75),
+        (widgets["follBut"], "left", 0), (widgets["follBut"], "top", 100),
+        (widgets["ribbonBut"], "left", 140), (widgets["ribbonBut"], "top", 100),    
+        (widgets["jntRadBut"], "left", 0), (widgets["jntRadBut"], "top", 125),
+        (widgets["cmtRename"], "left", 140), (widgets["cmtRename"], "top", 125),
+        (widgets["trnBuffer"], "left", 0), (widgets["trnBuffer"], "top", 150),                      
+        (widgets["cmtJntOrnt"], "left", 140), (widgets["cmtJntOrnt"], "top", 150),
+        (widgets["crvTools"], "left", 0), (widgets["crvTools"], "top", 175),    
+        (widgets["abSym"], "left", 140), (widgets["abSym"], "top", 175),
+        (widgets["autoSqRig"], "left", 0), (widgets["autoSqRig"], "top", 200),
+        (widgets["BSpirit"], "left", 140), (widgets["BSpirit"], "top", 200),
+        ])  
 
     cmds.setParent(widgets["tab"])
     widgets["modelCLO"] = cmds.columnLayout("MODEL", w=280)
@@ -304,7 +297,7 @@ def control(type="none", *args):
     if axisRaw == 2:
         axis = "y"
     if axisRaw == 3:
-        axis = "z"				
+        axis = "z"              
 
     rig.createControl(name = "Ctrl", type = type, axis = axis, color = "yellow")
 
@@ -323,24 +316,45 @@ def zAction(dict=None, action=None, *args):
                      "action: {1}".format(action, dict))
 
 
-def jnt_radius(mode=None, *args):
-    pass
+def snap_b_to_a(*args):
+    """
+    snaps 2nd selection to 1st, translate and rotate. Transforms only
+    """
+    sel = cmds.ls(sl=True)
+    if sel and len(sel)>1:
+        src = sel[0]
+        if rig.isType(src, "transform"):
+            tgt = sel[1:]
+            for t in tgt:
+                if rig.isType(t, "transform"):
+                    rig.snapTo(src, t)
+
+
+def parent_scale_constrain(*args):
+    """ just creates a parent and scale transform on the tgt object """
+    sel = cmds.ls(sl=True)
+    if not (sel and len(sel)==2):
+        cmds.warning("You need to select two objects!")
+        return()
+    src = sel[0]
+    if rig.isType(src, "transform"):
+        tgt = sel[1]
+        if rig.isType(tgt, "transform"):
+            cmds.parentConstraint(src, tgt, mo=True)
+            cmds.scaleConstraint(src, tgt)
+        else:
+            cmds.warning("The target is not a transform!")
+    else:
+        cmds.warning("The source is not a transform!")
 
 
 def remove_namespace(*args):
     """removes namespaces . . . """
-# TODO - ----- use the rig function for this
-    rem = ["UI", "shared"]
-    ns = cmds.namespaceInfo(lon=True, r=True)
-    for y in rem:
-        ns.remove(y)
-
-    ns.sort(key = lambda a: a.count(":"), reverse=True)
-    for n in ns:
-        ps = cmds.ls("{}:*".format(n), type="transform")
-        for p in ps:
-            cmds.rename(p, p.rpartition(":")[2]) 
-        cmds.namespace(rm=n)
+    ns = rmns.remove_namespaces()
+    if ns:
+        print "Removed namespaces: ", ns
+    else:
+        print "Did not delete any namespaces!"
 
 
 def add_lattice(*args):
@@ -357,18 +371,8 @@ def group_freeze(*args):
     """group freeze an obj"""
 
     sel = cmds.ls(sl=True, type="transform")
-
     for obj in sel:
         rig.groupFreeze(obj)
-
-
-def nameCheck(name):
-    if cmds.objExists(name):
-        name = "{}_GRP".format(name)
-        print name
-        nameCheck(name)
-    else:
-        return(name)
 
 
 def insert_group_above(*args):
@@ -379,8 +383,6 @@ def insert_group_above(*args):
         
         grp = cmds.group(em=True, n="{}_Grp".format(obj))
         
-        # grp = nameCheck(grp)
-
         pos = cmds.xform(obj, q=True, ws=True, rp=True)
         rot = cmds.xform(obj, q=True, ws=True, ro=True)
         
@@ -428,18 +430,14 @@ def select_hi(*args):
 
 def select_components(*args):
     sel = cmds.ls(sl=True)
-
     if sel:
-        
         for obj in sel:
             shape = cmds.listRelatives(obj, s=True)[0]
             
             if cmds.objectType(shape) == "nurbsCurve":
                 cmds.select(cmds.ls("{}.cv[*]".format(obj), fl=True))
-                
             elif cmds.objectType(shape) == "mesh":
                 cmds.select(cmds.ls("{}.vtx[*]".format(obj), fl=True))
-            
             else:
                 return
 
@@ -491,6 +489,7 @@ def copy_skinning(*args):
 def center_locator(*args):
     """creates a center loc on the avg position"""
 
+# differentiate if these are objs or points
     sel = cmds.ls(sl=True, fl=True)
     if sel:
         ps = []

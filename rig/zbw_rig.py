@@ -1267,6 +1267,7 @@ def increment_name(name, *args):
     :param args:
     :return:
     """
+# --------- better version below    
     split = name.rpartition("_")
     end = split[2]
     isInt = integer_test(end)

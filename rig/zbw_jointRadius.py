@@ -14,7 +14,7 @@ def jointRadiusUI(*args):
     widgets["clo"] = cmds.columnLayout(rs=10)
 
     widgets["slider"] = cmds.floatSliderGrp(l="radius", min=0.05, max=2, field=True, fieldMinValue=0.01,
-                                            fieldMaxValue=2, precision=2, sliderStep=0.1, value=0.5,
+                                            fieldMaxValue=50, precision=2, sliderStep=0.1, value=0.5,
                                             cw=([1, 40], [2, 45], [3, 115]),
                                             cal=([1, "left"], [2, "left"], [3, "left"]))
     # radio button group, all or selected
