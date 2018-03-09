@@ -320,32 +320,24 @@ def snap_b_to_a(*args):
     """
     snaps 2nd selection to 1st, translate and rotate. Transforms only
     """
-    sel = cmds.ls(sl=True)
+    sel = cmds.ls(sl=True, type="transform")
     if sel and len(sel)>1:
         src = sel[0]
-        if rig.isType(src, "transform"):
-            tgt = sel[1:]
-            for t in tgt:
-                if rig.isType(t, "transform"):
-                    rig.snapTo(src, t)
+        tgt = sel[1:]
+        for t in tgt:
+            rig.snapTo(src, t)
 
 
 def parent_scale_constrain(*args):
     """ just creates a parent and scale transform on the tgt object """
-    sel = cmds.ls(sl=True)
+    sel = cmds.ls(sl=True, type="transform")
     if not (sel and len(sel)==2):
-        cmds.warning("You need to select two objects!")
+        cmds.warning("You need to select two tranform objects!")
         return()
     src = sel[0]
-    if rig.isType(src, "transform"):
-        tgt = sel[1]
-        if rig.isType(tgt, "transform"):
-            cmds.parentConstraint(src, tgt, mo=True)
-            cmds.scaleConstraint(src, tgt)
-        else:
-            cmds.warning("The target is not a transform!")
-    else:
-        cmds.warning("The source is not a transform!")
+    tgt = sel[1]
+    cmds.parentConstraint(src, tgt, mo=True)
+    cmds.scaleConstraint(src, tgt)
 
 
 def remove_namespace(*args):

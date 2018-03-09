@@ -110,6 +110,8 @@ def transferUV(src, tgts, deleteHistory=False, *args):
                 if intObj:
                     print "transferring uvs to {0}.intermediateObject".format(intObj)
                     cmds.setAttr("{0}.intermediateObject".format(intObj), 0)
+                # try this instead? Maybe don't need intermediate object?
+                # cmds.polyTransfer(t, uv=1, ao=src)
                     cmds.transferAttributes(srcShp, intObj, uvs=2, sampleSpace=4)
                     cmds.delete(intObj, constructionHistory=True)
                     cmds.setAttr("{0}.intermediateObject".format(intObj), 1)

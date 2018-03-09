@@ -850,6 +850,7 @@ def isType(obj, typeCheck, *args):
     returns boolean
     give an object and type of object and this will look at a) the node itself and b) if node is transform, will look at shape node
     """
+# somethings not working with the transform bit here
     if cmds.objExists(obj):
         tempType = cmds.objectType(obj)
         if typeCheck == "transform":
