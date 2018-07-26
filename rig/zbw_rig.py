@@ -12,7 +12,9 @@ import maya.mel as mel
 import maya.OpenMaya as om
 
 def getTwoSelection(*args):
-    """gets two objects (only first 2) from selection and returns them in selected order as a list"""
+    """
+    gets two objects (only first 2) from selection and returns them in selected order as a list
+    """
     sel = cmds.ls(sl=True)
     if sel:
         objs = sel[:1]
@@ -52,10 +54,10 @@ def jointFromList(xformList=[], orient="xyz", secAxis="zup", strip="", suffix=""
     return(jointList)
 
 
-def follicle(surface="none", folName="none", u=0.5, v=0.5, *args):
+def follicle(surface="none", name="none", u=0.5, v=0.5, *args):
     """
     creates a follicle on a surface based on the uv input.
-    Args are: surface, folName, u, v
+    Args are: surface, name, u, v
     """
 #------------do a bit more checking here to make sure the shapes, numbers etc work out
     if surface=="none":
@@ -66,18 +68,23 @@ def follicle(surface="none", folName="none", u=0.5, v=0.5, *args):
         surfaceXform = surface
         surfaceShape = cmds.listRelatives(surfaceXform, shapes=True)[0]
 
-    if folName == "none":
-        folShapeName = "myFollicleShape"
-        folXformName = "myFollicle"
+    if name == "none":
+        folShapeName = "newFollicleShape"
+        folXformName = "newFollicle"
     else:
-        folShapeName = "%sShape"%folName
-        folXformName = folName
+        folShapeName = "%sShape"%name
+        folXformName = name
 
-#------------test if follicle exists
+#------------test if follicle exists - FIX THE INCREMENT SCRIPT TO WORK BETTER
+    # if cmds.objExists(folXformName):
+    #     increment_name(folXformName)
+
+# rename follicle xform (will rename shape, get shape name)
+
     #create the follicle
     folShape = cmds.createNode("follicle", n=folShapeName)
     folXform = cmds.listRelatives(folShape, p=True, type="transform")[0]
-    cmds.rename(folXform, folXformName)
+    #cmds.rename(folXform, folXformName)
 
     #connect up the follicle!
     #connect the matrix of the surface to the matrix of the follicle
@@ -100,6 +107,14 @@ def follicle(surface="none", folName="none", u=0.5, v=0.5, *args):
 
     cmds.setAttr("%s.translate"%folXform, l=True)
     cmds.setAttr("%s.rotate"%folXform, l=True)
+
+    attrsToHide = ["restPose", "pointLock", "simulationMethod", "startDirection", "flipDirection",
+                     "overrideDynamics", "collide", "damp", "stiffness", "lengthFlex", "clumpWidthMult",
+                     "startCurveAttract", "attractionDamp", "densityMult", "curlMult", "clumpTwistOffset",
+                     "braid", "colorBlend", "colorR", "colorG", "colorB", "fixedSegmentLength", "segmentLength",
+                     "sampleDensity", "degree", "clumpWidth"]
+    for attr in attrsToHide:
+        cmds.setAttr("{0}.{1}".format(folShape, attr), k=False)
 
     return(folXform, folShape)
 
@@ -172,7 +187,7 @@ def fkChain(ctrlType="circle", color="red", axis="x", *args):
 def createControl(name="default",type="circle", axis="x", color="darkBlue", *args):
     """
     creates control namemed by first arg, at origin.
-    shape is determined by second arg: "cube", "octagon", "sphere", "diamond", "barbell", "lollipop", "cross", "bentCross", "arrow", "bentArrow", "halfCircle", "splitCircle", "cylinder", "square", "circle", 
+    shape is determined by second arg: "cube", "octagon", "sphere", "diamond", "barbell", "lollipop", "cross", "bentCross", "arrow", "bentArrow", "halfCircle", "splitCircle", "cylinder", "square", "circle", "arrowCross"
     third arg can be 'x',, 'y', , 'z'  and is the axis along which the control lies.
     The colors are: 'lightBlue', 'darkGreen', 'lightPurple', 'yellow', 'darkPurple', 'pink', 'blue', 'purple', 'lightGreen', 'black', 'orange', 'white', 'darkYellow', 'brown', 'lightYellow', 'darkBlue', 'royalBlue', 'darkBrown', 'lightRed', 'medBlue', 'lightBrown', 'darkRed', 'yellowGreen', 'medGreen', 'green', 'red'
     Arguments: name, type, axis, color
@@ -300,7 +315,7 @@ def createMessage(host="none", attr="none", target="none", *args):
     return("%s.%s"%(host, attr))
 
 
-def getVertUV(vertsList = [], *args):
+def getVertUV(vertsList=[], *args):
     """use a vert input to get the UV value"""
     uvVals = []
     for v in vertsList:
@@ -471,12 +486,12 @@ def createAdd(name, input1, input2):
     cmds.connectAttr(input2, "%s.input2"%adl)
     return(adl)
 
-
-def blendRotation(blend="none", sourceA="none", sourceB="none", target="none", sourceValue="none"):
+# BELOW CAN BE COMBINED (SEE RIGGER TOOLS)
+def blendRotation(name="none", sourceA="none", sourceB="none", target="none", sourceValue="none"):
     #add input and *args?
     """name is first arg, then three objects. Blends rotation from first two selected into third selected. SourceValue (last input) is for the driving obj.attr. First source is active at '1', second at '2'"""
-    if blend == "none":
-        blend = "blendColors"
+    if name == "none":
+        name = "blendColors"
     if sourceA == "none":
         sel = getSelection()
         if len(sel) != 3:
@@ -485,20 +500,20 @@ def blendRotation(blend="none", sourceA="none", sourceB="none", target="none", s
         sourceA = sel[0]
         sourceB = sel[1]
         target = sel[2]
-    blend = cmds.shadingNode("blendColors", asUtility=True, name=blend)
+    blend = cmds.shadingNode("blendColors", asUtility=True, name=name)
     sourceAOut = sourceA + ".rotate"
     sourceBOut = sourceB + ".rotate"
     targetIn = target + ".rotate"
-    blend1 = blend + ".color1"
-    blend2 = blend + ".color2"
-    blendOut = blend + ".output"
+    blend1 = name + ".color1"
+    blend2 = name + ".color2"
+    blendOut = name + ".output"
     cmds.connectAttr(sourceAOut, blend1)
     cmds.connectAttr(sourceBOut, blend2)
     cmds.connectAttr(blendOut, targetIn)
     if not sourceValue == "none":
-        cmds.connectAttr(sourceValue, "%s.blender"%blend)
+        cmds.connectAttr(sourceValue, "%s.blender"%name)
 
-    return(blend)
+    return(name)
 
 def blendTranslate(blend="none", sourceA="none", sourceB="none", target="none", sourceValue="none"):
     """name is first arg, then three objects. Blends translation from first two selected into third selected. SourceValue (last input) is for the driving obj.attr. First source is active at '1', second at '2'"""
@@ -596,7 +611,6 @@ def addGroupAbove(obj="none", suff="none", *args):
         cmds.delete(oc)
         #check if there's a parent to the old group
         par = cmds.listRelatives(obj, p=True)
-        print(par)
         if par:
             cmds.parent(grp, par)
         cmds.parent(obj, grp)
@@ -618,7 +632,7 @@ def addGroupBelow(*args):
         
         cmds.parent(grp, obj)
         for child in children:
-            cmds.parent(child, grp) 
+            cmds.parent(child, grp)
     
 
 def reverseSetup(inAttr, strAttr, revAttr, rName, *args):
@@ -681,7 +695,7 @@ def measureDistance(mName="none", *args):
     cmds.select(clear=True)
     return(dist)
 
-def scaleStretchIK(limbName="none", ikTop="none", ikMid="none", ikLow="none", jntMeasure="none", IKMeasure="none", IKCtrl="none", axis="none", *args):
+def create_scale_stretch(limbName="none", ikTop="none", ikMid="none", ikLow="none", jntMeasure="none", IKMeasure="none", IKCtrl="none", axis="none", *args):
     """creates a stretch setup for 3 joint IK chain. Inputs (strings) are the limbName, 3 ik joints (top to bottom), the measure input for the whole chain (add up from measure joints), the measure for the ikCtrl, the ik handle or ctrl (which must have 'scaleMin', 'upScale' and 'lowScale' attrs, the axis letter. Returns . . . """
 
     ratioMult = cmds.shadingNode("multiplyDivide", asUtility=True, n="%s_stretchRatioMult"%limbName)
@@ -722,7 +736,7 @@ def scaleStretchIK(limbName="none", ikTop="none", ikMid="none", ikLow="none", jn
 
     return(ratioMult, defaultMult, defaultBlend, conditional, upScaleMult, loScaleMult)
 
-def translateStretchIK(limbName="none", ikTop="none", ikMid="none", ikLow="none", jntMeasure="none", IKMeasure="none", IKCtrl="none", axis="none", posNeg="none", *args):
+def translateStretchIK(limbName=None, ikTop=None, ikMid=None, ikLow=None, jntMeasure=None, IKMeasure=None, IKCtrl=None, axis=None, posNeg=None, *args):
     """creates a stretch setup for 3 joint IK chain. Inputs (strings) are the limbName, 3 ik joints (top to bottom), the measure input for the whole chain (add up from measure joints?), the measure for the ikCtrl, the ik handle or ctrl (which must have 'scaleMin' attr, the axis letter, and PosNeg, which is +1 or -1 (minus for things in negative direction/mirror). Returns . . . """
     #set up the ratio of ctrl to measure
     ratioMult = cmds.shadingNode("multiplyDivide", asUtility=True, n="%s_stretchRatioMult"%limbName)
@@ -875,12 +889,15 @@ def isType(obj, typeCheck, *args):
 
 
 def snapTo(target, obj):
-
+    """
+    TODO: make it apply to points and verts, etc
+    """
     pos = cmds.xform(target, q=True, ws=True, rp=True)
     rot = cmds.xform(target, q=True, ws=True, ro=True)
 
     cmds.xform(obj, ws=True, t=pos)
     cmds.xform(obj, ws=True, ro=rot)
+
 
 def swapDupe(obj, target, delete = True, name="", *args):
     """
@@ -915,9 +932,10 @@ def swapDupe(obj, target, delete = True, name="", *args):
 
     return(dupe[0])
 
+
 def positionsAlongCurve(crv="", numPts = 3, *args):
     """
-    returns list of numPts evenly distributed world positions along given nurbs crv
+    returns list (len of numPts) world positions evenly distributed along given nurbs crv
     """
     if not crv:
         return
@@ -934,7 +952,6 @@ def positionsAlongCurve(crv="", numPts = 3, *args):
         for x in range(0, numPts+1):
             perc = 1.0/numPts
             cmds.setAttr("{}.parameter".format(poc),x*perc)
-            print x*perc
             pos = cmds.getAttr("{}.position".format(poc))[0]
             posList.append(pos)
     
@@ -1002,7 +1019,7 @@ def doubleProxyCtrlGrp(ctrl = "", *args):
     return(ctrlGrp, parGrp)
 
 
-def groupFreeze(obj="", suffix = "GRP", *arg):
+def groupFreeze(obj, suffix="GRP", *arg):
     """
     takes an object in worldspace and snaps a group to it, then parents obj to that group
     i.e. zeros out the obj's translates and rotations
@@ -1017,6 +1034,7 @@ def groupFreeze(obj="", suffix = "GRP", *arg):
     cmds.parent(obj, grp)
 
     return(grp)
+
 
 def connect_transforms(source="", target = "", t=True, r=True, s=True, *args):
     """
@@ -1268,7 +1286,7 @@ def increment_name(name, *args):
     :param args:
     :return:
     """
-# --------- better version below    
+# --------- figure out version that will add padding?
     split = name.rpartition("_")
     end = split[2]
     isInt = integer_test(end)
@@ -1649,3 +1667,22 @@ def get_top_nodes(objects = [], *args):
                 roots.append(root[1])
 
     return(roots)
+
+
+def zero_pivot(objects = None, *args):
+    """
+    from given list of objects (or selected objs if no list given), puts the pivot at the origin
+    This is essentially the same as freezing transforms, just with the pivot at origin
+    Args:
+        objects (list): list of scene transforms
+    """
+
+    if not objects:
+        objects = cmds.ls(sl=True)
+
+    if not objects:
+        return()
+
+    for obj in objects:
+        cmds.xform(obj, ws=True, p=True, pivots=(0,0,0))
+        cmds.makeIdentity(obj, apply=True)

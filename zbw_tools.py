@@ -23,6 +23,7 @@ import maya.cmds as cmds
 import maya.mel as mel
 import maya.OpenMaya as om
 import zTools.rig.zbw_rig as rig
+reload(rig)
 import zTools.resources.zbw_pipe as pipe
 reload(pipe)
 import zTools.resources.zbw_removeNamespaces as rmns
@@ -96,7 +97,7 @@ def tools_UI(*args):
 
 #controls layout
     widgets["ctrlFLO"] = cmds.formLayout(w=113, h=380, bgc = (0.3,0.3,0.3))
-    widgets["ctrlFrLO"] = cmds.frameLayout(l="CONTROLS", w=113, h=380, bv=True, bgc = (0.3,0.3,0.3))
+    widgets["ctrlFrLO"] = cmds.frameLayout(l="CONTROLS", w=113, h=380, bv=True, bgc = (0.0,0.0,0.0))
     widgets["ctrlCLO"] = cmds.columnLayout(bgc = (0.3,0.3,0.3))
 
     widgets["circleBut"] = cmds.button(l="circle", w=113, h=20, bgc=(.7, .7, .5), c = partial(control, "circle"))
@@ -123,7 +124,7 @@ def tools_UI(*args):
     #action layout
     cmds.setParent(widgets["rigFLO"])
     widgets["actionFLO"] = cmds.formLayout(w=150, h=380, bgc = (0.3,0.3,0.3))
-    widgets["actionFrLO"] = cmds.frameLayout(l="ACTIONS", w=150, h=380, bv=True, bgc = (0.3,0.3,0.3))
+    widgets["actionFrLO"] = cmds.frameLayout(l="ACTIONS", w=150, h=380, bv=True, bgc = (0,0,0))
     widgets["actionCLO"] = cmds.columnLayout(bgc = (0.3,0.3,0.3))
     widgets["grpFrzBut"] = cmds.button(l="group freeze selected", w=150, bgc=(.5, .7, .5), c = group_freeze)
     widgets["grpAbvBut"] = cmds.button(l="insert group above ('Grp')", w=150, bgc=(.5, .7, .5), c = insert_group_above)
@@ -139,13 +140,15 @@ def tools_UI(*args):
     widgets["addToLat"] = cmds.button(l="add to lattice", w=150, bgc=(.5, .7, .5), c = add_lattice)
     widgets["snapto"] = cmds.button(l="snap B to A", w=150, bgc=(.5, .7, .5), c = snap_b_to_a)
     widgets["sclPrntCnstr"] = cmds.button(l="Parent+Scl Constrain", w=150, bgc=(.5, .7, .5), c = parent_scale_constrain)
+    widgets["zeroPiv"] = cmds.button(l="Zero Pivot", w=150, bgc=(.5, .7, .5), c = zero_pivot)
+    # add ai attributes
 # todo - group freeze connect AND parent ctrls into a hierarchy
 # todo - group freeze should leave object in place in hierarchy?
 
     #script Layout
     cmds.setParent(widgets["rigFLO"])
     widgets["zScrptFLO"] = cmds.formLayout(w=280, bgc = (0.3,0.3,0.3))
-    widgets["zScrptFrLO"] = cmds.frameLayout(l="SCRIPTS", w=280, bv=True, bgc = (0.3,0.3,0.3))
+    widgets["zScrptFrLO"] = cmds.frameLayout(l="SCRIPTS", w=280, bv=True, bgc = (0.0,0.0,0.0))
     cmds.setParent(widgets["zScrptFLO"])    
 
     widgets["attrBut"] = cmds.button(l="zbw_attrs", w=135, bgc = (.7, .5, .5), c=partial(zAction, zRigDict, "attr"))
@@ -185,7 +188,7 @@ def tools_UI(*args):
     #color layout
     cmds.setParent(widgets["rigFLO"])
     widgets["colorFLO"] = cmds.formLayout(w=280, h=66, bgc = (0.3,0.3,0.3))
-    widgets["colorFrLO"] = cmds.frameLayout(l="COLORS", w=280, h=66, bv=True, bgc = (0.3,0.3,0.3))
+    widgets["colorFrLO"] = cmds.frameLayout(l="COLORS", w=280, h=66, bv=True, bgc = (0.0,0.0,0.0))
     widgets["colorRCLO"] = cmds.rowColumnLayout(nc=6)
 
     widgets["redCNV"] = cmds.canvas(w=48, h=20, rgb=(1,0,0), pc=partial(changeColor, colors["red"]))
@@ -326,6 +329,13 @@ def snap_b_to_a(*args):
         tgt = sel[1:]
         for t in tgt:
             rig.snapTo(src, t)
+
+
+def zero_pivot(*args):
+    """puts pivots zeroed at origin"""
+    sel = cmds.ls(sl=True, transforms=True)
+
+    rig.zero_pivot(sel)
 
 
 def parent_scale_constrain(*args):
