@@ -9,7 +9,9 @@
 ########################
 
 import zTools.rig.zbw_rig as rig
+reload(rig)
 import zTools.resources.zbw_window as win
+reload(win)
 import maya.OpenMaya as om
 import maya.cmds as cmds
 
@@ -20,6 +22,8 @@ import maya.cmds as cmds
 #---------------- option on ctrl to turn of aim of first jnt
 #---------------- option to turn ALL off
 #---------------- test palcement of up locators, maybe on the med controls? On its own group above it?
+#---------------- option for just simple ribbon and bind and just controls (no aim locs?)
+#---------------- reverse orientation of top joint to point inwards to middle? (or maybe just the group/loc that points in)
 
 class RibbonUI(win.Window):
     def __init__(self):
@@ -125,8 +129,6 @@ class RibbonUI(win.Window):
         self.follicleGrpList = []
 
 #-----------make sure the num of divisions is at least 1
-#-----------create the nurbs plane in the correct axis (just make the plane in the axis and figure out how to rotate joint local rotational axes to match it) DON'T WORRY ABOUT THIS SO MUCH (IT'S HIDDEN), WORRY ABOUT THE CONTROLS BEING ORIENTED CORRECTLY!!!
-
         if self.own == 0:
             self.dir = 2
         if self.dir == 1:
@@ -268,8 +270,8 @@ class RibbonUI(win.Window):
         
             if ribType != "simple":
                 if ribType == "bind":
-                    ctrlType = "square"
-                    color = "darkPurple"
+                    ctrlType = "circle"
+                    color = "purple"
                 if ribType == "intermediate":
                     ctrlType = "star"
                     color = "orange"
@@ -278,6 +280,7 @@ class RibbonUI(win.Window):
                 ctrlGrp = rig.groupFreeze(ctrl)
                 cmds.parentConstraint(follicleList[x], ctrlGrp, mo=False)
                 cmds.parentConstraint(ctrl, jntGrp, mo=True)
+                cmds.scaleConstraint(ctrl, jntGrp, mo=True)
                 cmds.parent(ctrlGrp, mainCtrlGrp)
         
         if ribType == "simple":
@@ -291,59 +294,40 @@ class RibbonUI(win.Window):
 
 
     def create_controls(self):
-#---------------- now just need to feed adjusted uv pos of mid into "alignToUV"
-#---------------- here i should align each top, mid, end to the UV pos I want. . .
         cmds.select(cl=True)
-        #create ctrl structure
         prefixList = ["base", "mid", "top"]
         uvList = [0.0, self.centerPos, 1.0]
         self.groupList = []
-        # vecList = [baseVec, midVec, topVec]
         self.locList = []
         self.upLocList = []
         self.ctrlList = []
         self.ctrlJntList = []
 
-        #for each of "base", "mid", "top" create the control structure
         for i in range(3):
             groupName = "{0}_{1}_GRP".format(self.name, prefixList[i])
             self.groupList.append(groupName)
 
             grp = cmds.group(empty=True, n=groupName)
-
-            #create and parent constraint locator
             locName = "{0}_{1}_constr_LOC".format(self.name, prefixList[i])
-
             loc = cmds.spaceLocator(n=locName)
             self.locList.append(loc)
-            cmds.xform(loc, ws=True)
-
             cmds.parent(loc, groupName)
 
-            #create up locator
             upLocName = "{0}_{1}_up_LOC".format(self.name, prefixList[i])
             upLoc = cmds.spaceLocator(n=upLocName)
             self.upLocList.append(upLoc)
-
-            #create option for what direction the up vec is?
 #----------------axis here
             cmds.xform(upLocName, ws=True, t=[1,0,0])
             cmds.parent(upLocName, groupName)
-
-            #create controls
             ctrlName = "{0}_{1}_CTRL".format(self.name, prefixList[i])
             self.ctrlList.append(ctrlName)
 #----------------axis here
             cmds.circle(nr=(0, 1, 0), r=(self.height/10*3), n=ctrlName)
             cmds.parent(ctrlName, locName)
-
-            #create control joints (will already be parented to ctrl)
             jntName = "{0}_{1}_ctrl_JNT".format(self.name, prefixList[i])
-
             ctrlJoint = cmds.joint(n=jntName, p=(0,0,0))
             self.ctrlJntList.append(ctrlJoint)
-#----------------axis here
-            #align group to surface
+
             rig.alignToUV(targetObj=groupName, sourceObj=self.simpleRibbon, sourceU=0.5, sourceV=uvList[i], mainAxis="+z", secAxis="+y", UorV="v")
 
 

@@ -1028,7 +1028,6 @@ def groupFreeze(obj, suffix="GRP", *arg):
     Returns:
         string: returns the new group
     """
-
     grp = cmds.group(empty=True, name="{0}_{1}".format(obj, suffix))
     snapTo(obj, grp)
     cmds.parent(obj, grp)
@@ -1070,15 +1069,7 @@ def insertGroupAbove(obj, *args):
     par = cmds.listRelatives(obj, p=True)
     
     grp = cmds.group(em=True, n="{}_Grp".format(obj))
-    
-    # grp = nameCheck(grp)
-
-    pos = cmds.xform(obj, q=True, ws=True, rp=True)
-    rot = cmds.xform(obj, q=True, ws=True, ro=True)
-    
-    cmds.xform(grp, ws=True, t=pos)
-    cmds.xform(grp, ws=True, ro=rot) 
-     
+    snapTo(obj, grp) 
     cmds.parent(obj, grp)
     if par:
         cmds.parent(grp, par[0])
@@ -1686,3 +1677,32 @@ def zero_pivot(objects = None, *args):
     for obj in objects:
         cmds.xform(obj, ws=True, p=True, pivots=(0,0,0))
         cmds.makeIdentity(obj, apply=True)
+
+
+def average_transform_position(srcList):
+    """make this into a linear interpolation"""
+    positions = []
+    for src in srcList:
+        srcPos = cmds.xform(src, ws=True, q=True, rp=True)
+        positions.append(srcPos)
+
+    avgPos = average_vectors(positions)
+    return(avgPos)
+
+
+def linear_interpolate_vector(v1, v2, percent):
+    """
+    percent is 0-1 float
+    """
+    v1Vec = om.MVector(v1[0], v1[1], v1[2])
+    v2Vec = om.MVector(v2[0], v2[1], v2[2])
+    outVec = ((v2Vec-v1Vec)*percent) + v1Vec
+
+    return(outVec.x, outVec.y, outVec.z)
+
+
+def linear_interpolate_scalar(a , b, percent):
+    """
+    percent is 0-1
+    """
+    return((float(b)-float(a)) * percent + a)

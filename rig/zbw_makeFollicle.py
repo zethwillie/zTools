@@ -103,7 +103,8 @@ def getUV(*args):
 
         else:
             pass
-
+            
+#---------------- use the rig version
 def follicle(surface="none", folName="none", u=0.5, v=0.5, *args):
     """not quite finished here. . . takes the surface/mesh, a name for the follicle and u & v positions as args and creates a follicle at that uv position on that surface"""
 
