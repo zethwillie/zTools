@@ -17,7 +17,7 @@ lenZ = (Z.y - Z.x)
 
 print lenX, lenY, lenZ
 
-ctrl = rig.createControl(name="ctrl", type="cube", color="pink")
+ctrl = rig.create_control(name="ctrl", type="cube", color="pink")
 
 cvs ={"xyz":[5, 15],"-xyz":[0, 4],"xy-z":[10, 14],"x-yz":[6, 8],"-x-yz":[3, 7],"-x-y-z":[2, 12],"x-y-z":[9, 13],"-xy-z":[1, 11]}
 

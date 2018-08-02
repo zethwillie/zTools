@@ -153,7 +153,7 @@ def createControls(list):
   for clstr in list:
     #print list
     ctrlName = clstr.rpartition("Handle")[0] + "_CTRL"
-    ctrl = rig.createControl(name = ctrlName, type="sphere", axis="x", color = randColor)
+    ctrl = rig.create_control(name = ctrlName, type="sphere", axis="x", color = randColor)
     #scale ctrl
     scl = cmds.floatFieldGrp(widgets["scaleFFG"], q=True, v1=True)/2
     pts = cmds.ls(ctrlName + ".cv[*]")

@@ -124,9 +124,9 @@ def add_top_level_ctrl(origCtrl, type, geo, *args):
     """
     # THIS IS THE XTRA CTRL LAYER, THIS ORIENTS CTRL AND CONNECTS ORIG CTRL TO THE NEW CTRL
     origCtrlPos = cmds.xform(origCtrl, q=True, ws=True, rp=True)
-    topCtrl = rig.createControl(name="{0}_moveCtrl".format(origCtrl.rpartition("_")[0]), type=type, axis="z",
-                              color="yellow")
-    grp = rig.groupFreeze(topCtrl)
+    topCtrl = rig.create_control(name="{0}_moveCtrl".format(origCtrl.rpartition("_")[0]), type=type, axis="z",
+                                 color="yellow")
+    grp = rig.group_freeze(topCtrl)
     cmds.xform(grp, ws=True, t=origCtrlPos)
     nc = cmds.normalConstraint(geo, grp, worldUpType="vector", upVector=(0, 1, 0))
     cmds.delete(nc)
@@ -285,9 +285,9 @@ def soft_selection_to_joint(*args):
     center = rig.average_point_positions(selVtx)
     rot = (0,0,0)
     if ptOnSurface:
-        center = rig.closest_pt_on_mesh_position(center, mesh)
+        center = rig.closest_point_on_mesh_position(center, mesh)
     if rotOnSurface:
-        rot = rig.closest_pt_on_mesh_rotation(center, mesh)
+        rot = rig.closest_point_on_mesh_rotation(center, mesh)
 
     cmds.select(cl=True)
     jnt = cmds.joint(name = jntName)

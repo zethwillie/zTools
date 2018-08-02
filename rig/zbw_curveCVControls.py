@@ -33,8 +33,8 @@ def curve_CV_controls_execute(crv, *args):
     for x in range(0, len(cvs)):
         pos = cmds.pointPosition(cvs[x])
         shp = cmds.listRelatives(crv, s=True)[0]
-        ctrl = rig.createControl(type="sphere", name="{0}_{1}_CTRL".format(crv, x), color="red")
-        grp = rig.groupFreeze(ctrl)
+        ctrl = rig.create_control(type="sphere", name="{0}_{1}_CTRL".format(crv, x), color="red")
+        grp = rig.group_freeze(ctrl)
         cmds.connectAttr("{0}.controlScale".format(xformGrp), "{0}.sx".format(ctrl))
         cmds.connectAttr("{0}.controlScale".format(xformGrp), "{0}.sy".format(ctrl))
         cmds.connectAttr("{0}.controlScale".format(xformGrp), "{0}.sz".format(ctrl))
@@ -70,6 +70,6 @@ def curveCVControls(*args):
     """
     sel = cmds.ls(sl=True, type="transform")
     for crv in sel:
-        if rig.isType(crv, "nurbsCurve"):
+        if rig.type_check(crv, "nurbsCurve"):
             curve_CV_controls_execute(crv)
 

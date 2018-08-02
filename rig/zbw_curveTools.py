@@ -293,7 +293,7 @@ def move_pivot(end, *args):
 
     if sel:
         for x in sel:
-            check = rig.isType(x, "nurbsCurve")
+            check = rig.type_check(x, "nurbsCurve")
             if check:
                 # get curve info
                 pos = cmds.pointOnCurve(x, parameter = end, position = True)
@@ -315,7 +315,7 @@ def reparameter(*args):
 
     if sel:
         for x in sel:
-            check = rig.isType(x, "nurbsCurve")
+            check = rig.type_check(x, "nurbsCurve")
             if check:
                 crv = x
                 newCrv = cmds.rebuildCurve(crv, constructionHistory=False, rebuildType = 0, keepControlPoints=True,  keepRange = 0, replaceOriginal=True, name = "{0}_RB".format(crv))[0]
@@ -343,8 +343,8 @@ def align_attach(*args):
     crv2 = ""
 
     if sel and len(sel)== 2:
-        check1 = rig.isType(sel[0], "nurbsCurve")
-        check2 = rig.isType(sel[1], "nurbsCurve")
+        check1 = rig.type_check(sel[0], "nurbsCurve")
+        check2 = rig.type_check(sel[1], "nurbsCurve")
         if not check1 and check2:
             cmds.warning("you must select two curves!")
             return
@@ -363,7 +363,7 @@ def get_curve(*args):
     crv = ""
 
     if sel and len(sel) == 1:
-        check = rig.isType(sel[0], "nurbsCurve")
+        check = rig.type_check(sel[0], "nurbsCurve")
         if not check:
             cmds.warning("Must select one curve object!")
             return
@@ -402,7 +402,7 @@ def rebuild_curves(*args):
 
     if sel:
         for x in sel:
-            check = rig.isType(x, "nurbsCurve")
+            check = rig.type_check(x, "nurbsCurve")
 
             if check:
                 crv = x
@@ -464,7 +464,7 @@ def reverse_curve(*args):
 
     if sel:
         for x in sel:
-            check = rig.isType(x, "nurbsCurve")
+            check = rig.type_check(x, "nurbsCurve")
             if check:
                 cmds.reverseCurve(x, ch=False, replaceOriginal=True)
     else:
@@ -667,7 +667,7 @@ def align_along_curve(*args):
         return()
     crv = sel[0]
     obj = sel[1]
-    if not rig.isType(crv, "nurbsCurve"):
+    if not rig.type_check(crv, "nurbsCurve"):
         cmds.warning("select curve first, THEN object")
         return()
 

@@ -2,43 +2,55 @@ import maya.cmds as cmds
 
 import zTools.rig.zbw_rig as rig
 reload(rig)
-# get how many ctrls we want, then make cureve have that many cvs
+# get how many ctrls we want, then make curve have that many cvs
 # refactor this out to functions - outputs for api style
 
 
 #----------------UI
-
-def create_ikspline_rig(topJnt, lowJnt, numJnts, name=None):
-
+#todo ------ refactor this to break out funct
+def create_ikspline_rig(topObj, lowObj, numJnts, name=None):
     if not name:
-        name=topJnt
+        name=topObj
 
     name = name + "_spline"
 
-    topPos = cmds.xform(topJnt, ws=True, q=True, rp=True)
-    topRot = cmds.xform(topJnt, ws=True, q=True, ro=True)
-    lowPos = cmds.xform(lowJnt, ws=True, q=True, rp=True)
+    topPos = cmds.xform(topObj, ws=True, q=True, rp=True)
+    topRot = cmds.xform(topObj, ws=True, q=True, ro=True)
+    lowPos = cmds.xform(lowObj, ws=True, q=True, rp=True)
 
-#---------------- do this with a measure
-    dist = cmds.getAttr("{0}.tx".format(lowJnt))
+    dist = rig.measure_distance(topObj, lowObj)
 
     jntList = []
     factor = dist/float(numJnts-1)
 
-#----------------option to do with joints or with other transforms? or just pts?
     for i in range(numJnts):
-        jnt = cmds.duplicate(topJnt, po=True, name="{0}_ik_{1}".format(name, i))[0]
+        cmds.select(cl=True)
+        if rig.type_check(topObj, "joint") and rig.type_check(lowObj, "joint"):
+            jnt = cmds.duplicate(topObj, po=True, name="{0}_ik_{1}".format(
+                name, i))[
+                0]
+        else:
+            jnt = cmds.joint(name="{0}_ik_{1}".format(name, i))
+            rig.snap_to(topObj, jnt, rot=False)
+            oc = cmds.aimConstraint(lowObj, jnt, aimVector=(1, 0, 0),
+                                    upVector=(0, 1, 0), mo=False,
+                                    worldUpType="scene")
+            cmds.delete(oc)
+
         if i !=  0:
             cmds.parent(jnt, jntList[0])
             cmds.setAttr("{0}.tx".format(jnt), i*factor)
         jntList.append(jnt)
-        
-    for x in range(len(jntList)):
-        if x > 1:
-            cmds.parent(jntList[x], jntList[x-1])
 
-#----------------orient jnts to make sure it's in x 
+    for x in range(2, len(jntList)):
+        cmds.parent(jntList[x], jntList[x-1])
 
+    # do some joint orienting
+    rig.clean_joint_chain(jntList[0])
+    cmds.joint(jntList[0], edit=True, orientJoint="xyz",
+               secondaryAxisOrient="yup", ch=True)
+
+#---------------- below have option for how many cv's on curve. have few. Could use option later to rebuild curve and add in blend shapes, etc
     splHandle, splEffector, splCrv = cmds.ikHandle(startJoint=jntList[0], ee=jntList[-1], sol="ikSplineSolver", numSpans=1, rootTwistMode=False, parentCurve=False, name="{0}_IK".format(name))
     splCrv = cmds.rename(splCrv, "{0}_splCrv".format(name))
 
@@ -50,13 +62,13 @@ def create_ikspline_rig(topJnt, lowJnt, numJnts, name=None):
     # this into a loop for however many ctrls we need? 
     ctrlNames = ["base", "mid", "end"]
     for cName in ctrlNames:
-        ctrl = rig.createControl("{0}_{1}_CTRL".format(cName, name), "circle", color="red")
-        grp  = rig.groupFreeze(ctrl)
+        ctrl = rig.create_control("{0}_{1}_CTRL".format(cName, name), "circle", color="red")
+        grp  = rig.group_freeze(ctrl)
         cmds.select(cl=True)
         jnt = cmds.joint(name="{0}_{1}_JNT".format(cName, name))
         cmds.parent(jnt, ctrl)
-        offsetGrp = rig.groupFreeze(grp, suffix="offset")
-        topGrp = rig.groupFreeze(offsetGrp)
+        offsetGrp = rig.group_freeze(grp, suffix="offset")
+        topGrp = rig.group_freeze(offsetGrp)
         topGrp = cmds.rename(topGrp, "{0}_{1}_ctrl_GRP".format(cName, name))
         bindJnts.append(jnt)
         bindGrps.append(topGrp)
@@ -66,7 +78,7 @@ def create_ikspline_rig(topJnt, lowJnt, numJnts, name=None):
     percent = 1.0/(len(ctrlNames)-1)
     for i in range(len(ctrlNames)):
         # snap to cvs? 
-        rig.snapTo(topJnt, bindGrps[i])
+        rig.snap_to(topObj, bindGrps[i])
         pos = rig.linear_interpolate_vector(topPos, lowPos, i*percent)
         cmds.xform(bindGrps[i], ws=True, t=pos)
 
@@ -92,7 +104,7 @@ def create_ikspline_rig(topJnt, lowJnt, numJnts, name=None):
     setup_spline_advanced_twist(splHandle, bindCtrls[0], bindCtrls[2], 0, 0)
 
 #---------------- option to turn off stretching
-#---------------- squash and stretch on a ramp which tells where the effect takes place along the curve
+#---------------- squash and stretch on a ramp which tells where the effect takes place along the curve (ie. move joints up and down curve?)
 #---------------- attrs to lengthen and shorten the curve
 
     cmds.addAttr(bindCtrls[1], ln="startTwist", k=True, dv=0, at="float")
@@ -142,10 +154,10 @@ def bind_skin(jntList, objList):
 
 
 def splineRig(): 
-    kwargs = {
-        "topJnt":"a",
-        "lowJnt":"b", 
-        "numJnts": 20, 
-        "name": "upArm"
-    }
+    # kwargs = {
+    #     "topObj":"a",
+    #     "lowObj":"b",
+    #     "numJnts": 20,
+    #     "name": "upArm"
+    # }
     create_ikspline_rig(**kwargs)

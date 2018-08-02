@@ -262,7 +262,7 @@ class RibbonUI(win.Window):
             cmds.select(cl=True)
             joint = cmds.joint(n=baseName + "_JNT", p=(0,0,0))
             jntGrp = cmds.group(joint, n="{0}_GRP".format(joint))
-            rig.snapTo(follicleList[x], jntGrp)
+            rig.snap_to(follicleList[x], jntGrp)
 
             cmds.parent(jntGrp, mainJointGrp)
             jntList.append(joint)
@@ -276,8 +276,8 @@ class RibbonUI(win.Window):
                     ctrlType = "star"
                     color = "orange"
 
-                ctrl = rig.createControl("{0}_CTRL".format(baseName), ctrlType, "x", color)
-                ctrlGrp = rig.groupFreeze(ctrl)
+                ctrl = rig.create_control("{0}_CTRL".format(baseName), ctrlType, "x", color)
+                ctrlGrp = rig.group_freeze(ctrl)
                 cmds.parentConstraint(follicleList[x], ctrlGrp, mo=False)
                 cmds.parentConstraint(ctrl, jntGrp, mo=True)
                 cmds.scaleConstraint(ctrl, jntGrp, mo=True)
@@ -328,7 +328,7 @@ class RibbonUI(win.Window):
             ctrlJoint = cmds.joint(n=jntName, p=(0,0,0))
             self.ctrlJntList.append(ctrlJoint)
 
-            rig.alignToUV(targetObj=groupName, sourceObj=self.simpleRibbon, sourceU=0.5, sourceV=uvList[i], mainAxis="+z", secAxis="+y", UorV="v")
+            rig.align_to_uv(targetObj=groupName, sourceObj=self.simpleRibbon, sourceU=0.5, sourceV=uvList[i], mainAxis="+z", secAxis="+y", UorV="v")
 
 
 def ribbon():

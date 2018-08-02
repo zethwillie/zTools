@@ -84,7 +84,7 @@ def populateCrvField(tfgKey="", *args):
         if sel and len(sel)!=1:
             cmds.warning("only select the curve you want to rig up!")
         else:
-            if rig.isType(sel[0], "nurbsCurve"):
+            if rig.type_check(sel[0], "nurbsCurve"):
                 cmds.textFieldButtonGrp(widgets[tfgKey], e=True, tx=sel[0])
             else:
                 cmds.warning("That's not a curve!")
@@ -173,7 +173,7 @@ def curveJntRigExecute(numCtrls=5, centerLoc="", c="", name="", crvType="up", *a
     # put ctrls on the indiv jnts, if someone should want them
 
     # dupe curve, rebuild to 5
-    ctrlCrv = rig.rebuildCurve(curve = crv, num = numCtrls-1, name="{0}_{1}_Crv".format(name, lo), keep=True, ch=False)
+    ctrlCrv = rig.rebuild_curve(curve = crv, num =numCtrls - 1, name="{0}_{1}_Crv".format(name, lo), keep=True, ch=False)
 # rebuild to 5
     # put jnts at the eps
     ctrlEps = cmds.ls("{0}.ep[*]".format(ctrlCrv), fl=True)
@@ -184,7 +184,7 @@ def curveJntRigExecute(numCtrls=5, centerLoc="", c="", name="", crvType="up", *a
         pos = cmds.getAttr(ctrlEps[x])[0]
         cmds.select(cl=True)
         jnt = cmds.joint(n="{0}_Jnt{1}".format(ctrlCrv, x), position=pos)
-        jntGrp = rig.groupFreeze(jnt)
+        jntGrp = rig.group_freeze(jnt)
         #cmds.parent(jntGrp, ctrlJntGrp)
         bndJnts.append(jnt)
         bndGrps.append(jntGrp)
@@ -210,13 +210,13 @@ def curveJntRigExecute(numCtrls=5, centerLoc="", c="", name="", crvType="up", *a
     # create the controls for the ctrl jnts
     for x in range(0, len(bndJnts)):
         jnt = bndJnts[x]
-        ctrl = rig.createControl(name="{0}_CTRL_{1}".format(name, x), type="sphere", axis="x", color="red")
-        ctrlGrp = rig.groupFreeze(ctrl)
-        rig.snapTo(jnt, ctrlGrp)
+        ctrl = rig.create_control(name="{0}_CTRL_{1}".format(name, x), type="sphere", axis="x", color="red")
+        ctrlGrp = rig.group_freeze(ctrl)
+        rig.snap_to(jnt, ctrlGrp)
         cmds.parent(ctrlGrp, ctrlsGrp)
 
         # create the world space proxies
-        prxyCtrl, prxyGrp = rig.doubleProxyCtrlGrp(ctrl)
+        prxyCtrl, prxyGrp = rig.create_space_buffer_grps(ctrl)
         cmds.parent(prxyGrp, proxyGrp)
 
         if crvType == "up":

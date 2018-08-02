@@ -88,7 +88,7 @@ def extrude(name = "defaultName", *args):
     capUp = "z"
     # upLoc = cmds.spaceLocator(name = "{}_upLoc".format(name))[0]
 
-    ctrl = rig.createControl(type="sphere", name="{}_CTRL".format(name), color="blue")
+    ctrl = rig.create_control(type="sphere", name="{}_CTRL".format(name), color="blue")
     ctrlGrp = cmds.group(empty=True, name="{}_path_GRP".format(name))
     capGrp = cmds.group(empty=True, name="{}_cap_GRP".format(name))
     deadGrp = cmds.group(empty=True, name="{}_noInherit_GRP".format(name))

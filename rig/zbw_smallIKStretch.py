@@ -43,8 +43,8 @@ def smallIKStretch(*args):
 
     print orig2Loc
     #measure from the base measure joint to the ik handle
-    origM = rig.measureDistance((origJnt+"orig_dist"), mJnt1, mJnt2)
-    activeM = rig.measureDistance((origJnt+"active_dist"), mJnt1, orig2Loc)
+    origM = rig.measure_distance_nodes((origJnt + "orig_dist"), mJnt1, mJnt2)
+    activeM = rig.measure_distance_nodes((origJnt + "active_dist"), mJnt1, orig2Loc)
     #create mult node to compare the two measures
     mult = cmds.shadingNode("multiplyDivide", asUtility=True, n="%s_mult"%origJnt)
     cmds.setAttr("%s.operation"%mult, 2)

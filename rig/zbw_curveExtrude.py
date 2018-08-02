@@ -126,7 +126,7 @@ def extrude(*args):
     # do some checks for parenting
     tempPList = [profileOrig, cap, "curveRebuild_originals_grp"]
     for n in tempPList:
-        par = rig.parentCheck(n)
+        par = rig.parent_check(n)
         if par != "pastaRigSetupComponents_Grp":
             cmds.parent(n, "pastaRigSetupComponents_Grp")
 
@@ -149,7 +149,7 @@ def extrude(*args):
             capAxis = "y"
             capUp = "z"
 
-            ctrl = rig.createControl(type="sphere", name="{0}_CTRL".format(curve), color="blue")
+            ctrl = rig.create_control(type="sphere", name="{0}_CTRL".format(curve), color="blue")
             ctrlScale(ctrl)
             capGrp = cmds.group(empty=True, name="{0}_cap_grp".format(curve))
             baseCapGrp = cmds.group(empty=True, name="{0}_baseCap_grp".format(curve))
@@ -351,7 +351,7 @@ def deleteRig(*args):
             curve = cmds.connectionInfo("{0}.origCrv".format(ctrl), sfd=True).partition(".")[0]
             para = cmds.connectionInfo("{0}.paraMult".format(ctrl), sfd=True).partition(".")[0]
 
-            if rig.parentCheck(curve):
+            if rig.parent_check(curve):
                 cmds.parent(curve, world=True)
             cmds.setAttr("{0}.v".format(curve), 1)
 
@@ -544,7 +544,7 @@ def capReplace(*args):
     ctrls = sel[1:]
     for ctrl in ctrls:
         oldCap = cmds.connectionInfo("{0}.capRig".format(ctrl), sfd=True).partition(".")[0]
-        dupe = rig.swapDupe(newCap, oldCap, delete=True, name=oldCap)
+        dupe = rig.swap_dupe(newCap, oldCap, delete=True, name=oldCap)
         cmds.connectAttr("{0}.rotateCap".format(ctrl), "{0}.rotateY".format(dupe))
         cmds.connectAttr("{0}.message".format(dupe), "{0}.capRig".format(ctrl))
         cmds.setAttr("{0}.v".format(dupe), 1)
@@ -571,7 +571,7 @@ def addBaseCap(*args):
     for ctrl in ctrls:
         tempCap = cmds.connectionInfo("{0}.tempBaseCap".format(ctrl), sfd=True).partition(".")[0]
 
-        dupe = rig.swapDupe(newCap, tempCap, delete=True, name="{0}_baseCap".format(ctrl))
+        dupe = rig.swap_dupe(newCap, tempCap, delete=True, name="{0}_baseCap".format(ctrl))
         cmds.setAttr("{0}.v".format(dupe), 1)
         cmds.connectAttr("{0}.rotateBaseCap".format(ctrl), "{0}.rotateY".format(dupe))
         cmds.connectAttr("{0}.message".format(dupe), "{0}.tempBaseCap".format(ctrl))

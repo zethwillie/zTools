@@ -72,8 +72,8 @@ def create_ctrls():
     l_ctrls = larger_ctrls(grps, sel)
 
     # create master ctrl
-    master = rig.createControl(type="star", color="blue", name="{0}_master_CTRL".format(sel))
-    rig.groupFreeze(master)
+    master = rig.create_control(type="star", color="blue", name="{0}_master_CTRL".format(sel))
+    rig.group_freeze(master)
 
     cmds.addAttr(master, ln="showFineCtrls", at="long", min=0, max=1, dv=0, k=True)
     cmds.addAttr(master, ln="showLargeCtrls", at="long", min=0, max=1, dv=0, k=True)
@@ -107,7 +107,7 @@ def larger_ctrls(grps, sel):
             local = grps[0:10]
             list(set(local))
             pos = get_center_point(local)
-            box = rig.createControl(name="{0}_largeCtrl_{1}".format(sel, i), type="cube", color="green")
+            box = rig.create_control(name="{0}_largeCtrl_{1}".format(sel, i), type="cube", color="green")
             grp = cmds.group(em=True, name="{0}_GRP".format(box))
             cmds.parent(box, grp)
             cmds.xform(grp, ws=True, t=pos)
@@ -124,7 +124,7 @@ def larger_ctrls(grps, sel):
                 local.append(j)
             list(set(local))
             pos = get_center_point(local)
-            box = rig.createControl(name="{0}_largeCtrl_{1}".format(sel, i), type="cube", color="green")
+            box = rig.create_control(name="{0}_largeCtrl_{1}".format(sel, i), type="cube", color="green")
             grp = cmds.group(em=True, name="{0}_GRP".format(box))
             cmds.parent(box, grp)
             cmds.xform(grp, ws=True, t=pos)           
@@ -137,7 +137,7 @@ def larger_ctrls(grps, sel):
             local = grps[-5:]
             list(set(local))
             pos = get_center_point(local)
-            box = rig.createControl(name="{0}_largeCtrl_{1}".format(sel, i), type="cube", color="green")
+            box = rig.create_control(name="{0}_largeCtrl_{1}".format(sel, i), type="cube", color="green")
             grp = cmds.group(em=True, name="{0}_GRP".format(box))
             cmds.parent(box, grp)
             cmds.xform(grp, ws=True, t=pos)
@@ -153,7 +153,7 @@ def larger_ctrls(grps, sel):
                 local.append(j)
             list(set(local))
             pos = get_center_point(local)
-            box = rig.createControl(name="{0}_largeCtrl_{1}".format(sel, i), type="cube", color="green")
+            box = rig.create_control(name="{0}_largeCtrl_{1}".format(sel, i), type="cube", color="green")
             grp = cmds.group(em=True, name="{0}_GRP".format(box))
             cmds.parent(box, grp)
             cmds.xform(grp, ws=True, t=pos)           
@@ -169,7 +169,7 @@ def larger_ctrls(grps, sel):
                 local.append(j)
             list(set(local))
             pos = get_center_point(local)
-            box = rig.createControl(name="{0}_largeCtrl_{1}".format(sel, i), type="cube", color="green")
+            box = rig.create_control(name="{0}_largeCtrl_{1}".format(sel, i), type="cube", color="green")
             grp = cmds.group(em=True, name="{0}_GRP".format(box))
             cmds.parent(box, grp)
             cmds.xform(grp, ws=True, t=pos)           
@@ -211,7 +211,7 @@ def create_joint(cvs, wts):
 #---------------- orient the joint along the curve?
 #---------------- here create the ctrl set up for the joint
     
-    ctrl = rig.createControl(name="{0}Ctrl".format(jnt), type="sphere", color="red")
+    ctrl = rig.create_control(name="{0}Ctrl".format(jnt), type="sphere", color="red")
     grp = cmds.group(name="{0}Grp".format(ctrl), em=True)
     cmds.parent(ctrl, grp)
     cmds.xform(grp, ws=True, t=center)

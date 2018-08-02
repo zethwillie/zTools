@@ -247,8 +247,9 @@ class RibbonUI(win.Window):
             constrGrp = self.name + "_" + origControlList[v] + "_const_GRP"
             attachGrp = self.name + "_" + origControlList[v] + "_attach_GRP"
 
-            rig.createControl(name=control,type="circle", axis="y", color="darkGreen", *args)
-            oldGrp = rig.groupOrient(clusName, control)
+            rig.create_control(name=control, type="circle", axis="y", color="darkGreen", *args)
+            grp = rig.group_freeze(ctrl)
+            rig.snap_to(clusName, grp)
             cmds.rename(oldGrp, constrGrp)
 
             #parent clus to control

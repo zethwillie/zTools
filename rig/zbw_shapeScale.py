@@ -121,11 +121,11 @@ def scale_the_objects(scaleVal, *args):
     sel = cmds.ls(sl=True, type="transform")
     if sel:
         for obj in sel:
-            if (rig.isType(obj, "nurbsSurface")) or (rig.isType(obj, "nurbsCurve")):
+            if (rig.type_check(obj, "nurbsSurface")) or (rig.type_check(obj, "nurbsCurve")):
                 piv = cmds.xform(obj, q=True, ws=True, rp=True)
                 cvs = cmds.select((obj + ".cv[*]"))
                 cmds.scale(scaleVal, scaleVal, scaleVal, cvs, pivot=piv)
-            elif rig.isType(obj, "mesh"):
+            elif rig.type_check(obj, "mesh"):
                 piv = cmds.xform(obj, q=True, ws=True, rp=True)
                 vs = cmds.select((obj + ".vtx[*]"))
                 cmds.scale(scaleVal, scaleVal, scaleVal, vs, pivot=piv)

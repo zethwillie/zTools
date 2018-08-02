@@ -11,7 +11,10 @@
 
 import maya.cmds as cmds
 import zTools.rig.zbw_rig as rig
+reload(rig)
 
+
+#todo   add the third direction for the squashing
 def create_squash_rig(*args):
     """
     creates a rig around the selected objects. Two squashes are created (upDown/lfRt)
@@ -25,9 +28,9 @@ def create_squash_rig(*args):
         cmds.warning("You need to select some transforms!")
         return()
 
-    mainCtrlRaw = rig.boundingBoxCtrl(sel, False)
+    mainCtrlRaw = rig.bounding_box_ctrl(sel, False)
     mainCtrl = cmds.rename(mainCtrlRaw, "{0}_CTRL".format(sel[0]))
-    grp = rig.groupFreeze(mainCtrl)
+    grp = rig.group_freeze(mainCtrl)
     rig.scale_nurbs_control(mainCtrl, 1.2, .2, 1.2)
     secCtrl = cmds.duplicate(mainCtrl, name="{0}2_CTRL".format(sel[0]))[0]
     rig.scale_nurbs_control(secCtrl, .9, .9, .9)
@@ -38,15 +41,15 @@ def create_squash_rig(*args):
     cmds.parent(sel, thrdCtrl)
 
     try:
-        rig.assignColor(mainCtrl, "red")
+        rig.assign_color(mainCtrl, "red")
     except:
         pass
     try:
-        rig.assignColor(secCtrl, "pink")
+        rig.assign_color(secCtrl, "pink")
     except:
         pass
     try:
-        rig.assignColor(thrdCtrl, "lightRed")
+        rig.assign_color(thrdCtrl, "lightRed")
     except:
         pass
 

@@ -102,9 +102,9 @@ def setWeights(mode, *args):
     if mode == "zero":
         t = cmds.textFieldGrp(widgets["objTFG"], q=True, tx=True)
         sel = []
-        if rig.isType(t, "mesh"):
+        if rig.type_check(t, "mesh"):
             sel = cmds.ls("{0}.vtx[*]".format(t), fl=True)
-        elif rig.isType(t, "nurbsCurve") or rig.isType(t, "nurbsSurface"):
+        elif rig.type_check(t, "nurbsCurve") or rig.type_check(t, "nurbsSurface"):
             sel = cmds.ls("{0}.cv[*]".format(t), fl=True)
 
         for d in deformers:
@@ -115,9 +115,9 @@ def setWeights(mode, *args):
 def getWeights(*args):
     tType = ""
     t = cmds.textFieldGrp(widgets["objTFG"], q=True, tx=True)
-    if rig.isType(t, "mesh"):
+    if rig.type_check(t, "mesh"):
         tType = "poly"
-    if rig.isType(t, "nurbsCurve") or rig.isType(t, "nurbsSurface"):
+    if rig.type_check(t, "nurbsCurve") or rig.type_check(t, "nurbsSurface"):
         tType = "nurbs"
 
     # get type of object (nurbs or poly)
