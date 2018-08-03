@@ -60,7 +60,12 @@ zRigDict = {
     "abSym": "mel.eval('abSymMesh')",
     "cmtJntOrnt": "mel.eval('cometJointOrient')",
     "autoSquash": "import zTools.rig.zbw_autoSquashRig as zAS; reload(zAS); zAS.autoSquashRig()",
-    "BSpirit": "mel.eval('BSpiritCorrectiveShape')"
+    "BSpirit": "mel.eval('BSpiritCorrectiveShape')",
+    "follow": "import zTools.rig.followConstraints as zFC; reload(zFC); zFC.followConstraints",
+    "splineIK": "import zTools.rig.zbw_splineRig as zspik; reload(zspik); "
+                "zspik.splineRig",
+    "leg": "import "
+
 }
 
 zAnimDict = {
@@ -98,102 +103,82 @@ def tools_UI(*args):
     widgets["win"] = cmds.window("toolsWin", t="zbw_tools", w=280, rtf=True,
                                  s=True)
     widgets["tab"] = cmds.tabLayout(w=280)
-    widgets["rigCLO"] = cmds.columnLayout("RIG", w=280)
+    widgets["rigCLO"] = cmds.columnLayout("TD", w=280)
     widgets["rigFLO"] = cmds.formLayout(w=280, bgc=(0.1, 0.1, 0.1))
 
-    # controls layout
-    widgets["ctrlFLO"] = cmds.formLayout(w=113, h=380, bgc=(0.3, 0.3, 0.3))
-    widgets["ctrlFrLO"] = cmds.frameLayout(l="CONTROLS", w=113, h=380, bv=True,
-                                           bgc=(0.0, 0.0, 0.0))
-    widgets["ctrlCLO"] = cmds.columnLayout(bgc=(0.3, 0.3, 0.3))
 
-    widgets["circleBut"] = cmds.button(l="circle", w=113, h=20,
-                                       bgc=(.7, .7, .5),
-                                       c=partial(control, "circle"))
-    widgets["sphereBut"] = cmds.button(l="sphere", w=113, h=20,
-                                       bgc=(.7, .7, .5),
-                                       c=partial(control, "sphere"))
-    widgets["squareBut"] = cmds.button(l="square", w=113, h=20,
-                                       bgc=(.7, .7, .5),
-                                       c=partial(control, "square"))
-    widgets["boxBut"] = cmds.button(l="box", w=113, h=20, bgc=(.7, .7, .5),
-                                    c=partial(control, "box"))
-    widgets["lolBut"] = cmds.button(l="lollipop", w=113, h=20, bgc=(.7, .7, .5),
-                                    c=partial(control, "lollipop"))
-    widgets["barbellBut"] = cmds.button(l="barbell", w=113, h=20,
-                                        bgc=(.7, .7, .5),
-                                        c=partial(control, "barbell"))
-    widgets["crossBut"] = cmds.button(l="cross", w=113, h=20, bgc=(.7, .7, .5),
-                                      c=partial(control, "cross"))
-    widgets["bentXBut"] = cmds.button(l="bent cross", h=20, w=113,
-                                      bgc=(.7, .7, .5),
-                                      c=partial(control, "bentCross"))
-    widgets["arrowBut"] = cmds.button(l="arrow", w=113, h=20, bgc=(.7, .7, .5),
-                                      c=partial(control, "arrow"))
-    widgets["bentArrowBut"] = cmds.button(l="bent arrow", h=20, w=113,
-                                          bgc=(.7, .7, .5),
-                                          c=partial(control, "bentArrow"))
-    widgets["splitOBut"] = cmds.button(l="split circle", h=20, w=113,
-                                       bgc=(.7, .7, .5),
-                                       c=partial(control, "splitCircle"))
-    widgets["cylinderBut"] = cmds.button(l="cylinder", h=20, w=113,
-                                         bgc=(.7, .7, .5),
-                                         c=partial(control, "cylinder"))
-    widgets["starBut"] = cmds.button(l="star", w=113, h=20, bgc=(.7, .7, .5),
-                                     c=partial(control, "star"))
-    widgets["octagonBut"] = cmds.button(l="octagon", h=20, w=113,
-                                        bgc=(.7, .7, .5),
-                                        c=partial(control, "octagon"))
-    widgets["halfCircBut"] = cmds.button(l="half circle", h=20, w=113,
-                                         bgc=(.7, .7, .5),
-                                         c=partial(control, "halfCircle"))
-    widgets["crossArrow"] = cmds.button(l="arrow cross", h=20, w=113,
-                                        bgc=(.7, .7, .5),
-                                        c=partial(control, "arrowCross"))
-    cmds.separator(h=10, style="none")
+    # controls layout
+    widgets["ctrlFLO"] = cmds.formLayout(w=270, h=50, bgc=(0.3, 0.3, 0.3))
+    widgets["ctrlFrLO"] = cmds.frameLayout(l="CONTROLS", w=270, h=50, bv=True,
+                                           bgc=(0.0, 0.0, 0.0))
+    widgets["ctrlInFLO"] = cmds.formLayout(bgc=(0.3, 0.3, 0.3))
     widgets["ctrlAxisRBG"] = cmds.radioButtonGrp(nrb=3, la3=("x", "y", "z"),
                                                  cw=([1, 33], [2, 33], [3, 33]),
                                                  cal=([1, "left"], [2, "left"],
                                                       [3, "left"]), sl=1)
+    widgets["ctrlBut"] = cmds.button(l="Create Control", w=100, bgc=(.7,.7,
+                                                                     .5))
+    cmds.popupMenu(b=1)
+    cmds.menuItem(l="circle", c=partial(control, "circle"))
+    cmds.menuItem(l="sphere", c=partial(control, "sphere"))
+    cmds.menuItem(l="square", c=partial(control, "square"))
+    cmds.menuItem(l="cube", c=partial(control, "cube"))
+    cmds.menuItem(l="lollipop", c=partial(control, "lollipop"))
+    cmds.menuItem(l="barbell", c=partial(control, "barbell"))
+    cmds.menuItem(l="cross", c=partial(control, "cross"))
+    cmds.menuItem(l="bentCross", c=partial(control, "bentCross"))
+    cmds.menuItem(l="arrow", c=partial(control, "arrow"))
+    cmds.menuItem(l="bentArrow", c=partial(control, "bentArrow"))
+    cmds.menuItem(l="arrowCross", c=partial(control, "arrowCross"))
+    cmds.menuItem(l="splitCircle", c=partial(control, "splitCircle"))
+    cmds.menuItem(l="cylinder", c=partial(control, "cylinder"))
+    cmds.menuItem(l="octagon", c=partial(control, "octagon"))
+    cmds.menuItem(l="halfCircle", c=partial(control, "halfCircle"))
 
+    cmds.formLayout(widgets["ctrlInFLO"], e=True, af=[
+        (widgets["ctrlAxisRBG"],"left", 0),
+        (widgets["ctrlAxisRBG"], "top", 0),
+        (widgets["ctrlBut"], "left", 170),
+        (widgets["ctrlBut"], "top", 0),
+    ])
     # TODO - add scale factor field for control creation
 
     # action layout
     cmds.setParent(widgets["rigFLO"])
-    widgets["actionFLO"] = cmds.formLayout(w=150, h=380, bgc=(0.3, 0.3, 0.3))
-    widgets["actionFrLO"] = cmds.frameLayout(l="ACTIONS", w=150, h=380, bv=True,
+    widgets["actionFLO"] = cmds.formLayout(w=280, h=330, bgc=(0.3, 0.3, 0.3))
+    widgets["actionFrLO"] = cmds.frameLayout(l="ACTIONS", w=280, h=330, bv=True,
                                              bgc=(0, 0, 0))
-    widgets["actionCLO"] = cmds.columnLayout(bgc=(0.3, 0.3, 0.3))
-    widgets["grpFrzBut"] = cmds.button(l="group freeze selected", w=150,
+    widgets["actionCLO"] = cmds.rowColumnLayout(bgc=(0.3, 0.3, 0.3), nc=2)
+    widgets["grpFrzBut"] = cmds.button(l="group freeze selected", w=140,
                                        bgc=(.5, .7, .5), c=group_freeze)
-    widgets["grpAbvBut"] = cmds.button(l="insert group above ('Grp')", w=150,
+    widgets["grpAbvBut"] = cmds.button(l="insert group above ('Grp')", w=140,
                                        bgc=(.5, .7, .5), c=insert_group_above)
-    widgets["grpCnctBut"] = cmds.button(l="group freeze connect", w=150,
+    widgets["grpCnctBut"] = cmds.button(l="group freeze connect", w=140,
                                         bgc=(.5, .7, .5), c=freeze_and_connect)
-    widgets["slctHiBut"] = cmds.button(l="select hierarchy", w=150,
+    widgets["slctHiBut"] = cmds.button(l="select hierarchy", w=140,
                                        bgc=(.5, .7, .5), c=select_hi)
-    widgets["prntChnBut"] = cmds.button(l="parent chain selected", w=150,
+    widgets["prntChnBut"] = cmds.button(l="parent chain selected", w=140,
                                         bgc=(.5, .7, .5), c=parent_chain)
-    widgets["hideShp"] = cmds.button(l="selection shape vis toggle", w=150,
+    widgets["hideShp"] = cmds.button(l="sel shape vis toggle", w=140,
                                      bgc=(.5, .7, .5), c=hide_shape)
-    widgets["slctCmptBut"] = cmds.button(l="select components", w=150,
+    widgets["slctCmptBut"] = cmds.button(l="select components", w=140,
                                          bgc=(.5, .7, .5), c=select_components)
-    widgets["bBox"] = cmds.button(l="bounding box control", w=150,
+    widgets["bBox"] = cmds.button(l="bounding box control", w=140,
                                   bgc=(.5, .7, .5), c=bBox)
-    widgets["cpSkinWtsBut"] = cmds.button(l="copy skin & weights", w=150,
+    widgets["cpSkinWtsBut"] = cmds.button(l="copy skin & weights", w=140,
                                           bgc=(.5, .7, .5), c=copy_skinning)
-    widgets["remNSBut"] = cmds.button(l="remove all namespaces", w=150,
+    widgets["remNSBut"] = cmds.button(l="remove all namespaces", w=140,
                                       bgc=(.5, .7, .5), c=remove_namespace)
-    widgets["cntrLoc"] = cmds.button(l="selection center locator", w=150,
+    widgets["cntrLoc"] = cmds.button(l="selection center locator", w=140,
                                      bgc=(.5, .7, .5), c=center_locator)
-    widgets["addToLat"] = cmds.button(l="add to lattice", w=150,
+    widgets["addToLat"] = cmds.button(l="add to lattice", w=140,
                                       bgc=(.5, .7, .5), c=add_lattice)
-    widgets["snapto"] = cmds.button(l="snap B to A", w=150, bgc=(.5, .7, .5),
+    widgets["snapto"] = cmds.button(l="snap B to A", w=140, bgc=(.5, .7, .5),
                                     c=snap_b_to_a)
-    widgets["sclPrntCnstr"] = cmds.button(l="Parent+Scl Constrain", w=150,
+    widgets["sclPrntCnstr"] = cmds.button(l="Parent+Scl Constrain", w=140,
                                           bgc=(.5, .7, .5),
                                           c=parent_scale_constrain)
-    widgets["zeroPiv"] = cmds.button(l="Zero Pivot", w=150, bgc=(.5, .7, .5),
+    widgets["zeroPiv"] = cmds.button(l="Zero Pivot", w=140, bgc=(.5, .7, .5),
                                      c=zero_pivot)
     # add ai attributes
     # todo - group freeze connect AND parent ctrls into a hierarchy
@@ -298,8 +283,8 @@ def tools_UI(*args):
     cmds.formLayout(widgets["rigFLO"], e=True, af=[
         (widgets["ctrlFLO"], "left", 0),
         (widgets["ctrlFLO"], "top", 0),
-        (widgets["actionFLO"], "left", 125),
-        (widgets["actionFLO"], "top", 0),
+        (widgets["actionFLO"], "left", 0),
+        (widgets["actionFLO"], "top", 50),
         (widgets["zScrptFLO"], "left", 0),
         (widgets["zScrptFLO"], "top", 457),
         (widgets["colorFLO"], "left", 0),
@@ -325,6 +310,45 @@ def tools_UI(*args):
         (widgets["autoSqRig"], "left", 0), (widgets["autoSqRig"], "top", 200),
         (widgets["BSpirit"], "left", 140), (widgets["BSpirit"], "top", 200),
     ])
+
+    cmds.setParent(widgets["tab"])
+    widgets["lgtRndCLO"] = cmds.columnLayout("RIG", w=280)
+    widgets["RcrvTools"] = cmds.button(l="Curve Tools", w=135,
+                                       bgc=(.5, .7, .5), c=partial(zAction,
+                                                            zRigDict, "crvTools"))
+    widgets["RcrvTools"] = cmds.button(l="Single Jnt IK", w=135,
+                                       bgc=(.5, .7, .5), c=partial(zAction,
+                                                           zRigDict,
+                                                                   "smIK"))
+    widgets["RcrvTools"] = cmds.button(l="AutoSquash Rig", w=135,
+                                       bgc=(.5, .7, .5), c=partial(zAction,
+                                       zRigDict,
+                                                                   "autoSquash"))
+    widgets["RcrvTools"] = cmds.button(l="Soft Deformers", w=135,
+                                       bgc=(.5, .7, .5), c=partial(zAction,
+                                       zRigDict,
+                                                                   "soft"))
+    widgets["RcrvTools"] = cmds.button(l="Ribbon Rig", w=135,
+                                       bgc=(.5, .7, .5), c=partial(zAction,
+                                       zRigDict,
+                                                                   "ribbon"))
+    widgets["RcrvTools"] = cmds.button(l="Spline IK Rig", w=135,
+                                       bgc=(.5, .7, .5), c=partial(zAction,
+                                       zRigDict,
+                                                                   "splineIK"))
+    widgets["RcrvTools"] = cmds.button(l="Follow Constraints", w=135,
+                                       bgc=(.5, .7, .5), c=partial(zAction,
+                                       zRigDict,
+                                                                   "follow"))
+    widgets["RcrvTools"] = cmds.button(l="Leg Rig", w=135,
+                                       bgc=(.5, .7, .5), c=partial(zAction,
+                                       zRigDict,
+                                                                   "leg"))
+    widgets["RcrvTools"] = cmds.button(l="Arm Rig", w=135,
+                                       bgc=(.5, .7, .5), c=partial(zAction,
+                                       zRigDict,
+                                                                   "arm"))
+
 
     cmds.setParent(widgets["tab"])
     widgets["modelCLO"] = cmds.columnLayout("MODEL", w=280)
