@@ -1655,7 +1655,7 @@ def linear_interpolate_scalar(a, b, percent):
     return ((float(b) - float(a)) * percent + a)
 
 
-def clean_joint_chain(jnt):
+def clean_joint_chain(jnt, *args):
     """removes rotation from jnts leaving them free to be oriented"""
     sel = cmds.ls(sl=True)
     cmds.select(jnt, hi=True, r=True)
@@ -1672,3 +1672,11 @@ def clean_joint_chain(jnt):
     else:
         cmds.setAttr("{0}.r".format(jnt), 0, 0, 0)
     cmds.select(sel)
+
+
+def create_set(name=None, *args):
+    """creates a set with selected objs"""
+    sel = cmds.ls(sl=True)
+    if not name:
+        name = "userSet1"
+    sets = cmds.sets(sel, name=name)
