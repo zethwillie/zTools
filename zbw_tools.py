@@ -62,10 +62,11 @@ zRigDict = {
     "autoSquash": "import zTools.rig.zbw_autoSquashRig as zAS; reload(zAS); zAS.autoSquashRig()",
     "BSpirit": "mel.eval('BSpiritCorrectiveShape')",
     "follow": "import zTools.rig.followConstraints as zFC; reload(zFC); zFC.followConstraints",
-    "splineIK": "import zTools.rig.zbw_splineRig as zspik; reload(zspik); "
-                "zspik.splineRig",
-    "leg": None, 
-    "arm": None,
+    "splineIK": "import zTools.rig.zbw_splineRig as zspik; reload(zspik); zspik.splineRig",
+    "leg": "import zTools.rig.auto_legRig as leg; reload(leg); LEG=leg.LegRigUI()",
+    "arm": "import zTools.rig.auto_armRig as arm; reload(arm); ARM = arm.ArmRigUI()",
+    "typFind": "import zTools.rig.zbw_typeFinder as zType; reload(zType); zType.typeFinder()",
+    "wire": "import zTools.rig.zbw_wireRig as wire; reload(wire); wire.wireRig()"
 
 }
 
@@ -101,24 +102,18 @@ def tools_UI(*args):
     if cmds.window("toolsWin", exists=True):
         cmds.deleteUI("toolsWin")
 
-    widgets["win"] = cmds.window("toolsWin", t="zbw_tools", w=280, rtf=True,
+    widgets["win"] = cmds.window("toolsWin", t="zTools", w=280, rtf=True,
                                  s=True)
     widgets["tab"] = cmds.tabLayout(w=280)
     widgets["rigCLO"] = cmds.columnLayout("TD", w=280)
     widgets["rigFLO"] = cmds.formLayout(w=280, bgc=(0.1, 0.1, 0.1))
 
-
     # controls layout
     widgets["ctrlFLO"] = cmds.formLayout(w=270, h=50, bgc=(0.3, 0.3, 0.3))
-    widgets["ctrlFrLO"] = cmds.frameLayout(l="CONTROLS", w=270, h=50, bv=True,
-                                           bgc=(0.0, 0.0, 0.0))
+    widgets["ctrlFrLO"] = cmds.frameLayout(l="CONTROLS", w=270, h=50, bv=True,bgc=(0.0, 0.0, 0.0))
     widgets["ctrlInFLO"] = cmds.formLayout(bgc=(0.3, 0.3, 0.3))
-    widgets["ctrlAxisRBG"] = cmds.radioButtonGrp(l="Axis", nrb=3, la3=("x", "y", "z"),
-                                                 cw=([1, 33], [2, 33], [3, 33]),
-                                                 cal=([1, "left"], [2, "left"],
-                                                      [3, "left"]), sl=1)
-    widgets["ctrlBut"] = cmds.button(l="Create Control", w=100, bgc=(.7,.7,
-                                                                     .5))
+    widgets["ctrlAxisRBG"] = cmds.radioButtonGrp(l="Axis", nrb=3, la3=("x", "y", "z"),cw=([1, 33], [2, 33], [3, 33]),cal=([1, "left"], [2, "left"],[3, "left"]), sl=1)
+    widgets["ctrlBut"] = cmds.button(l="Create Control", w=100, bgc=(.7,.7,.5))
     cmds.popupMenu(b=1)
     cmds.menuItem(l="circle", c=partial(control, "circle"))
     cmds.menuItem(l="sphere", c=partial(control, "sphere"))
@@ -195,24 +190,26 @@ def tools_UI(*args):
     widgets["zScrptFLO"] = cmds.formLayout(w=280, bgc=(0.3, 0.3, 0.3))
     widgets["zScrptFrLO"] = cmds.frameLayout(l="SCRIPTS", w=280, bv=True, bgc=(0.0, 0.0, 0.0))
     widgets["rigScriptsRCLO"] = cmds.rowColumnLayout(w=280, nc=2)
-    widgets["attrBut"] = cmds.button(l="zbw_attrs", w=135, bgc=(.7, .5, .5), c=partial(zAction, zRigDict, "attr"))
-    widgets["shpSclBut"] = cmds.button(l="zbw_shapeScale", w=135, bgc=(.7, .5, .5), c=partial(zAction, zRigDict,"shpScl"))
-    widgets["selBufBut"] = cmds.button(l="zbw_selectionBuffer", w=135,bgc=(.7, .5, .5), c=partial(zAction, zRigDict,"selBuf"))
-    widgets["snapBut"] = cmds.button(l="zbw_snap", w=135, bgc=(.7, .5, .5), c=partial(zAction, zRigDict, "snap"))
-    widgets["follBut"] = cmds.button(l="zbw_makeFollicle", w=135, bgc=(.7, .5, .5), c=partial(zAction, zRigDict,"foll"))
-    widgets["jntRadBut"] = cmds.button(l="zbw_jointRadius", w=135, bgc=(.7, .5, .5), c=partial(zAction, zRigDict,"jntRadius"))
-    widgets["cmtRename"] = cmds.button(l="cometRename", w=135, bgc=(.5, .5, .5), c=partial(zAction, zRigDict, "cmtRename"))
-    widgets["trnBuffer"] = cmds.button(l="zbw_transformBuffer", w=135, bgc=(.7, .5, .5), c=partial(zAction, zRigDict,"trfmBuffer"))
-    widgets["abSym"] = cmds.button(l="abSymMesh", w=135, bgc=(.5, .5, .5), c=partial(zAction, zRigDict,"abSym"))
-    widgets["cmtJntOrnt"] = cmds.button(l="cometJntOrient", w=135, bgc=(.5, .5, .5), c=partial(zAction, zRigDict,"cmtJntOrnt"))
-    widgets["BSpirit"] = cmds.button(l="BSpirtCorrective", w=135, bgc=(.5, .5, .5), c=partial(zAction, zRigDict,"BSpirit"))
-    
+    widgets["attrBut"] = cmds.button(l="zbw_attrs", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict, "attr"))
+    widgets["shpSclBut"] = cmds.button(l="zbw_shapeScale", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict,"shpScl"))
+    widgets["selBufBut"] = cmds.button(l="zbw_selectionBuffer", w=140,bgc=(.7, .5, .5), c=partial(zAction, zRigDict,"selBuf"))
+    widgets["snapBut"] = cmds.button(l="zbw_snap", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict, "snap"))
+    widgets["follBut"] = cmds.button(l="zbw_makeFollicle", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict,"foll"))
+    widgets["jntRadBut"] = cmds.button(l="zbw_jointRadius", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict,"jntRadius"))
+    widgets["typFindBut"] = cmds.button(l="zbw_typeFinder", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict,"typFind"))
+    widgets["cmtRename"] = cmds.button(l="cometRename", w=140, bgc=(.5, .5, .5), c=partial(zAction, zRigDict, "cmtRename"))
+    widgets["abSym"] = cmds.button(l="abSymMesh", w=140, bgc=(.5, .5, .5), c=partial(zAction, zRigDict,"abSym"))
+    widgets["cmtJntOrnt"] = cmds.button(l="cometJntOrient", w=140, bgc=(.5, .5, .5), c=partial(zAction, zRigDict,"cmtJntOrnt"))
+    widgets["BSpirit"] = cmds.button(l="BSpirtCorrective", w=140, bgc=(.5, .5, .5), c=partial(zAction, zRigDict,"BSpirit"))
+    widgets["extract"] = cmds.button(l="Extract Deltas", w=135, bgc=(.5, .5,
+                                                                     .5),)
+
+
     # color layout
     cmds.setParent(widgets["rigFLO"])
     widgets["colorFLO"] = cmds.formLayout(w=280, h=66, bgc=(0.3, 0.3, 0.3))
     widgets["colorFrLO"] = cmds.frameLayout(l="COLORS", w=280, h=66, bv=True, bgc=(0.0, 0.0, 0.0))
     widgets["colorRCLO"] = cmds.rowColumnLayout(nc=6)
-
     widgets["redCNV"] = cmds.canvas(w=48, h=20, rgb=(1, 0, 0), pc=partial(changeColor, colors["red"]))
     widgets["blueCNV"] = cmds.canvas(w=48, h=20, rgb=(0, 0, 1), pc=partial(changeColor, colors["blue"]))
     widgets["greenCNV"] = cmds.canvas(w=48, h=20, rgb=(0, 1, 0), pc=partial(changeColor, colors["green"]))
@@ -238,47 +235,51 @@ def tools_UI(*args):
 
     cmds.setParent(widgets["tab"])
     widgets["lgtRndCLO"] = cmds.columnLayout("RIGS", w=280)
-    widgets["RcrvTools"] = cmds.button(l="Curve Tools", w=135, bgc=(.5, .7, .5), c=partial(zAction, zRigDict, "crvTools"))
-    widgets["RcrvTools"] = cmds.button(l="Single Jnt IK", w=135, bgc=(.5, .7, .5), c=partial(zAction, zRigDict,"smIK"))
-    widgets["RcrvTools"] = cmds.button(l="AutoSquash Rig", w=135, bgc=(.5, .7, .5), c=partial(zAction, zRigDict,"autoSquash"))
-    widgets["RcrvTools"] = cmds.button(l="Soft Deformers", w=135, bgc=(.5, .7, .5), c=partial(zAction,zRigDict,"soft"))
-    widgets["RcrvTools"] = cmds.button(l="Ribbon Rig", w=135, bgc=(.5, .7, .5), c=partial(zAction, zRigDict,"ribbon"))
-    widgets["RcrvTools"] = cmds.button(l="Spline IK Rig", w=135, bgc=(.5, .7, .5), c=partial(zAction, zRigDict, "splineIK"))
-    widgets["RcrvTools"] = cmds.button(l="Follow Constraints", w=135, bgc=(.5, .7, .5), c=partial(zAction, zRigDict,"follow"))
-    widgets["RcrvTools"] = cmds.button(l="Leg Rig", w=135, bgc=(.5, .7, .5), c=partial(zAction, zRigDict,"leg"))
-    widgets["RcrvTools"] = cmds.button(l="Arm Rig", w=135, bgc=(.5, .7, .5), c=partial(zAction, zRigDict, "arm"))
+    widgets["RcrvTools"] = cmds.button(l="Curve Tools", w=140, bgc=(.5, .7, .5), c=partial(zAction, zRigDict, "crvTools"))
+    widgets["smIKBut"] = cmds.button(l="Single Jnt IK", w=140, bgc=(.5, .7, .5), c=partial(zAction, zRigDict,"smIK"))
+    widgets["autoSqBut"] = cmds.button(l="AutoSquash Rig", w=140, bgc=(.5, .7, .5), c=partial(zAction, zRigDict,"autoSquash"))
+    widgets["sftDefBut"] = cmds.button(l="Soft Deformers", w=140, bgc=(.5, .7, .5), c=partial(zAction,zRigDict,"soft"))
+    widgets["ribBut"] = cmds.button(l="Ribbon Rig", w=140, bgc=(.5, .7, .5), c=partial(zAction, zRigDict,"ribbon"))
+    widgets["splineBut"] = cmds.button(l="Spline IK Rig", w=140, bgc=(.5, .7, .5), c=partial(zAction, zRigDict, "splineIK"))
+    widgets["followBut"] = cmds.button(l="Follow Constraints", w=140, bgc=(.5, .7, .5), c=partial(zAction, zRigDict,"follow"))
+    widgets["legBut"] = cmds.button(l="Leg Rig", w=140, bgc=(.5, .7, .5), c=partial(zAction, zRigDict,"leg"))
+    widgets["armBut"] = cmds.button(l="Arm Rig", w=140, bgc=(.5, .7, .5), c=partial(zAction, zRigDict, "arm"))
+    widgets["wireBut"] = cmds.button(l="Wire Def Rig", w=140, bgc=(.5, .7, .5), c=partial(zAction, zRigDict, "wire"))
 
     cmds.setParent(widgets["tab"])
     widgets["modelCLO"] = cmds.columnLayout("MODEL", w=280)
 # curve tools, model scripts, add to lattice, select hierarchy, snap selection buffer, transform buffer
-    widgets["MaddToLat"] = cmds.button(l="add to lattice", w=135, bgc=(.5, .7, .5), c=add_lattice)
-    widgets["extend"] = cmds.button(l="zbw_polyExtend", w=135, bgc=(.7, .5, .5),c=partial(zAction, zModelDict,"extend"))
-    widgets["wrinkle"] = cmds.button(l="zbw_wrinklePoly", w=135, bgc=(.7, .5, .5), c=partial(zAction, zModelDict,"wrinkle"))
-    widgets["McrvTools"] = cmds.button(l="zbw_curveTools", w=135, bgc=(.7, .5, .5), c=partial(zAction, zRigDict, "crvTools"))
-    widgets["MtrnBuffer"] = cmds.button(l="zbw_transformBuffer", w=135, bgc=(.7, .5, .5), c=partial(zAction, zRigDict, "trfmBuffer"))
+    widgets["MaddToLat"] = cmds.button(l="add to lattice", w=140, bgc=(.5, .7, .5), c=add_lattice)
+    widgets["extend"] = cmds.button(l="zbw_polyExtend", w=140, bgc=(.7, .5, .5),c=partial(zAction, zModelDict,"extend"))
+    widgets["wrinkle"] = cmds.button(l="zbw_wrinklePoly", w=140, bgc=(.7, .5, .5), c=partial(zAction, zModelDict,"wrinkle"))
+    widgets["McrvTools"] = cmds.button(l="zbw_curveTools", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict, "crvTools"))
+    widgets["MtrnBuffer"] = cmds.button(l="zbw_transformBuffer", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict, "trfmBuffer"))
 
-    widgets["MrandomSel"] = cmds.button(l="zhw_randomSel", w=135, bgc=(.7, .5, .5), c=partial(zAction, zAnimDict,"randomSel"))
-    widgets["MselBufBut"] = cmds.button(l="zbw_selectionBuffer", w=135, bgc=(.7, .5, .5), c=partial(zAction, zRigDict,"selBuf"))
-    widgets["MsnapBut"] = cmds.button(l="zbw_snap", w=135, bgc=(.7, .5, .5), c=partial(zAction, zRigDict, "snap"))
-    widgets["MabSym"] = cmds.button(l="abSymMesh", w=135, bgc=(.5, .5, .5), c=partial(zAction, zRigDict,"abSym"))
-    widgets["McmtRename"] = cmds.button(l="cometRename", w=135, bgc=(.5, .5, .5), c=partial(zAction, zRigDict,"cmtRename"))
+    widgets["MrandomSel"] = cmds.button(l="zhw_randomSel", w=140, bgc=(.7, .5, .5), c=partial(zAction, zAnimDict,"randomSel"))
+    widgets["MselBufBut"] = cmds.button(l="zbw_selectionBuffer", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict,"selBuf"))
+    widgets["MsnapBut"] = cmds.button(l="zbw_snap", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict, "snap"))
+    widgets["MabSym"] = cmds.button(l="abSymMesh", w=140, bgc=(.5, .5, .5), c=partial(zAction, zRigDict,"abSym"))
+    widgets["McmtRename"] = cmds.button(l="cometRename", w=140, bgc=(.5, .5, .5), c=partial(zAction, zRigDict,"cmtRename"))
 
     cmds.setParent(widgets["tab"])
     widgets["animCLO"] = cmds.columnLayout("ANIM", w=280)
-    widgets["tween"] = cmds.button(l="tween machine", w=135, bgc=(.5, .5, .5), c=partial(zAction, zAnimDict, "tween"))
-    widgets["noise"] = cmds.button(l="zbw_animNoise", w=135, bgc=(.7, .5, .5), c=partial(zAction, zAnimDict, "noise"))
-    widgets["audio"] = cmds.button(l="zbw_audioManager", w=135, bgc=(.7, .5, .5),c=partial(zAction, zAnimDict, "audio"))
-    widgets["clean"] = cmds.button(l="zbw_cleanKeys", w=135, bgc=(.7, .5, .5), c=partial(zAction, zAnimDict, "clean"))
-    widgets["dupe"] = cmds.button(l="zbw_dupeSwap", w=135, bgc=(.7, .5, .5), c=partial(zAction, zAnimDict, "dupe"))
-    widgets["huddle"] = cmds.button(l="zbw_huddle", w=135, bgc=(.7, .5, .5), c=partial(zAction, zAnimDict,"huddle"))
-    widgets["randomSel"] = cmds.button(l="zhw_randomSel", w=135, bgc=(.7, .5, .5),c=partial(zAction, zAnimDict,"randomSel"))
-    widgets["randomAttr"] = cmds.button(l="zbw_randomAttr", w=135, bgc=(.7, .5, .5),c=partial(zAction, zAnimDict,"randomAttr"))
-    widgets["clip"] = cmds.button(l="zbw_setClipPlanes", w=135, bgc=(.7, .5, .5), c=partial(zAction, zAnimDict,"clip"))
-    widgets["tangents"] = cmds.button(l="zbw_tangents", w=135, bgc=(.7, .5, .5), c=partial(zAction, zAnimDict, "tangents"))
+    widgets["tween"] = cmds.button(l="tween machine", w=140, bgc=(.5, .5, .5), c=partial(zAction, zAnimDict, "tween"))
+    widgets["noise"] = cmds.button(l="zbw_animNoise", w=140, bgc=(.7, .5, .5), c=partial(zAction, zAnimDict, "noise"))
+    widgets["audio"] = cmds.button(l="zbw_audioManager", w=140, bgc=(.7, .5, .5),c=partial(zAction, zAnimDict, "audio"))
+    widgets["clean"] = cmds.button(l="zbw_cleanKeys", w=140, bgc=(.7, .5, .5), c=partial(zAction, zAnimDict, "clean"))
+    widgets["dupe"] = cmds.button(l="zbw_dupeSwap", w=140, bgc=(.7, .5, .5), c=partial(zAction, zAnimDict, "dupe"))
+    widgets["huddle"] = cmds.button(l="zbw_huddle", w=140, bgc=(.7, .5, .5), c=partial(zAction, zAnimDict,"huddle"))
+    widgets["randomSel"] = cmds.button(l="zhw_randomSel", w=140, bgc=(.7, .5, .5),c=partial(zAction, zAnimDict,"randomSel"))
+    widgets["randomAttr"] = cmds.button(l="zbw_randomAttr", w=140, bgc=(.7, .5, .5),c=partial(zAction, zAnimDict,"randomAttr"))
+    widgets["clip"] = cmds.button(l="zbw_setClipPlanes", w=140, bgc=(.7, .5, .5), c=partial(zAction, zAnimDict,"clip"))
+    widgets["tangents"] = cmds.button(l="zbw_tangents", w=140, bgc=(.7, .5, .5), c=partial(zAction, zAnimDict, "tangents"))
+    widgets["studLib"] = cmds.button(l="Studio Library", w=140, bgc=(.5, .7,.5))
+    widgets["atools"] = cmds.button(l="ATools", w=140, bgc=(.5, .7,.5))
+    widgets["picker"] = cmds.button(l="Anim School Picker", w=140, bgc=(.5, .7,.5),)
 
     cmds.setParent(widgets["tab"])
     widgets["lgtRndCLO"] = cmds.columnLayout("LT_RN", w=280)
-    widgets["transfer"] = cmds.button(l="zbw_shadingTransfer", w=135, bgc=(.7, .5, .5), c=partial(zAction, zShdDict, "transfer"))
+    widgets["transfer"] = cmds.button(l="zbw_shadingTransfer", w=140, bgc=(.7, .5, .5), c=partial(zAction, zShdDict, "transfer"))
 
     cmds.window(widgets["win"], e=True, rtf=True, w=5, h=5)
     cmds.showWindow(widgets["win"])
