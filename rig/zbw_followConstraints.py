@@ -3,7 +3,7 @@ import zTools.rig.zbw_rig as rig
 from functools import partial
 
 widgets = {}
-def followConstraintsUI():
+def follow_constraints_UI():
     if cmds.window("followCreatorWin", exists = True):
         cmds.deleteUI("followCreatorWin")
 
@@ -138,5 +138,5 @@ def get_enum_index_from_string(node, attr, value):
     index = enumList.index(value)
     return(index)
 
-def followConstraints():
-    followConstraintsUI()
+def followConstraints(*args):
+    follow_constraints_UI()

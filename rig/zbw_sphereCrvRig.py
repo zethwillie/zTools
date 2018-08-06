@@ -14,7 +14,7 @@ highResCurves = []
 ctrlsUp = []
 ctrlsDwn = []
 
-def curveJntRigUI(*args):
+def sphere_curve_rig_UI(*args):
     if cmds.window("crvRigJntWin", exists=True):
         cmds.deleteUI("crvRigJntWin")
 
@@ -26,24 +26,24 @@ def curveJntRigUI(*args):
 
     widgets["numCtrlIFG"] = cmds.intFieldGrp(l="Number of Ctrls:", cal=[(1,"left"), (2,"left")], cw=[(1,120), (2,50)], v1=5)
     widgets["nameTFG"] = cmds.textFieldGrp(l="Rig Name (i.e. lfEye):", cal=[(1,"left"), (2,"left"), (3,"left")], cw=[(1,120), (2,280), (3,30)], tx="eye")
-    widgets["cntrPivTFBG"] = cmds.textFieldButtonGrp(l="Center pivot object:", bl="<<<", cal=[(1,"left"), (2,"left"), (3,"left")], cw=[(1,120), (2,280), (3,30)], bc=partial(populateCrvField, "cntrPivTFBG"), cc=partial(secondFill, "center"), tx="centerLoc")
-    widgets["upLocTFBG"] = cmds.textFieldButtonGrp(l="Aim up object:", bl="<<<", cal=[(1,"left"), (2,"left"), (3,"left")], cw=[(1,120), (2,280), (3,30)], bc=partial(populateCrvField, "upLocTFBG"), cc=partial(secondFill, "up"), tx="upLoc")
+    widgets["cntrPivTFBG"] = cmds.textFieldButtonGrp(l="Center pivot object:", bl="<<<", cal=[(1,"left"), (2,"left"), (3,"left")], cw=[(1,120), (2,280), (3,30)], bc=partial(populate_curve_field, "cntrPivTFBG"), cc=partial(second_fill, "center"), tx="centerLoc")
+    widgets["upLocTFBG"] = cmds.textFieldButtonGrp(l="Aim up object:", bl="<<<", cal=[(1,"left"), (2,"left"), (3,"left")], cw=[(1,120), (2,280), (3,30)], bc=partial(populate_curve_field, "upLocTFBG"), cc=partial(second_fill, "up"), tx="upLoc")
     cmds.separator(h=10)
 
-    widgets["upCrvTFBG"] = cmds.textFieldButtonGrp(l="First Curve", bl="<<<", cal=[(1,"left"), (2,"left"), (3,"left")], cw=[(1,120), (2,280), (3,30)], bc=partial(populateCrvField, "upCrvTFBG"),tx="topCrv")
+    widgets["upCrvTFBG"] = cmds.textFieldButtonGrp(l="First Curve", bl="<<<", cal=[(1,"left"), (2,"left"), (3,"left")], cw=[(1,120), (2,280), (3,30)], bc=partial(populate_curve_field, "upCrvTFBG"), tx="topCrv")
     widgets["upNameTFG"] = cmds.textFieldGrp(l="1st Suffix (i.e.'Top')", cal=[(1,"left"), (2,"left")], cw=[(1,120), (2,280)], tx="Top")
     cmds.separator(h=10)
 
-    widgets["secondCBG"] = cmds.checkBoxGrp(l="Create Second Curve?", ncb=1, v1=0, cal=[(1,"left"), (2,"left")], cc=toggleSecond, en=True)
-    widgets["downCrvTFBG"] = cmds.textFieldButtonGrp(l="Second Curve", bl="<<<", cal=[(1,"left"), (2,"left"), (3,"left")], en=False, cw=[(1,120), (2,280), (3,30)], bc=partial(populateCrvField, "downCrvTFBG"), tx="downCrv")
+    widgets["secondCBG"] = cmds.checkBoxGrp(l="Create Second Curve?", ncb=1, v1=0, cal=[(1,"left"), (2,"left")], cc=toggle_second, en=True)
+    widgets["downCrvTFBG"] = cmds.textFieldButtonGrp(l="Second Curve", bl="<<<", cal=[(1,"left"), (2,"left"), (3,"left")], en=False, cw=[(1,120), (2,280), (3,30)], bc=partial(populate_curve_field, "downCrvTFBG"), tx="downCrv")
     widgets["downNameTFG"] = cmds.textFieldGrp(l="2nd Suffix (i.e. 'Dwn')", cal=[(1,"left"), (2,"left")], cw=[(1,120), (2,280)], en=False, tx="Dwn")
-    widgets["cntrPiv2TFBG"] = cmds.textFieldButtonGrp(l="Center pivot object:", bl="<<<", cal=[(1,"left"), (2,"left"), (3,"left")], cw=[(1,120), (2,280), (3,30)], bc=partial(populateCrvField, "cntrPivTFBG"), en=False, tx="centerLoc")
-    widgets["upLoc2TFBG"] = cmds.textFieldButtonGrp(l="Aim up object:", bl="<<<", cal=[(1,"left"), (2,"left"), (3,"left")], cw=[(1,120), (2,280), (3,30)], bc=partial(populateCrvField, "upLoc2TFBG"), en=False, tx="upLoc")
+    widgets["cntrPiv2TFBG"] = cmds.textFieldButtonGrp(l="Center pivot object:", bl="<<<", cal=[(1,"left"), (2,"left"), (3,"left")], cw=[(1,120), (2,280), (3,30)], bc=partial(populate_curve_field, "cntrPivTFBG"), en=False, tx="centerLoc")
+    widgets["upLoc2TFBG"] = cmds.textFieldButtonGrp(l="Aim up object:", bl="<<<", cal=[(1,"left"), (2,"left"), (3,"left")], cw=[(1,120), (2,280), (3,30)], bc=partial(populate_curve_field, "upLoc2TFBG"), en=False, tx="upLoc")
     cmds.separator(h=10)
 
-    widgets["execBut"] = cmds.button(l="create base rig!", w=w, c=passToExecute)
-    widgets["cnctBut"] = cmds.button(l="connect ctrls to jnts", w=w, c=connectProxies)
-    widgets["closeBut"] = cmds.button(l="setup smart close", w=w, c=smartClose)
+    widgets["execBut"] = cmds.button(l="create base rig!", w=w, c=pass_to_execute)
+    widgets["cnctBut"] = cmds.button(l="connect ctrls to jnts", w=w, c=connect_proxies)
+    widgets["closeBut"] = cmds.button(l="setup smart close", w=w, c=smart_close)
 
     cmds.separator(h=10)
 
@@ -53,7 +53,7 @@ def curveJntRigUI(*args):
     cmds.window(widgets["win"], e=True, w=5, h=5, resizeToFitChildren=True, sizeable=True)
     cmds.showWindow(widgets["win"])
 
-def secondFill(tfg, *args):
+def second_fill(tfg, *args):
     print "in center fill"
     if tfg == "center":
         obj = cmds.textFieldButtonGrp(widgets["cntrPivTFBG"], q=True, tx=True)
@@ -63,7 +63,7 @@ def secondFill(tfg, *args):
         obj = cmds.textFieldButtonGrp(widgets["upLocTFBG"], q=True, tx=True)
         cmds.textFieldButtonGrp(widgets["upLoc2TFBG"], e=True, tx=obj)
 
-def toggleSecond(*args):
+def toggle_second(*args):
     state = cmds.checkBoxGrp(widgets["secondCBG"], q=True, v1=True)
     if state:
         cmds.textFieldButtonGrp(widgets["downCrvTFBG"], e=True, en=True)
@@ -78,7 +78,9 @@ def toggleSecond(*args):
         cmds.textFieldGrp(widgets["downNameTFG"], e=True, en=False)     
         cmds.button(widgets["closeBut"], e=True, en=False)  
 
-def populateCrvField(tfgKey="", *args):
+def populate_curve_field(tfgKey="", *args):
+
+#TODO   make this a message attr?
     if tfgKey not in ["cntrPivTFBG", "cntrPiv2TFBG", "upLoc2TFBG", "upLocTFBG"]:
         sel = cmds.ls(sl=True)
         if sel and len(sel)!=1:
@@ -99,8 +101,7 @@ def populateCrvField(tfgKey="", *args):
             if tfgKey == "cntrPivTFBG":
                 cmds.textFieldButtonGrp(widgets["cntrPiv2TFBG"], e=True, tx=sel[0])         
 
-
-def passToExecute(*args):
+def pass_to_execute(*args):
     
     lowResCurves = []
     highResCurves = []
@@ -117,7 +118,7 @@ def passToExecute(*args):
     firstName = "{0}_{1}".format(name, firstNameSuf)
 
     if num and name and centerLoc and firstCrv and firstName:
-        curveJntRigExecute(num, centerLoc, firstCrv, firstName, crvType="up")
+        curve_joint_rig_execute(num, centerLoc, firstCrv, firstName, crvType="up")
     else:
         cmds.warning("Some fields weren't filled out for the first curve! Undo and try again!")
         return
@@ -127,12 +128,12 @@ def passToExecute(*args):
         secondNameSuf = cmds.textFieldGrp(widgets["downNameTFG"], q=True, tx=True)
         secondName = "{0}_{1}".format(name, secondNameSuf)
         if num and centerLoc and secondCrv and secondName:
-            curveJntRigExecute(num, centerLoc, secondCrv, secondName, crvType="down")
+            curve_joint_rig_execute(num, centerLoc, secondCrv, secondName, crvType="down")
     else:
         cmds.warning("Some fields weren't filled out for the second curve! Undo and try again!")
         return
 
-def curveJntRigExecute(numCtrls=5, centerLoc="", c="", name="", crvType="up", *args):
+def curve_joint_rig_execute(numCtrls=5, centerLoc="", c="", name="", crvType="up", *args):
         
     #crv = cmds.curve(d=3, ep=pts)
     #---------------- create the curve, ideally from the geo
@@ -230,7 +231,7 @@ def curveJntRigExecute(numCtrls=5, centerLoc="", c="", name="", crvType="up", *a
     highResCurves.append(crv)
 
 
-def connectProxies(*args):
+def connect_proxies(*args):
     for key in upJntProxyGrpCtrls:
         jnt = key
         prxy = upJntProxyGrpCtrls[key]
@@ -250,7 +251,7 @@ def connectProxies(*args):
         downJntProxyGrpCtrls.clear()
 
 
-def smartClose(*args):
+def smart_close(*args):
     name = cmds.textFieldGrp(widgets["nameTFG"], q=True, tx=True)
     upSuf = cmds.textFieldGrp(widgets["upNameTFG"], q=True, tx=True)
     dwnSuf = cmds.textFieldGrp(widgets["downNameTFG"], q=True, tx=True)
@@ -296,7 +297,7 @@ def smartClose(*args):
 #---------------- set up the center ctrl to drive this BS
 
 
-def curveJntRig():
-    curveJntRigUI()
+def sphereCrvRig():
+    sphere_curve_rig_UI()
 
 #---------------- create a script to take bones on a BS head (in place?) and make controls/inbetween groups to bs them from main rig to drive joints

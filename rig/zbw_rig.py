@@ -11,7 +11,8 @@ import maya.cmds as cmds
 import maya.mel as mel
 import maya.OpenMaya as om
 
-import controlShapes as cshp
+import zbw_controlShapes as cshp
+reload(cshp)
 
 colors = {
     "red": 13,
@@ -278,7 +279,15 @@ def create_control(name="default", type="circle", axis="x", color="darkBlue",
 
     elif type == "cylinder":
         ctrl = cmds.curve(n=name, d=1, p=cshp.shapes["cylinder"])
-
+    
+    elif type == "arrowCircle":
+        ctrl = cmds.curve(n=name, d=1, p=cshp.shapes["arrowCircle"])
+    
+    elif type == "arrowSquare":
+        ctrl = cmds.curve(n=name, d=1, p=cshp.shapes["arrowSquare"])
+    
+    elif type == "4arrowSquare":
+        ctrl = cmds.curve(n=name, d=1, p=cshp.shapes["4arrowSquare"])
     else:
         cmds.warning("createControl doesn't know shape - '%s'" % type)
 
@@ -1092,9 +1101,11 @@ def bounding_box_ctrl(sel=[], prnt=True, *args):
         return (ctrl)
 
 
-def scale_nurbs_control(ctrl=None, x=1, y=1, z=1, *args):
+def scale_nurbs_control(ctrl=None, x=1, y=1, z=1, origin=False, *args):
     """
     scales cvs from rotate pivot of obj
+    ARGS:
+        origin(bool)- scale from origin
     """
     if not ctrl or not type_check(ctrl, "nurbsCurve"):
         cmds.warning(
@@ -1102,6 +1113,8 @@ def scale_nurbs_control(ctrl=None, x=1, y=1, z=1, *args):
         return ()
 
     piv = cmds.xform(ctrl, q=True, ws=True, rp=True)
+    if origin:
+        piv = (0, 0, 0)
     cvs = cmds.ls("{0}.cv[*]".format(ctrl), fl=True)
     cmds.scale(x, y, z, cvs, pivot=piv)
 

@@ -1,0 +1,13 @@
+{
+    string $animCurves[] = `ls -type "animCurve"`;
+    //print $animCurves;
+    
+    for ($each in $animCurves){
+        snapKey -timeMultiple 1 -time ":" -float ":" -hierarchy none -controlPoints 0 -shape 1 $each;
+        //snap curve back to 101
+   
+    }
+    
+    
+    
+}

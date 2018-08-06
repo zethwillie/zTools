@@ -1,0 +1,313 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// BoS Selection_To_Buffercurve.mel
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////
+//
+// Maya Script File
+//
+/////////////////////////////////
+//
+// Author :      Joerg Volk
+//               Lluis Llobera
+// inspired by: (Aaron Koressel)
+//   
+// Creation date : 10/04/2014
+// Version 1.46    07/13/2016
+//       
+/////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Description:
+//
+// This workflow script will make the default maya buffercurves more useful by giving the user 
+// the possibility to select which keys should be snapped or which timerange should be replaced.
+// The script has two different functions - depending on the user selection:
+// A Snap function or a Replace function.
+//
+// 1.	The user-selection of keys in the graph-editor will snap vertically to the 
+//	corresponding buffer-curves. The amount of keys and their time does not change 	
+//	by doing so. The tangent values of the buffer-curve will be applied.
+//	A warning window will pop-up if keys for more than 250 curves are selected. The
+// 	calculation time for more than that can increase significantly and should be
+// 	approached carefully to avoid a maya-freeze.
+//	
+// 2.	When a timerange in the timeline is selected, the user-selection of that  
+// 	timerange (marked red) will be replaced with all the keys of the buffercurve.
+//	This function works like a copy/paste command. The amount, time and tangents
+// 	of the keys are all taken from the buffercurves and will replace any keys of the
+// 	objects selected in the marked timerange of the original curves. 
+//	A warning window will pop-up if  more than 200 objects (= roughly 2000 curves)
+// 	are selected. The calculation time for more than that will increase exponentially
+// 	and should be approached carefully to avoid a maya-freeze.
+//	The high volume possibility on this function comes with three drawbacks to be
+// 	aware of: 
+//	- It works on objects selected, which means it will execute on all keyed curves of
+// 	  the selected object, a single curve execution is not possible.
+//	- It creates additional keys on the beginning and on the end of the timeline
+// 	  selection:                                                                                                                              
+//	  1 vertical row of regular keys one frame before the timeframe selection
+// 	  1 row of insert-keys (marked green) at the beginning of the timeframe  
+//	  1 row of insert-keys (marked green) at the end if the timeframe 
+//	  1 row of regular keys one frame later.
+//	- Undo can become unusable slow and should be avoided with too many curves
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+global proc SnapToBuffer ()
+  {       
+       //loop over selected curves and process independently
+            string $selectedCurves[] = `keyframe -selected -q -name`;
+            for ($c = 0; $c < size($selectedCurves); $c++){
+                //channel to use for this pass
+                $channel = $selectedCurves[$c];           
+
+                //get array of key times in selection
+                $timeArray = `keyframe -selected -q -timeChange $channel`;
+
+                //get buffer values and insert key
+                float $bufferValueArray[];
+                int $weightlockTangent[];                
+                string $innTangents[]; 
+                float $inAnglesArray[];        
+                float $outAngleArray[];
+                float $inWeightArray[];
+                float $outWeightArray[];
+                string $outTangent[];                    
+                 
+                bufferCurve -swap;
+                for ($i = 0; $i < size($timeArray); $i++){
+                     $bufferValue = `keyframe -time $timeArray[$i] -q -eval $channel`;
+                     $bufferValueArray[$i] = $bufferValue[0];
+                     setKeyframe -insert -time $timeArray[$i] $channel ;                     
+                     $weightlockTangentValue = `keyTangent -time $timeArray[$i] -q -wl $channel` ;                     
+                     $innTangentsValue = `keyTangent -time $timeArray[$i] -q -itt $channel`;                                            
+                     $weightlockTangent[$i] = $weightlockTangentValue[0];                     
+                     $innTangents[$i] = $innTangentsValue[0];
+                     $inAnglesValue = `keyTangent -time $timeArray[$i] -q -ia $channel`;
+                     $outAngleValue = `keyTangent -time $timeArray[$i] -q -oa $channel`;
+                     $inWeightValue = `keyTangent -time $timeArray[$i] -q -iw $channel`;
+                     $outWeightValue = `keyTangent -time $timeArray[$i] -q -ow $channel`;
+                     $outTangentValue = `keyTangent -time $timeArray[$i] -q -ott $channel`;                                                            
+                     $inAnglesArray[$i] =  $inAnglesValue[0];  
+                     $outAngleArray[$i] =  $outAngleValue[0];
+                     $inWeightArray[$i] =  $inWeightValue[0];
+                     $outWeightArray[$i] =  $outWeightValue[0];
+                     $outTangent[$i] = $outTangentValue[0];                       
+                }
+                bufferCurve -swap;
+
+                //converge keys to buffer values (of selected keys)
+                    $selected = `keyframe -selected -q -indexValue $channel`;
+                    for ($i = 0; $i < size($selected); $i++){                                                       
+		                    		                    
+		                    if( `keyTangent -edit -weightedTangents true` )
+		                    {		                        
+		                    keyTangent -edit -weightedTangents false;
+		                    keyframe -index $selected[$i] -valueChange ($bufferValueArray[$i]) $channel;                                                                                                  
+                            keyTangent -index $selected[$i] -itt ($innTangents[$i]) $channel;
+                                keyTangent -lock off;                                  
+                                                                                                                                                                                    
+                                keyTangent -index $selected[$i] -ia ($inAnglesArray[$i]) $channel;  
+                                keyTangent -index $selected[$i] -oa ($outAngleArray[$i]) $channel;                                
+                                keyTangent -index $selected[0] -oa ($outAngleArray[0]) $channel;       //fixing 1st key                                                         
+                                keyTangent -index $selected[$i] -iw ($inWeightArray[$i]) $channel;
+                                keyTangent -index $selected[$i] -ow ($outWeightArray[$i]) $channel;                                                                
+                                keyTangent -index $selected[0] -ow ($outWeightArray[0]) $channel;      //fixing 1st key                                                                                     
+                                keyTangent -index $selected[$i] -ott ($outTangent[$i]) $channel;                                
+                                if( gmatch($outTangent[0], "step"))                                        
+		                            {		                        
+		                            keyTangent -index $selected[0] -ott step $channel;	               //fixing 1st stepped key		                
+		                            }  
+		                                                                                                                 
+                                keyTangent -lock on;			                
+		                    } 
+		                    else 
+		                    {
+		                    keyframe -index $selected[$i] -valueChange ($bufferValueArray[$i]) $channel;
+		                    keyTangent -index $selected[$i] -wl ($weightlockTangent[$i]) $channel;                                                                                                  
+                            keyTangent -index $selected[$i] -itt ($innTangents[$i]) $channel;  
+                                keyTangent -lock off;                                  
+                                                                                                                                                                                    
+                                keyTangent -index $selected[$i] -ia ($inAnglesArray[$i]) $channel;  
+                                keyTangent -index $selected[$i] -oa ($outAngleArray[$i]) $channel;                                
+                                keyTangent -index $selected[0] -oa ($outAngleArray[0]) $channel;       //fixing 1st key                                                         
+                                keyTangent -index $selected[$i] -iw ($inWeightArray[$i]) $channel;
+                                keyTangent -index $selected[$i] -ow ($outWeightArray[$i]) $channel;                                                                
+                                keyTangent -index $selected[0] -ow ($outWeightArray[0]) $channel;      //fixing 1st key                                                                                     
+                                keyTangent -index $selected[$i] -ott ($outTangent[$i]) $channel;                                
+                                if( gmatch($outTangent[0], "step"))                                        
+		                            {		                        
+		                            keyTangent -index $selected[0] -ott step $channel;	               //fixing 1st stepped key		                
+		                            }  
+		                                                                                                                 
+                                keyTangent -lock on; 
+                    		}	                                                                     
+                    }
+                }
+                     
+  };
+   
+global proc DeselectKeylessObjects ()                                               //deselects all objects without keys
+  {
+  string $graphEditorObjects[] = `selectionConnection -q -object graphEditorList`;
+    for ($h = 0; $h < size($graphEditorObjects); $h++)
+      {		                    
+	  if( `keyframe -query -keyframeCount $graphEditorObjects[$h]` == 0 )           //when no keyframes on object		                        
+      select -tgl $graphEditorObjects[$h] ;			                                //deselect it            
+      }    
+  } ; 
+  
+global proc SelectObjects ()                                                    //selects all objects in the graph editor
+  {
+  string $graphEditorObjects[] = `selectionConnection -q -object graphEditorList`;
+    for ( $object in $graphEditorObjects )
+    {
+      selectionConnection -e -select $object graphEditor1FromOutliner;   
+    }
+  }  ;
+  
+global proc StampTimerange ()
+  {
+    global string $gPlayBackSlider ;
+    float $range[]=`timeControl -q -rangeArray $gPlayBackSlider`;     
+    currentTime ($range[0]-1);                                                  //go one frame before selection       
+    setKeyframe -insert ;              
+    currentTime $range[0];                                                      //go first frame of selection   
+    setKeyframe -insert ;             
+    currentTime ($range[1]-1);                                                  //go last frame of selection
+    setKeyframe -insert ;
+    currentTime $range[1];                                                      //go one frame after selection
+    setKeyframe -insert ;        
+    selectKey -clear ;
+    selectKey -time ($range[0]+":"+($range[1]-1));                              //selects all keys in timeline-selection
+    selectKey -tgl `ls -selection`;
+    copyKey ;
+    doBuffer swap graphEditor1GraphEd;
+    selectKey -clear ;    
+    currentTime ($range[0]-0.5);                                                //go half a frame before selection       
+    setKeyframe -insert ;                                                       // fixes some tangent issues for $range[0]    
+    currentTime $range[0];                                                      //go first frame of selection 
+    setKeyframe -insert -bd true ;        
+    keyTangent -time $range[0] -itt linear -ott linear;      
+    currentTime ($range[1]-1);                                                  //go last frame of selection 
+    setKeyframe -insert -bd true ;    
+    keyTangent -time ($range[1]-1) -itt linear ;    
+    selectKey -time ($range[0]+":"+($range[1]-1));       
+    selectKey -tgl `ls -selection`;
+    doBuffer snapshot graphEditor1GraphEd ;
+    cutKey -animation keys -clear -selectKey ;
+    selectKey -clear ;
+    pasteKey -option merge -copies 1 -connect 0 -timeOffset 0 -floatOffset 0 -valueOffset 0 ;
+    selectKey -clear ;
+    selectKey -time ($range[0]+":"+($range[1]-1));
+  } ;        
+global proc ButtonYes1 ()
+  { 
+    DeselectKeylessObjects ;   
+    StampTimerange ;  
+    SelectObjects ;                                        //this shows the user ALL the affected curves on all objects
+  } ;
+ 
+global proc ButtonYes2 ()
+  {  
+  // Create a buffer curve for the selected keys
+       bufferCurve -animation keys -overwrite false;   
+  //extra loop for single curve processing 
+  string $selectedCurves[] = `keyframe -selected -q -name`;
+  for ($b = 0; $b < size($selectedCurves); $b++){                     
+        bufferCurve -swap;
+        selectKey -replace $selectedCurves[$b];
+        bufferCurve -swap; 
+        SnapToBuffer;             
+  }      
+        bufferCurve -swap; 
+        selectKey $selectedCurves ;
+        bufferCurve -swap;    
+  } ;
+   
+global proc WarnWindow1 ()
+  {       
+        string $graphEditorObjects[] = `selectionConnection -q -object graphEditorList`;
+        int $num = size($graphEditorObjects);                                //number of objects selected
+        // create a confirm dialog with a yes and no button.
+        $response = `confirmDialog -title "Long Calculation Time Warning"
+                          -message ($num + "  objects selected. Recommended are less than 200 objects.\nContinue anyway?")
+                          -button "Yes"
+                          -button "No"
+                          -defaultButton "Yes"
+                          -cancelButton "No"
+                          -dismissString "No"`;
+       
+        // check response     
+        if( $response == "Yes" ) {
+            ButtonYes1 ;       
+        }
+  } ;
+ 
+global proc WarnWindow2 ()
+  {       
+        string $names[] = `keyframe -q -sl -name`;                            //name of selected curves in selection order
+        int $number = size($names);                                           //number of selected curves       
+        // create a confirm dialog with a yes and no button.
+        $response = `confirmDialog -title "Long Calculation Time Warning"
+                          -message ($number + "  curves selected. Recommended are keys on less than 250 curves.\nContinue anyway?")
+                          -button "Yes"
+                          -button "No"
+                          -defaultButton "Yes"
+                          -cancelButton "No"
+                          -dismissString "No"`;
+       
+        // check response     
+        if( $response == "Yes" ) {
+            ButtonYes2 ;       
+        }
+  } ;
+
+//selectionCore
+string $keys[] = `keyframe -sl -q -name`;                                     //name of selected curves in selection order
+global string $gPlayBackSlider ;
+float $range[]=`timeControl -q -rangeArray $gPlayBackSlider`;           
+  if( size($keys) > 0 )
+    {   
+     if( ($range[1]-1) == $range[0])                                          //when no timerange is marked
+     {
+      string $names[] = `keyframe -q -sl -name`;                              //name of selected curves in selection order       
+      int $number = size($names);                                             //number of selected curves
+      if( $number > 250 )
+         {
+         WarnWindow2 ;
+         }
+      else
+         {     
+         ButtonYes2 ;
+         }
+     }
+    }  
+  if( ($range[1]-1) > $range[0])                                              //when timerange more than 2 frames long is marked
+    {   
+     string $graphEditorObjects[] = `selectionConnection -q -object graphEditorList`;
+     int $num = size($graphEditorObjects);                                    //number of objects selected
+     if( $num > 200 )
+         {   
+         WarnWindow1 ;
+         }
+     else
+         {    
+         ButtonYes1 ;
+         }
+    } ;
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// EoS Selection_To_Buffercurve.mel
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
