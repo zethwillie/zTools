@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-import zbw_window as win
+import zTools.resources.zbw_window as win
 import cPickle
 
 # sg = cmds.ls(type="shadingEngine")
@@ -8,52 +8,52 @@ import cPickle
 # cs = cmds.listConnections("lambert2SG.dagSetMembers")
 # print cs
 
-class ShaderSaverUI(win.Window):
+class Shader_Saver_UI(win.Window):
     def __init__(self):
         self.windowName = "zbw_shaderSaver"
         self.windowSize = [420, 280]
         self.sizeable = 1
 
-        self.createUI()
+        self.create_UI()
 
-    def commonUI(self):
+    def common_UI(self):
         pass
 
-    def customUI(self):
+    def custom_UI(self):
         cmds.text("put UI stuff here for options")
         path = cmds.internalVar(upd=True) + "default.txt"
-        self.widgets["destinationTFBG"] = cmds.textFieldButtonGrp(l="destination", bl="<<<", cal=([1,"left"], [2,"left"], [3,"left"]), cw3=(65,275, 50), tx=path, bc=self.getLocation)
+        self.widgets["destinationTFBG"] = cmds.textFieldButtonGrp(l="destination", bl="<<<", cal=([1,"left"], [2,"left"], [3,"left"]), cw3=(65,275, 50), tx=path, bc=self.get_location)
 
     def action(self, close, *args):
         #do the action here
-        self.saveShaderList()
+        self.save_shader_list()
 
         #close window
         if close:
-            self.closeWindow()
+            self.close_window()
         pass
 
-    def printHelp(self, *args):
+    def print_help(self, *args):
         #########  modify for inheritence ###########
         print("this is your help, yo")
 
-    def resetValues(self, *args):
+    def reset_values(self, *args):
         #########  modify for inheritence ###########
         print("test values reset")
 
-    def saveValues(self, *args):
+    def save_values(self, *args):
         #########  modify for inheritence ###########
         print("test save values")
 
-    def loadValues(self, *args):
+    def load_values(self, *args):
         #########  modify for inheritence ###########
         print("test load values")
 
-    def getLocation(*args):
+    def get_location(*args):
         print("this gets location")
         pass
 
-    def saveShaderList(self, *args):
+    def save_shader_list(self, *args):
         """
         """
         sgs = []
@@ -84,7 +84,8 @@ class ShaderSaverUI(win.Window):
             file.write("%s,%s\n"%(key, connections[key]))
         file.close()
 
-    def getShaderList(self, *args):
+
+    def get_shader_list(self, *args):
         #retrieve the dict of shaders from file
         self.path = cmds.textFieldButtonGrp(self.widgets["destinationTFBG"], q=True, tx=True)
         getFile = open(self.path, "r")
@@ -94,7 +95,8 @@ class ShaderSaverUI(win.Window):
         getFile.close()
         print "connections = %s"%connections
 
-    def assignShaderList(self, *args):
+
+    def assign_shader_list(self, *args):
         #assign the list of shaders to the geo in the new scene
         #check about namespaces, etc. How to deal with that? type in a namespace?
         #select the top node then use the | to split split the names of the objects
@@ -105,5 +107,5 @@ class ShaderSaverUI(win.Window):
 
         pass
 
-def zbw_shaderSaver():
-    shaderWin = ShaderSaverUI()
+def shaderSaver():
+    shaderWin = Shader_Saver_UI()

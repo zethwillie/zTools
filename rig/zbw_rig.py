@@ -984,9 +984,16 @@ def group_freeze(obj, suffix="GRP", *arg):
     Returns:
         string: returns the new group
     """
+    parent = cmds.listRelatives(obj, p=True)
+    if parent:
+        parent = parent[0]
+
     grp = cmds.group(empty=True, name="{0}_{1}".format(obj, suffix))
     snap_to(obj, grp)
     cmds.parent(obj, grp)
+
+    if parent:
+        cmds.parent(grp, parent)
 
     return (grp)
 
@@ -1477,6 +1484,9 @@ def plugin_load(plugin, *args):
     loaded = cmds.pluginInfo(plugin, q=True, loaded=True)
     if not loaded:
         cmds.loadPlugin(plugin)
+        cmds.warning("loaded: {0}".format(plugin))
+    else:
+        print("{0} is already loaded!".format(plugin))
 
 
 def align_to_curve(crv=None, obj=None, param=None, *args):

@@ -33,29 +33,29 @@ class Window(object):
         self.lowColumnLO = cmds.columnLayout(w=self.winWidth)
         cmds.formLayout(self.formLO, e=True, attachForm = [(self.scrollLO, "top", 0), (self.scrollLO, "left", 0), (self.scrollLO, 'right', 0), (self.scrollLO, 'bottom', 35)])
 
-        self.commonUI()
+        self.common_UI()
         
-        self.customUI()
+        self.custom_UI()
 
-        self.buttonsUI()
+        self.buttons_UI()
 
         cmds.showWindow(self.window)
         cmds.window(self.window, e=True, w=self.winWidth, h=height)
 
 
-    def commonUI(self):
+    def common_UI(self):
         #########  modify for inheritence ###########
         cmds.text('this is where the common UI elements go')
         cmds.separator(h=100)
 
 
-    def customUI(self):
+    def custom_UI(self):
         #########  modify for inheritence ###########
         cmds.text("this is where the custom UI elements go")
         cmds.separator(h=200)
 
 
-    def buttonsUI(self):
+    def buttons_UI(self):
         #########  modify for inheritence ###########
         butWidth = self.winWidth/3 - 10
 

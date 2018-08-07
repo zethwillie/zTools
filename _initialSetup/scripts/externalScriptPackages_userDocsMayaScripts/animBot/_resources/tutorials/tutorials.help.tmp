@@ -1,0 +1,53 @@
+{
+  "creatingAlignLocator": {
+    "title": "Creating a locator aligned to a control",
+    "link": "https://www.youtube.com/watch?v=dvk2PQNcg8w",
+    "img": "align.gif",
+    "len": "1:28",
+    "details": "Learn how to easily create a locator aligned to a control for all its keyframes.",
+    "toolTags": [
+      "selectOpposite",
+      "blendToFrame",
+      "alignSelected"
+    ],
+    "searchTags": [
+      "snap"
+    ]
+  },
+  "lipSync": {
+    "title": "Lip Sync with Sliders",
+    "link": "https://www.youtube.com/watch?v=dvk2PQNcg8w",
+    "len": "1:55",
+    "details": "Learn how to make this work.",
+    "toolTags": [
+      "blendToFrame",
+      "alignSelected",
+      "selectOpposite",
+      "setSmartKey"
+    ]
+  },
+  "Another": {
+    "title": "Lip Sync with Sliders 2, the Saga",
+    "link": "https://www.youtube.com/watch?v=dvk2PQNcg8w",
+    "len": "1:25",
+    "details": "Learn how to make this work.",
+    "toolTags": [
+      "blendToFrame",
+      "alignSelected",
+      "selectOpposite",
+      "setSmartKey"
+    ]
+  },
+  "Anothfder": {
+    "title": "Lip Sync with Sliders 3, the Saga",
+    "link": "https://www.youtube.com/watch?v=dvk2PQNcg8w",
+    "len": "1:25",
+    "details": "Learn how to make this work.",
+    "toolTags": [
+      "blendToFrame",
+      "alignSelected",
+      "selectOpposite",
+      "setSmartKey"
+    ]
+  }
+}

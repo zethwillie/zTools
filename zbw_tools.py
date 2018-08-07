@@ -31,7 +31,7 @@ widgets = {}
 
 # make sure maya can see and call mel scripts from zTools (where this is called from)
 zToolsPath = os.path.dirname(os.path.abspath(__file__))
-subpaths = ["", "rig", "resources", "anim", "model", "shaderRender"]
+subpaths = ["", "rig", "resources", "anim", "model", "shaderRender",]
 newPaths = []
 for p in subpaths:
     thisPath = os.path.join(zToolsPath, p)
@@ -76,7 +76,9 @@ zAnimDict = {
     "randomSel": "import zTools.anim.zbw_randomSelection as zRS; reload(zRS);zRS.randomSelection()",
     "randomAttr": "import zTools.anim.zbw_randomAttrs as zRA; reload(zRA); zRA.randomAttrs()",
     "clip": "import zTools.anim.zbw_setClipPlanes as zSC; reload(zSC); zSC.setClipPlanes()",
-    "tangents": "import zTools.anim.zbw_tangents as zTan; reload(zTan); zTan.tangents()"
+    "tangents": "import zTools.anim.zbw_tangents as zTan; reload(zTan); zTan.tangents()",
+    "studioLib": "import studiolibrary; studiolibrary.main()", 
+    "animBot": "import animBot; animBot.welcome()", 
 }
 
 zModelDict = {
@@ -85,7 +87,9 @@ zModelDict = {
 }
 
 zShdDict = {
-    "shdTransfer": "import zTools.shaderRender.zbw_shadingTransfer as zST; reload(zST); zST.shadingTransfer()"
+    "shdTransfer": "import zTools.shaderRender.zbw_shadingTransfer as zST; reload(zST); zST.shadingTransfer()",
+    "prvsShd": "import zTools.shaderRender.zbw_previsShaders as zPrvsShd; reload(zPrvsShd); zPrvsShd.previsShaders()",
+    "shdSave": "import zTools.shaderRender.zbw_shaderSaver as zshSv; reload(zshSv); zshSv.shaderSaver()",
 }
 
 colors = rig.colors
@@ -141,7 +145,7 @@ def tools_UI(*args):
     widgets["actionFrLO"] = cmds.frameLayout(l="ACTIONS", w=280, h=330, bv=True, bgc=(0, 0, 0))
     widgets["actionRCLO"] = cmds.rowColumnLayout(bgc=(0.3, 0.3, 0.3), nc=2)
     widgets["grpFrzBut"] = cmds.button(l="group freeze selected", w=140, bgc=(.5, .7, .5), c=group_freeze)
-    widgets["grpAbvBut"] = cmds.button(l="insert group above ('Grp')", w=140, bgc=(.5, .7, .5), c=insert_group_above)
+    widgets["selCrvHier"] = cmds.button(l="sel crv hier", w=140, bgc=(.5, .7, .5), c=select_curve_hierarchy)
     widgets["grpCnctBut"] = cmds.button(l="group freeze + connect", w=140, bgc=(.5, .7, .5), c=freeze_and_connect)
     widgets["slctHiBut"] = cmds.button(l="select hierarchy", w=140, bgc=(.5, .7, .5), c=select_hi)
     widgets["prntChnBut"] = cmds.button(l="parent chain selected", w=140, bgc=(.5, .7, .5), c=parent_chain)
@@ -220,9 +224,8 @@ def tools_UI(*args):
     widgets["cmtRename"] = cmds.button(l="cometRename", w=140, bgc=(.5, .5, .5), c=partial(zAction, zRigDict, "cmtRename"))
     widgets["abSym"] = cmds.button(l="abSymMesh", w=140, bgc=(.5, .5, .5), c=partial(zAction, zRigDict,"abSym"))
     widgets["cmtJntOrnt"] = cmds.button(l="cometJntOrient", w=140, bgc=(.5, .5, .5), c=partial(zAction, zRigDict,"cmtJntOrnt"))
-    widgets["BSpirit"] = cmds.button(l="BSpirtCorrective", w=140, bgc=(.5, .5, .5), c=partial(zAction, zRigDict,"BSpirit"))
-    widgets["extract"] = cmds.button(l="Extract Deltas", w=135, bgc=(.5, .5,
-                                                                     .5),)
+    widgets["extract"] = cmds.button(l="Extract Deltas", w=135, bgc=(.5, .5,.5), c=extract_deltas)
+
     # color layout
     cmds.setParent(widgets["rigFLO"])
     widgets["colorFLO"] = cmds.formLayout(w=280, h=66, bgc=(0.3, 0.3, 0.3))
@@ -277,8 +280,10 @@ def tools_UI(*args):
 
 
     cmds.setParent(widgets["tab"])
-    widgets["modelCLO"] = cmds.columnLayout("MDL", w=280)
+    widgets["modelLgtCLO"] = cmds.columnLayout("MDL_LGT", w=280)
 # curve tools, model scripts, add to lattice, select hierarchy, snap selection buffer, transform buffer
+    widgets["mdlMdlFrameLO"] = cmds.frameLayout(l="MODELING", w=280, bv=True, bgc=(0, 0, 0))
+    widgets["mdlPropRCLO"] = cmds.rowColumnLayout(nc=2, bgc=(0.3, 0.3, 0.3))
     widgets["MaddToLat"] = cmds.button(l="add to lattice", w=140, bgc=(.5, .7, .5), c=add_lattice)
     widgets["extend"] = cmds.button(l="zbw_polyExtend", w=140, bgc=(.7, .5, .5),c=partial(zAction, zModelDict,"extend"))
     widgets["wrinkle"] = cmds.button(l="zbw_wrinklePoly", w=140, bgc=(.7, .5, .5), c=partial(zAction, zModelDict,"wrinkle"))
@@ -292,6 +297,12 @@ def tools_UI(*args):
     widgets["cube"] = cmds.button(l="zeroed cube", w=140, bgc=(.5, .5, .5))
     widgets["cylinder"] = cmds.button(l="zeroed cylinder", w=140, bgc=(.5, .5, .5))
 
+    cmds.setParent(widgets["modelLgtCLO"])
+    widgets["lgtFrameLO"] = cmds.frameLayout(l="LIGHTING RENDER", w=280, bv=True, bgc=(0, 0, 0))
+    widgets["lgtPropRCLO"] = cmds.rowColumnLayout(nc=2, bgc=(0.3, 0.3, 0.3))
+    widgets["transfer"] = cmds.button(l="zbw_shadingTransfer", w=140, bgc=(.7, .5, .5), c=partial(zAction, zShdDict, "shdTransfer"))
+    widgets["previsShd"] = cmds.button(l="zbw_previsShaders", w=140, bgc=(.7, .5, .5), c=partial(zAction, zShdDict, "prvsShd"))    
+
     cmds.setParent(widgets["tab"])
     widgets["animCLO"] = cmds.columnLayout("ANIM", w=280)
     widgets["tween"] = cmds.button(l="tween machine", w=140, bgc=(.5, .5, .5), c=partial(zAction, zAnimDict, "tween"))
@@ -304,13 +315,9 @@ def tools_UI(*args):
     widgets["randomAttr"] = cmds.button(l="zbw_randomAttr", w=140, bgc=(.7, .5, .5),c=partial(zAction, zAnimDict,"randomAttr"))
     widgets["clip"] = cmds.button(l="zbw_setClipPlanes", w=140, bgc=(.7, .5, .5), c=partial(zAction, zAnimDict,"clip"))
     widgets["tangents"] = cmds.button(l="zbw_tangents", w=140, bgc=(.7, .5, .5), c=partial(zAction, zAnimDict, "tangents"))
-    widgets["studLib"] = cmds.button(l="Studio Library", w=140, bgc=(.5, .7,.5))
-    widgets["atools"] = cmds.button(l="ATools", w=140, bgc=(.5, .7,.5))
-    widgets["picker"] = cmds.button(l="Anim School Picker", w=140, bgc=(.5, .7,.5),)
+    widgets["studLib"] = cmds.button(l="Studio Library", w=140, bgc=(.5, .5,.5), c=partial(zAction, zAnimDict, "studioLib"))
+    widgets["atools"] = cmds.button(l="animBot", w=140, bgc=(.5, .5,.5), c=partial(zAction, zAnimDict, "animBot"))
 
-    cmds.setParent(widgets["tab"])
-    widgets["lgtRndCLO"] = cmds.columnLayout("LT_RN", w=280)
-    widgets["transfer"] = cmds.button(l="zbw_shadingTransfer", w=140, bgc=(.7, .5, .5), c=partial(zAction, zShdDict, "shdTransfer"))
 
     cmds.setParent(widgets["tab"])
     widgets["lgtRndCLO"] = cmds.columnLayout("MISC", w=280)
@@ -476,6 +483,12 @@ def create_master_pack(self):
     cmds.parent(mst2Grp, mst1)
 
 
+def extract_deltas(*args):
+    # check plug is loaded
+    rig.plugin_load("extractDeltas")
+    mel.eval("performExtractDeltas")
+
+
 def parent_scale_constrain(*args):
     """ just creates a parent and scale transform on the tgt object """
     sel = cmds.ls(sl=True, type="transform")
@@ -515,45 +528,58 @@ def group_freeze(*args):
         rig.group_freeze(obj)
 
 
-def insert_group_above(*args):
-    sel = cmds.ls(sl=True)
-
-    for obj in sel:
-        par = cmds.listRelatives(obj, p=True)
-
-        grp = cmds.group(em=True, n="{}_Grp".format(obj))
-
-        pos = cmds.xform(obj, q=True, ws=True, rp=True)
-        rot = cmds.xform(obj, q=True, ws=True, ro=True)
-
-        cmds.xform(grp, ws=True, t=pos)
-        cmds.xform(grp, ws=True, ro=rot)
-
-        cmds.parent(obj, grp)
-        if par:
-            cmds.parent(grp, par[0])
+def select_curve_hierarchy(*args):
+    """
+        select top node(s) and this will (inclusively) select all the curve xforms below it
+    """
+    sel = cmds.ls(sl=True, type="transform")
+    crvXforms = []
+    for top in sel:
+        cshps = cmds.listRelatives(top, allDescendents=True, f=True, type="nurbsCurve")
+        if cshps:
+            for cshp in cshps:
+                xf = cmds.listRelatives(cshp, p=True, f=True)[0]
+                crvXforms.append(xf)
+        # sort list by greatest number of path splits first (deepest)
+        crvXforms.sort(key=lambda a: a.count("|"), reverse=True)
+    
+    list(set(crvXforms))
+    cmds.select(crvXforms, r=True)
 
 
 def freeze_and_connect(*args):
-    #---------------- recreate hierarchy
     sel = cmds.ls(sl=True)
-
     ctrlOrig = sel[0]
+    grpList = []
+    ctrlList = []
 
     for x in range(1, len(sel)):
-        obj = sel[x]
-        ctrl = cmds.duplicate(ctrlOrig, n="{}Ctrl".format(obj))[0]
 
-        pos = cmds.xform(obj, ws=True, q=True, rp=True)
-        rot = cmds.xform(obj, ws=True, q=True, ro=True)
+        pos = cmds.xform(sel[x], ws=True, q=True, rp=True)
+        rot = cmds.xform(sel[x], ws=True, q=True, ro=True)
 
-        grp = cmds.group(em=True, n="{}Grp".format(ctrl))
+        ctrl = cmds.duplicate(ctrlOrig, n="{}Ctrl".format(sel[x]))[0]
+        grp = rig.group_freeze(ctrl)
 
-        cmds.parent(ctrl, grp)
-        cmds.xform(grp, ws=True, t=pos)
-        cmds.xform(grp, ws=True, ro=rot)
+        rig.snap_to(sel[x], grp)
+        cmds.parentConstraint(ctrl, sel[x])
+        grpList.append(grp)
+        ctrlList.append(ctrl)
+    
+    zipList = zip(sel[1:], grpList, ctrlList)
 
-        cmds.parentConstraint(ctrl, obj)
+    for i in range(len(zipList)):
+        parID = None
+        par = cmds.listRelatives(zipList[i][0], p=True)
+        if par:
+            try:
+                parID = sel.index(par[0])-1
+                parCtrl = zipList[parID][2]
+                cmds.parent(zipList[i][1], parCtrl)
+            except:
+                pass
+
+    cmds.delete(sel[0])
 
 
 def parent_chain(*args):
@@ -612,24 +638,15 @@ def copy_skinning(*args):
     orig = sel[0]
     target = sel[1]
 
-    # get orig obj joints
     try:
         jnts = cmds.skinCluster(orig, q=True, influence=True)
     except:
         cmds.warning("couldn't get skin weights from {}".format(orig))
-
-    # bind the target with the jnts
     try:
-        targetClus = cmds.skinCluster(jnts, target, bindMethod=0, skinMethod=0,
-                                      normalizeWeights=1, maximumInfluences=3,
-                                      obeyMaxInfluences=False, tsb=True)[0]
-        print targetClus
+        targetClus = cmds.skinCluster(jnts, target, bindMethod=0, skinMethod=0,normalizeWeights=1, maximumInfluences=3,obeyMaxInfluences=False, tsb=True)[0]
     except:
         cmds.warning("couln't bind to {}".format(target))
-
-    # get skin clusters
     origClus = mel.eval("findRelatedSkinCluster " + orig)
-
     # copy skin weights from orig to target
     try:
         cmds.copySkinWeights(ss=origClus, ds=targetClus, noMirror=True,

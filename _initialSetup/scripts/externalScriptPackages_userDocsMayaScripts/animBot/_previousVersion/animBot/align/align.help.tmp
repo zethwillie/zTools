@@ -1,0 +1,57 @@
+[
+  {
+    "name": "selectionDisplay",
+    "pages": [
+      [
+        "First page: Snap selected objects. Simply select two or more objects and apply. The objects will snap to the latest selected."
+      ],
+      [
+        "Second page: Snap selected objects. Simply select two or more objects and apply. The objects will snap to the latest selected.",
+        "separator",
+        "Another text"
+      ]
+    ]
+  },
+  {
+    "name": "alignSelected",
+    "pages": [
+      [
+        "First page: Snap selected objects. Simply select two or more objects and apply. The objects will snap to the latest selected.",
+        "a_cool_image_will_go_here.png"
+      ],
+      [
+        "Second page: Snap selected objects. Simply select two or more objects and apply. The objects will snap to the latest selected.",
+        "align.gif",
+        "separator",
+        "Another text",
+        "teste.png"
+      ],
+      [
+        "Third page: Snap selected objects. Simply select two or more objects and apply. The objects will snap to the latest selected.",
+        "align.gif",
+        "Another text",
+        "teste.png"
+      ],
+      [
+        "Third page: Snap selected objects. Simply select two or more objects and apply. The objects will snap to the latest selected.",
+        "align.gif",
+        "Another text",
+        "teste.png"
+      ],
+      [
+        "Third page: Snap selected objects. Simply select two or more objects and apply. The objects will snap to the latest selected.",
+        "align.gif",
+        "Another text",
+        "teste.png"
+      ],
+      [
+        "Third page: Snap selected objects. Simply select two or more objects and apply. The objects will snap to the latest selected.",
+        "align.gif",
+        "Another text",
+        "teste.png"
+      ]
+    ]
+  }
+]
+
+

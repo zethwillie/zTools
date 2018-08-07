@@ -33,7 +33,7 @@ class RibbonUI(win.Window):
 
         self.create_UI()
 
-    def commonUI(self):
+    def common_UI(self):
         pass
 
 
