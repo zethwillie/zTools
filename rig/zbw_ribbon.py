@@ -37,7 +37,7 @@ class RibbonUI(win.Window):
         pass
 
 
-    def customUI(self):
+    def custom_UI(self):
         cmds.text("Add some basic instructions here?")
         self.ribbonNameTFG = cmds.textFieldGrp(l="Ribbon Rig Name", cal=[(1, "left"), (2, "left")], cw=[(1, 100), (2, 200)], tx="myRibbon")
         cmds.separator(h=10, style="single")
