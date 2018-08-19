@@ -1,15 +1,15 @@
 import maya.cmds as cmds
 
-import python_rigger_old.rigger_tools.rigger_tools as zrt
+import zTools.rig.zbw_rigger_utils as zrt
 
 reload(zrt)
-import zTools.rig.auto_baseLimb as BL
+import zTools.rig.zbw_rigger_baseLimb as BL
 
 reload(BL)
 import zTools.rig.zbw_rig as rig
 
 reload(rig)
-import zTools.rig.auto_rigWindow as zrw
+import zTools.rig.zbw_rigger_window as zrw
 
 reload(zrw)
 

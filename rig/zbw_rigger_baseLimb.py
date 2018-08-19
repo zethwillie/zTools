@@ -1,12 +1,12 @@
 import maya.cmds as cmds
 
-import python_rigger_old.rigger_tools.rigger_tools as zrt
+import zTools.rig.zbw_rigger_utils as zrt
 
 reload(zrt)
 import zTools.rig.zbw_rig as rig
 reload(rig)
 import maya.OpenMaya as om
-import zTools.rig.auto_rigWindow as zrw
+import zTools.rig.zbw_rigger_window as zrw
 reload(zrw)
 
 #----------------# for sides create a list w "orig", if mirror add "mir", replace all self.fkJoints.keys(), etc. . 
@@ -232,7 +232,6 @@ class BaseLimb(object):
 
 
     def create_ik_rig(self):
-
         for side in self.ikJoints.keys():
             jnts = self.ikJoints[side]
             if side == "orig":
@@ -248,9 +247,7 @@ class BaseLimb(object):
             self.ikCtrls[side] = [ctrl]
             self.ikCtrlGrps[side] = [grp]
             self.ikHandles[side].append(handle)
-        # scale the control
 
-    # extract the pole Vector bits to riggerTools
             # create pole vec
             if side == "orig":
                 pvname = "{0}_{1}_poleVector_{2}".format(self.origPrefix, self.part, self.ctrlSuffix)
@@ -265,8 +262,8 @@ class BaseLimb(object):
             cmds.select(handle, r=True)
             pos = zrt.find_pole_vector_location(handle)
             cmds.xform(pvgrp, ws=True, t=(pos[0], pos[1], pos[2]))
-            pvc = cmds.poleVectorConstraint(pv, handle)
-        # save constraint?
+            cmds.poleVectorConstraint(pv, handle)
+
             # add crv lines from shoulder to pv
             if side == "orig":
                 pvline = "{0}_{1}_poleVec_Line".format(self.origPrefix, self.part)
@@ -285,7 +282,6 @@ class BaseLimb(object):
             cmds.addAttr(self.switchCtrls[side], ln="poleVecLineVis", at="short", min=0, max=1, dv=1, k=True)
             cmds.connectAttr("{0}.poleVecLineVis".format(self.switchCtrls[side]), "{0}.overrideVisibility".format(shp))
         # option for no flip pv?
-        # option to create follow spaces? (pv follow ik ctrl)
 
     def connect_deform_joints(self):
         # zip up fk, ik and deform joints for easier stuff
@@ -294,11 +290,9 @@ class BaseLimb(object):
             # should we parent constraint these? 
             for grp in joints:
                 zrt.create_parent_reverse_network(grp[:-1], grp[-1], "{0}.fkik".format(self.switchCtrls[side]), index=0)
-                # zrt.create_scale_reverse_network(grp[:-1], grp[-1], "{0}.fkik".format(self.switchCtrls[side]), index=0)
 
     # a way to do gimbles in both ik and fk? create gimbel ctrl under grp. grp is parent constrained to ik/fk ctrls (like deform joint). ctrl then is what parent constrains to the deform joints
 
-    # add no flip pole vector 
 
     def create_ik_stretch(self):
         # LET"S DO THIS SCALE-WISE FOR NOW
@@ -367,7 +361,6 @@ class BaseLimb(object):
 
 
     def create_ik_group(self):
-    # package up cmponents, color controls, hide jnts, etc
         ikName = "ik_world_rig_GRP"
         if not cmds.objExists(ikName):
             ikGrp = cmds.group(em=True, name=ikName)
@@ -458,7 +451,6 @@ class BaseLimb(object):
                     roindex = roList.index(origRotOrder)
                     cmds.setAttr(roattr, roindex)
 
-# strip to rotate adn translates. . . . 
 
 
     def label_deform_joints(self):
