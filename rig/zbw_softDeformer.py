@@ -16,15 +16,16 @@ import zTools.resources.zbw_window as zwin
 widgets= {}
 class SoftDeformerUI(zwin.Window):
     def __init__(self):
-        super(SoftDeformerUI, self).__init__(title="Soft Mod Deformer", w=320, h=220, winName="softWin", buttonLabel="Create")
+        super(SoftDeformerUI, self).__init__(title="Soft Mod Deformer", w=320, h=250, winName="softWin", buttonLabel="Create")
 
     def common_UI(self):
+        cmds.text("By default, this works with already bound geo.\nFor non_deformed geo, tick the box below")
         self.softNameTFG = cmds.textFieldGrp(l="Deformer Name", w=300, cw=[(1, 100), (2, 190)], cal=[(1, "left"), (2, "left")], placeholderText="softMod_DEF")
-        self.frontChainCBG = cmds.checkBoxGrp(l="Auto move to front of chain", v1=0, cw=[(1, 200)],cal=[(1, "left"), (2, "left")])
+        self.frontChainCBG = cmds.checkBoxGrp(l="Create at front of chain?", v1=0, cw=[(1, 200)],cal=[(1, "left"), (2, "left")])
         self.ctrlScaleFFG = cmds.floatFieldGrp(l="Control Scale", v1=1, pre=2, cw=[(1, 150), (2, 50)], cal=[(1, "left"), (2, "left")])
-        self.autoScaleCBG = cmds.checkBoxGrp(l="autoscale control?", v1=1, cw=[(1, 200)], cal=[(1, "left"), (2, "left")])
-# TODO -  - do we need this?
-        self.bindPoseIFG = cmds.intFieldGrp(l="BindPose/origin Frame", cw=[(1, 150), (2, 50)], cal=[(1, "left"), (2, "left")], v1=0)
+        self.autoScaleCBG = cmds.checkBoxGrp(l="Autoscale control?", v1=1, cw=[(1, 200)], cal=[(1, "left"), (2, "left")])
+        self.waveCBG = cmds.checkBoxGrp(l="Add wave shape?", v1=0, cw=[(1, 200)], cal=[(1, "left"), (2, "left")])        
+        self.geoCBG = cmds.checkBoxGrp(l="non-deformed geo?", v1=0, cw=[(1, 200)], cal=[(1, "left"), (2, "left")])
         self.parentTFBG = cmds.textFieldButtonGrp(l="Parent Object:", cw=[(1, 75), (2, 175), (3, 75)], cal=[(1, "left"), (2, "left"), (3, "left")], bl="<<<", bc=self.set_parent_object)
 
 
@@ -38,10 +39,11 @@ class SoftDeformerUI(zwin.Window):
         foc = cmds.checkBoxGrp(self.frontChainCBG, q=True, v1=True)
         ctrlScl = cmds.floatFieldGrp(self.ctrlScaleFFG, q=True, v1=True)
         autoScale = cmds.checkBoxGrp(self.autoScaleCBG, q=True, v1=True)
-        bindPoseFrame = cmds.intFieldGrp(self.bindPoseIFG, q=True, v1=True)
         parent = cmds.textFieldButtonGrp(self.parentTFBG, q=True, tx=True)
+        wave = cmds.checkBoxGrp(self.waveCBG, q=True, v1=True)
+        nonDefGeo = cmds.checkBoxGrp(self.geoCBG, q=True, v1=True)
         # create the rig
-        smdRig = SoftModRig(parent=parent, name=smdName, frontOfChain=foc, ctrlScale=ctrlScl, autoScale=autoScale, bindPoseFrame=bindPoseFrame)
+        smdRig = SoftModRig(parent=parent, name=smdName, frontOfChain=foc, ctrlScale=ctrlScl, autoScale=autoScale, wave=wave, nonDefGeo=nonDefGeo)
 
         if close:
             self.close_window()
@@ -63,15 +65,17 @@ class SoftDeformerUI(zwin.Window):
 
 
 class SoftModRig(object):
-    def __init__(self, parent, name="softMod", frontOfChain=False, ctrlScale=1, autoScale=True, bindPoseFrame=0, obj=None):
+    def __init__(self, parent, name="softMod", frontOfChain=False, ctrlScale=1, autoScale=True, wave=False, nonDefGeo=False, obj=None):
         """
         only args REQUIRED is parent control (or follicle). Others are optional (obj to apply to (xform of mesh))
         """
         self.name = name
-        self.frontOfChain = frontOfChain
+        self.frontOfChain = frontOfChain # deformer should go at end of chain. . . 
         self.ctrlScale = ctrlScale
         self.autoScale = autoScale
-        self.bindPoseFrame = bindPoseFrame
+        self.wave = wave
+        self.nonDefGeo = nonDefGeo
+
         self.parent = parent
         self.obj = obj
         self.initPos = None
@@ -120,6 +124,7 @@ class SoftModRig(object):
 
         self.create_soft_mod_rig()
 
+
     def create_soft_mod_rig(self):
         """
         create softmod rig on obj at initPosition, if self.onSurface: align to surface of obj
@@ -138,14 +143,35 @@ class SoftModRig(object):
 
         # create softmod
         cmds.select(self.obj, r=True)
-        self.softList = cmds.softMod(relative=False, falloffCenter=self.initPos, falloffRadius=5.0, n="{0}_softMod".format(self.name), frontOfChain=True)
+        self.softList = cmds.softMod(relative=False, falloffCenter=self.initPos, falloffRadius=5.0, n="{0}_softMod".format(self.name), frontOfChain=self.frontOfChain, weightedNode = [self.moveCtrl, self.moveCtrl])
 
         # link controls to softmod
         self.connect_ctrls_to_softmod()
 
         cmds.parent(self.baseGrp, self.parent)
 
+        if self.autoScale:
+            self.autosize_controls()
+
+
+#---------------- need to neutralize the transforms on the geometry node.
+        # set geometry matrix on softmod at creation time
+        # at = softmod.geomMatrix
+        # m = datatypes.Matrix()
+        # targets = _getAffectedObjects(softmod)
+        # for i in xrange(len(targets)):
+        #     at.attr("geomMatrix[{}]".format(str(i))).set(m)
+
+
+        rig.scale_nurbs_control(self.moveCtrl, self.ctrlScale, self.ctrlScale, self.ctrlScale)
+        rig.scale_nurbs_control(self.baseCtrl, self.ctrlScale, self.ctrlScale, self.ctrlScale)
+
+        if self.wave:
+            self.add_wave_to_softmod()
+
     def connect_ctrls_to_softmod(self):
+        cmds.addAttr(self.moveCtrl, ln="__XTRA__", at="enum", k=True)
+        cmds.setAttr("{0}.__XTRA__".format(self.moveCtrl), l=True)
         cmds.addAttr(self.moveCtrl, ln="envelope", at="float", k=True, min=0, max=1, dv=1)
         cmds.addAttr(self.moveCtrl, ln="falloffRadius", at="float", k=True, min=0, dv=3.0)
         cmds.addAttr(self.moveCtrl, ln="mode", at="enum", enumName= "volume=0:surface=1", k=True)
@@ -163,24 +189,59 @@ class SoftModRig(object):
         cmds.connectAttr("{0}.parentInverseMatrix[0]".format(self.moveCtrl), "{0}.matrixIn[1]".format(mm))
         cmds.connectAttr("{0}.matrixSum".format(mm), "{0}.weightedMatrix".format(self.softList[0]))
         cmds.connectAttr("{0}.outputTranslate".format(dm), "{0}.falloffCenter".format(self.softList[0]))
-        cmds.connectAttr("{0}.worldMatrix[0]".format(self.moveCtrl), "{0}.matrix".format(self.softList[0]), f=True)
 
         cmds.connectAttr("{0}.envelope".format(self.moveCtrl), "{0}.envelope".format(self.softList[0]), f=True)
         cmds.connectAttr("{0}.mode".format(self.moveCtrl), "{0}.falloffMode".format(self.softList[0]), f=True)
-
-        cmds.setAttr("{0}.v".format(self.softList[1]), 0)
-        cmds.parent(self.softList[1], self.moveCtrl)
+#---------------- here I need to get the actual connection index        
+        if self.nonDefGeo:
+            cmds.connectAttr("{0}.worldMatrix[0]".format(self.obj), "{0}.geomMatrix[0]".format(self.softList[0]))
 
 
     def create_controls(self, name):
         # size here
-        baseCtrl = rig.create_control("{0}_base".format(name), type="cube", color="yellow")
+        baseCtrl = rig.create_control("{0}_base".format(name), type="cube", color="green")
         baseGrp = rig.group_freeze(baseCtrl)
         moveCtrl = rig.create_control("{0}_move".format(name), type="sphere", color="red")
         moveGrp = rig.group_freeze(moveCtrl)
         cmds.parent(moveGrp, baseCtrl)
 
         return(baseGrp, baseCtrl, moveGrp, moveCtrl)
+
+
+    def add_wave_to_softmod(self):
+        positions = [0.0, 0.3, 0.6, 0.9, 0.95]
+        values = [1.0, -0.3, 0.1, -0.05, 0.01]
+        for i in range(len(positions)):
+            cmds.setAttr("{0}.falloffCurve[{1}].falloffCurve_Position".format(self.softList[0], i), positions[i])
+            cmds.setAttr("{0}.falloffCurve[{1}].falloffCurve_FloatValue".format(self.softList[0], i), values[i])
+            cmds.setAttr("{0}.falloffCurve[{1}].falloffCurve_Interp".format(self.softList[0], i), 2)
+
+        cmds.addAttr(self.moveCtrl, ln="WaveAttrs", at="enum", k=True)
+        cmds.setAttr("{0}.WaveAttrs".format(self.moveCtrl), l=True)
+
+        # expose these on the control
+        for j in range(5):
+            cmds.addAttr(self.moveCtrl, ln="position{0}".format(j), at="float", min=0.0, max=1.0, dv=positions[j], k=True)
+            cmds.connectAttr("{0}.position{1}".format(self.moveCtrl, j),
+                             "{0}.falloffCurve[{1}].falloffCurve_Position".format(self.softList[0], j))
+
+        for j in range(5):
+            cmds.addAttr(self.moveCtrl, ln="value{0}".format(j), at="float", min=-1.0, max=1.0, dv=values[j], k=True)
+            cmds.connectAttr("{0}.value{1}".format(self.moveCtrl, j),
+                             "{0}.falloffCurve[{1}].falloffCurve_FloatValue".format(self.softList[0], j))
+            cmds.setAttr("{0}.position{1}".format(self.moveCtrl, j), l=True)
+            cmds.setAttr("{0}.value{1}".format(self.moveCtrl, j), l=True)
+
+
+    def autosize_controls(self):
+        calsz = rig.calibrate_size(self.obj, .15)
+        if calsz:
+            rig.scale_nurbs_control(self.moveCtrl, calsz, calsz, calsz)
+            rig.scale_nurbs_control(self.baseCtrl, calsz, calsz, calsz)
+            cmds.setAttr("{0}.falloffRadius".format(self.moveCtrl), 2*calsz)
+        else:
+            cmds.warning("I had an issue getting the calibrated scale of {0}".format(self.obj))
+
 
 # --------------------------
 # softMod deformer

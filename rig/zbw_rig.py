@@ -1147,6 +1147,10 @@ def add_geo_to_deformer(deformer, geo, *args):
     Returns:
 
     """
+##----------------need to add a function to put the xform matrix of the geometry into the geomMatrix of the deformer (in the right index)
+# first get the affected geo from the deformer
+# then take all those geos and get set the geomMatrix of the deformer for each index
+
     # make geo a list if it's only one object (ie. a string)
     if isinstance(geo, basestring):
         geo = [geo]
