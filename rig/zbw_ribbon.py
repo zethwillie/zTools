@@ -27,17 +27,9 @@ import maya.cmds as cmds
 
 class RibbonUI(win.Window):
     def __init__(self):
-        self.windowName = "zbw_ribbon"
-        self.windowSize = [420, 280]
-        self.sizeable = 1
-
-        self.create_UI()
+        super(RibbonUI, self).__init__(w=420, h=350, winName="zRibWin")
 
     def common_UI(self):
-        pass
-
-
-    def custom_UI(self):
         cmds.text("Add some basic instructions here?")
         self.ribbonNameTFG = cmds.textFieldGrp(l="Ribbon Rig Name", cal=[(1, "left"), (2, "left")], cw=[(1, 100), (2, 200)], tx="myRibbon")
         cmds.separator(h=10, style="single")

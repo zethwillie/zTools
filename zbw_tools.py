@@ -469,7 +469,7 @@ def add_lattice(*args):
     sel = cmds.ls(sl=True)
     lat = sel[0]
     geo = sel[1:]
-    rig.add_to_lattice(lat, geo)
+    rig.add_geo_to_deformer(lat, geo)
 
 
 def group_freeze(*args):

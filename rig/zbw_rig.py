@@ -1137,15 +1137,62 @@ def assign_color(obj=None, clr="yellow", *args):
             cmds.setAttr("{0}.overrideColor".format(s), colors[clr])
 
 
-def add_to_lattice(lat, geo, *args):
+def add_geo_to_deformer(deformer, geo, *args):
     """
-    lat is lattice, geo is geometry OR a list of geometry
+    Args:
+        deformer: string, the deformer to add to
+        geo: string or list, the transform(s) of the geo to add
+        *args:
+
+    Returns:
+
     """
+    # make geo a list if it's only one object (ie. a string)
     if isinstance(geo, basestring):
         geo = [geo]
 
-    for g in geo:
-        cmds.lattice(lat, e=True, g=g)
+    defType = cmds.objectType(deformer)
+    if defType == "lattice":
+        for g in geo:
+            cmds.lattice(deformer, edit=True, geometry=g)
+    elif defType == "nonLinear":
+        for g in geo:
+            cmds.nonLinear(deformer, edit=True, geometry=g)
+    elif defType == "softMod":
+        for g in geo:
+            cmds.softMod(deformer, edit=True, geometry=g)
+    elif defType == "cluster":
+        for g in geo:
+            cmds.cluster(deformer, edit=True, geometry=g)
+
+
+def remove_geo_from_deformer(deformer, geo, *args):
+    """
+    Args:
+        deformer: string, the deformer to add to
+        geo: string or list, the transform(s) of the geo to add
+        *args:
+
+    Returns:
+
+    """
+    # make geo a list if it's only one object (ie. a string)
+    if isinstance(geo, basestring):
+        geo = [geo]
+
+    defType = cmds.objectType(deformer)
+    if defType == "lattice":
+        for g in geo:
+            cmds.lattice(deformer, edit=True, geometry=g, remove=True)
+    elif defType == "nonLinear":
+        for g in geo:
+            cmds.nonLinear(deformer, edit=True, geometry=g, remove=True)
+    elif defType == "softMod":
+        for g in geo:
+            cmds.softMod(deformer, edit=True, geometry=g, remove=True)
+    elif defType == "cluster":
+        for g in geo:
+            cmds.cluster(deformer, edit=True, geometry=g, remove=True)
 
 
 def get_selected_channels(full=True, long=True, *args):
@@ -1275,7 +1322,10 @@ def get_soft_selection():
 
 
 def closest_point_on_mesh_position(point, mesh, *args):
-    """rtrns position of closest pt
+    """
+    point - either a transform (will use rotate pivot), or array 3
+    mesh - either shape of poly, or transform of poly
+    rtrns position of closest pt
         #--------------------
         #inputs and outputs for "closestPointOnMesh":
 

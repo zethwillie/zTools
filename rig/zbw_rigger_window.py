@@ -33,7 +33,6 @@ class RiggerWindow(object):
         
         self.mainColumn = cmds.columnLayout(w=self.width, h=self.height)
         self.common_limb_UI()
-        self.custom_limb_UI()
         self.execute_buttons_UI()
 
         cmds.window(self.winInitName, e=True, rtf=True, w=5, h=5)
@@ -99,8 +98,6 @@ class RiggerWindow(object):
         cmds.menuItem(l="zxy")
         cmds.optionMenu(self.secRotOrderOM, e=True, sl=5)
 
-
-    def custom_limb_UI(self):
         cmds.setParent(self.mainColumn)
         self.customFLO = cmds.frameLayout(l="3. Custom Limb Attributes", w=self.width, bgc=(0,0,0), cll=False, cl=True, cc=self.resize_window)
         #tmp

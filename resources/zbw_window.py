@@ -4,12 +4,13 @@ import maya.cmds as cmds
 class Window(object):
     """create a basic window with room to put more stuff, stuff goes into either common or custom UI methods"""
 
-    def __init__(self, name="Test Window", w=420, h=200):
+    def __init__(self, title="Window", w=420, h=200, winName="zbw_win", buttonLabel="Apply"):
         ####### modify for inheritence ########
-        self.windowName = name
+        self.title = title
         self.windowSize = [w, h]
         self.sizeable = True
-
+        self.winName = winName
+        self.buttonLabel = buttonLabel
         self.create_UI()
 
     def create_UI(self):
@@ -18,29 +19,26 @@ class Window(object):
         self.winWidth = self.windowSize[0]
         height = self.windowSize[1]
 
-        if (cmds.window("zbw_win", exists=True)):
-            cmds.deleteUI("zbw_win")
+        if (cmds.window(self.winName, exists=True)):
+            cmds.deleteUI(self.winName)
 
-        self.window = cmds.window("zbw_win", title=self.windowName, w=self.winWidth, h=height, s=self.sizeable)
+        self.window = cmds.window(self.winName, title=self.title, w=self.winWidth, h=height, s=self.sizeable, rtf=True)
 
         #menus for future
         self.menus()
 
         cmds.setParent(self.window)
         self.formLO = cmds.formLayout(nd=100, w=self.winWidth)
-        # self.widgets["topColumnLO"] = cmds.columnLayout(w=self.winWidth)
         self.scrollLO = cmds.scrollLayout(vst=10)
         self.lowColumnLO = cmds.columnLayout(w=self.winWidth)
         cmds.formLayout(self.formLO, e=True, attachForm = [(self.scrollLO, "top", 0), (self.scrollLO, "left", 0), (self.scrollLO, 'right', 0), (self.scrollLO, 'bottom', 35)])
 
         self.common_UI()
-        
-        self.custom_UI()
 
-        self.buttons_UI()
+        self.buttons_UI(self.buttonLabel)
 
+        cmds.window(self.window, e=True, wh=self.windowSize, rtf=True)
         cmds.showWindow(self.window)
-        cmds.window(self.window, e=True, w=self.winWidth, h=height)
 
 
     def common_UI(self):
@@ -49,18 +47,12 @@ class Window(object):
         cmds.separator(h=100)
 
 
-    def custom_UI(self):
-        #########  modify for inheritence ###########
-        cmds.text("this is where the custom UI elements go")
-        cmds.separator(h=200)
-
-
-    def buttons_UI(self):
+    def buttons_UI(self, buttonLabel="Apply"):
         #########  modify for inheritence ###########
         butWidth = self.winWidth/3 - 10
 
-        self.applyCloseBut = cmds.button(w=butWidth, h=30, l='Apply and Close', p=self.formLO, bgc=(.5, .7, .5), c=partial(self.action, 1))
-        self.applyBut = cmds.button(w=butWidth, h= 30, l='Apply', p=self.formLO, bgc=(.7, .7, .5), c=partial(self.action, 0))
+        self.applyCloseBut = cmds.button(w=butWidth, h=30, l='{0} and Close'.format(self.buttonLabel), p=self.formLO, bgc=(.5, .7, .5), c=partial(self.action, 1))
+        self.applyBut = cmds.button(w=butWidth, h= 30, l='{0}'.format(self.buttonLabel), p=self.formLO, bgc=(.7, .7, .5), c=partial(self.action, 0))
         self.closeBut = cmds.button(w=butWidth, h=30, l="Close Window", p=self.formLO, bgc=(.7, .5, .5), c=self.close_window)
 
         cmds.formLayout(self.formLO, e=True, attachForm=[(self.applyCloseBut, 'bottom', 5), (self.applyCloseBut, 'left', 5)])
