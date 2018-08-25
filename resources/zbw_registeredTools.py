@@ -10,7 +10,7 @@ zRigDict = {
     "smIK": "import zTools.rig.zbw_smallIKStretch as zsik; zsik.smallIKStretch()",
     "foll": "import zTools.rig.zbw_makeFollicle as zmf; reload(zmf); zmf.makeFollicle()",
     "ribbon": "import zTools.rig.zbw_ribbon as zrib; reload(zrib); zrib.ribbon()",
-    "soft": "import zTools.rig.zbw_softDeformer as zsft; reload(zsft); zsft.softDeformer()",
+    "softMod": "import zTools.rig.zbw_softDeformer as zsft; reload(zsft); zsft.softDeformer()",
     "jntRadius": "import zTools.rig.zbw_jointRadius as jntR; jntR.jointRadius()",
     "cmtRename": "mel.eval('cometRename')",
     "trfmBuffer": "import zTools.rig.zbw_transformBuffer as ztbuf; reload(ztbuf); ztbuf.transformBuffer()",
@@ -26,6 +26,7 @@ zRigDict = {
     "typFind": "import zTools.rig.zbw_typeFinder as zType; reload(zType); zType.typeFinder()",
     "wire": "import zTools.rig.zbw_wireRig as wire; reload(wire); wire.wireRig()",
     "sphereCrvRig":"import zTools.rig.zbw_sphereCrvRig as zscr; reload(zscr); zscr.sphereCrvRig()",
+    "softJoint": "import zTools.rig.zbw_softSelectionToJoint as sstj; reload(sstj); sstj.softSelectionToJoint()"
 }
 
 zAnimDict = {

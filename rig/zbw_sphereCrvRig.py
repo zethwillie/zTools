@@ -236,7 +236,7 @@ def connect_proxies(*args):
         jnt = key
         prxy = upJntProxyGrpCtrls[key]
         # direct connect ctrl to jnt
-        rig.connectTransforms(prxy, jnt, s=False)
+        rig.connect_transforms(prxy, jnt, s=False)
 
     if upJntProxyGrpCtrls:
         upJntProxyGrpCtrls.clear()
@@ -247,7 +247,7 @@ def connect_proxies(*args):
             prxy = downJntProxyGrpCtrls[key]
 
             # direct connect ctrl to jnt
-            rig.connectTransforms(prxy, jnt, s=False)
+            rig.connect_transforms(prxy, jnt, s=False)
         downJntProxyGrpCtrls.clear()
 
 
@@ -256,7 +256,7 @@ def smart_close(*args):
     upSuf = cmds.textFieldGrp(widgets["upNameTFG"], q=True, tx=True)
     dwnSuf = cmds.textFieldGrp(widgets["downNameTFG"], q=True, tx=True)
     topMidCtrl = ctrlsUp[len(ctrlsUp)/2]
-    downMidCtrl = ctrlsUp[len(ctrlsDown)/2]
+    downMidCtrl = ctrlsUp[len(ctrlsDwn)/2]
     
     if len(lowResCurves)==2 and len(highResCurves)==2:
         tmpCloseLow = cmds.duplicate(lowResCurves[0], n="{0}_closeLowTmpCrv".format(name))[0]
@@ -296,6 +296,12 @@ def smart_close(*args):
 #---------------- set up blend shape on high res curve (drive high res with wire driven curve)
 #---------------- set up the center ctrl to drive this BS
 
+"""
+dupe lores crv (upper?) and pump both low res crvs into that a blend shape (this is blinkcrv)
+setup a reverse network (to some ctrl) so the BS drives blinkcrv from crv (hi/low) to the other
+Dupe each hires crv and connect via wire deformer (set scale of wireDef to 0) to each hirez dupe
+and push those hirez dupes as blend shapes (end of chain) into the existing hirez crvs. These blend drive the blinking of each hirez
+"""
 
 def sphereCrvRig():
     sphere_curve_rig_UI()

@@ -4,16 +4,13 @@
 # Contact: zethwillie@gmail.com, www.williework.blogspot.com
 # Date Modified: 8/17/17
 # To Use: type in python window  "import zbw_tools as tools; reload(tools); tools.tools()"
-# Notes/Descriptions: some rigging, anim, modeling and shading tools. *** requires zTools folder in a python path.
+# Notes/Descriptions: some rigging, anim, modeling and shading tools. *** requires zTools package in a python path.
 ########################
 
-# todo: maybe add space buffer?
-# todo: deformer weights
-# todo: drop in all mel scripts deal with sourceing mel scripts from zTools (comet, etc with attribution), brave rabbit
 # TODO add some tooltips to buttons
 # Todo - add docs to all of these
-# todo maybe add shader/uv transfer to rig?
-# TODo move the dictionary to resources and pull it from there
+
+#TODO convert to windows class
 
 from functools import partial
 import os
@@ -110,16 +107,35 @@ def tools_UI(*args):
     widgets["cpSkinWtsBut"] = cmds.button(l="copy skin & weights", w=140, bgc=(.5, .7, .5), c=copy_skinning)
     widgets["remNSBut"] = cmds.button(l="remove all namespaces", w=140, bgc=(.5, .7, .5), c=remove_namespace)
     widgets["cntrLoc"] = cmds.button(l="sel vtx cntr jnt", w=140,bgc=(.5, .7, .5), c=center_joint)
-    widgets["addToLat"] = cmds.button(l="add to lattice", w=140, bgc=(.5, .7, .5), c=add_lattice)
+    widgets["addToDef"] = cmds.button(l="add to deformer", w=140, bgc=(.5, .7, .5), c=add_to_deformer)
     widgets["snapto"] = cmds.button(l="snap B to A", w=140, bgc=(.5, .7, .5),c=snap_b_to_a)
-    widgets["sclPrntCnstr"] = cmds.button(l="Parent+Scl Constrain", w=140, bgc=(.5, .7, .5),c=parent_scale_constrain)
+    widgets["constrain"] = cmds.button(l="Create Constraint", w=140, bgc=(.5, .7, .5))
+    cmds.popupMenu(b=1)
+    cmds.menuItem(l="parent - maintain offset", c=partial(create_constraint, "prnt", True))
+    cmds.menuItem(l="parent & scale - maintain offset", c=partial(create_constraint, "prntscl", True))
+    cmds.menuItem(l="point & orient - maintain offset", c=partial(create_constraint, "pntornt", True))    
+    cmds.menuItem(l="point - maintain offset", c=partial(create_constraint, "pnt", True))
+    cmds.menuItem(l="orient - maintain offset", c=partial(create_constraint, "ornt", True))
+    cmds.menuItem(l="scale - maintain offset", c=partial(create_constraint, "scl", True))
+    cmds.menuItem(l="point - no offset", c=partial(create_constraint, "pnt", False))
+    cmds.menuItem(l="orient - no offset", c=partial(create_constraint, "ornt", False))
+    cmds.menuItem(l="parent - no offset", c=partial(create_constraint, "prnt", False))
+    cmds.menuItem(l="scale - no offset", c=partial(create_constraint, "scl", False))
     widgets["zeroPiv"] = cmds.button(l="Zero Pivot", w=140, bgc=(.5, .7, .5),c=zero_pivot)
     widgets["centerPiv"] = cmds.button(l="Center Pivot", w=140, bgc=(.5, .7, .5), c=center_pivot)
-    widgets["setBut"] = cmds.button(l="Create Set", w=140, bgc=(.5, .7, .5), c=rig.create_set)
     widgets["clnJntBut"] = cmds.button(l="Scrub Jnt Chain", w=140, bgc=(.5, .7, .5), c=clean_joints)
-    widgets["jntTool"] = cmds.button(l="Create Joint", w=140, bgc=(.5, .7, .5), c=create_joint)
+    widgets["createBut"] = cmds.button(l="Create: ", w=140, bgc=(.5, .7, .5))
+    cmds.popupMenu(b=1)
+    cmds.menuItem(l="joint", c=create_joint)
+    cmds.menuItem(l="locator", c=create_locator)
+    cmds.menuItem(l="set from sel", c=rig.create_set)
+    cmds.menuItem(l="displayLayer from sel", c=rig.display_layer_from_selection)
+    cmds.menuItem(l="zeroed cube", c=partial(zeroed_geo, "cube"))
+    cmds.menuItem(l="zeroed cylinder", c=partial(zeroed_geo, "cylinder"))
+    cmds.menuItem(l="zeroed cone", c=partial(zeroed_geo, "cone"))
+    widgets["sftJntBut"] = cmds.button(l="Joint from softSel", w=140, bgc=(.5, .7, .5), c=partial(zAction, zRigDict, "softJoint"))
+    widgets["invertBut"] = cmds.button(l="Invert Shape", w=140, bgc=(.5, .7, .5), c=invert_shape)
     widgets["hmmrBut"] = cmds.button(l="Hammer Weights", w=140, bgc=(.5, .7, .5), c=hammer_skin_weights)
-    widgets["locatorBut"] = cmds.button(l="Create Locator", w=140, bgc=(.5, .7, .5), c=create_locator)
 
     cmds.rowColumnLayout(w=140, nc=2, cs=[(1, 5), (2,5)])
     widgets["deleteH"] = cmds.button(l="del hist", w=65, bgc=(.7, .7, .5), c=partial(deleteH, 0))
@@ -214,16 +230,18 @@ def tools_UI(*args):
     widgets["rigsCLO"] = cmds.columnLayout("RIGS", w=280)
     widgets["rigsPropFrameLO"] = cmds.frameLayout(l="PROP RIGGING", w=280, bv=True, bgc=(0, 0, 0))
     widgets["rigsPropRCLO"] = cmds.rowColumnLayout(nc=2, bgc=(0.3, 0.3, 0.3))
-    widgets["sftDefBut"] = cmds.button(l="Soft Deformers", w=140, bgc=(.5, .7, .5), c=partial(zAction,zRigDict,"soft"))
+    widgets["sftDefBut"] = cmds.button(l="Soft Deformers", w=140, bgc=(.5, .7, .5), c=partial(zAction,zRigDict,"softMod"))
     widgets["RcrvTools"] = cmds.button(l="Curve Tools", w=140, bgc=(.5, .7, .5), c=partial(zAction, zRigDict, "crvTools"))
     widgets["smIKBut"] = cmds.button(l="Single Jnt IK", w=140, bgc=(.5, .7, .5), c=partial(zAction, zRigDict,"smIK"))
     widgets["autoSqBut"] = cmds.button(l="AutoSquash Rig", w=140, bgc=(.5, .7, .5), c=partial(zAction, zRigDict,"autoSquash"))
     widgets["wireBut"] = cmds.button(l="Wire Def Rig", w=140, bgc=(.5, .7, .5), c=partial(zAction, zRigDict, "wire"))
+
     cmds.setParent(widgets["rigsCLO"])
     widgets["rigsCharFrameLO"] = cmds.frameLayout(l="CHARACTER RIGGING", w=280, bv=True, bgc=(0, 0, 0))
     widgets["rigsCharRCLO"] = cmds.rowColumnLayout(nc=2, bgc=(0.3, 0.3, 0.3))
     widgets["legBut"] = cmds.button(l="Leg Rig", w=140, bgc=(.5, .7, .5), c=partial(zAction, zRigDict,"leg"))
     widgets["armBut"] = cmds.button(l="Arm Rig", w=140, bgc=(.5, .7, .5), c=partial(zAction, zRigDict, "arm"))
+    
     cmds.setParent(widgets["rigsCLO"])
     widgets["rigsCharTFrameLO"] = cmds.frameLayout(l="CHARACTER TOOLS", w=280, bv=True, bgc=(0, 0, 0))
     widgets["rigsCharTRCLO"] = cmds.rowColumnLayout(nc=2, bgc=(0.3, 0.3, 0.3))
@@ -238,7 +256,7 @@ def tools_UI(*args):
 # curve tools, model scripts, add to lattice, select hierarchy, snap selection buffer, transform buffer
     widgets["mdlMdlFrameLO"] = cmds.frameLayout(l="MODELING", w=280, bv=True, bgc=(0, 0, 0))
     widgets["mdlPropRCLO"] = cmds.rowColumnLayout(nc=2, bgc=(0.3, 0.3, 0.3))
-    widgets["MaddToLat"] = cmds.button(l="add to lattice", w=140, bgc=(.5, .7, .5), c=add_lattice)
+    widgets["MaddToLat"] = cmds.button(l="add to deformer", w=140, bgc=(.5, .7, .5), c=add_to_deformer)
     widgets["extend"] = cmds.button(l="zbw_polyExtend", w=140, bgc=(.7, .5, .5),c=partial(zAction, zModelDict,"extend"))
     widgets["wrinkle"] = cmds.button(l="zbw_wrinklePoly", w=140, bgc=(.7, .5, .5), c=partial(zAction, zModelDict,"wrinkle"))
     widgets["McrvTools"] = cmds.button(l="zbw_curveTools", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict, "crvTools"))
@@ -330,6 +348,11 @@ def snap_b_to_a(*args):
             rig.snap_to(src, t)
 
 
+def invert_shape(*args):
+    # assign a shader to this. . .
+    cmds.invertShape()
+
+
 def zero_pivot(*args):
     """puts pivots zeroed at origin"""
     sel = cmds.ls(sl=True, transforms=True)
@@ -355,6 +378,24 @@ def deleteH(mode, *args):
         cmds.delete(sel, ch=True)
     else:
         cmds.delete(sel, c=True, timeAnimationCurves=True, unitlessAnimationCurves=False)
+
+
+def zeroed_geo(gtype, *args):
+    geo = None
+    if gtype == "cube":
+        geo = cmds.polyCube()
+        cmds.xform(geo, ws=True, t=(0, .5, 0))
+        cmds.xform(geo, ws=True, piv=(0,0,0))
+    if gtype == "cylinder":
+        geo = cmds.polyCylinder()
+        cmds.xform(geo, ws=True, t=(0, 1, 0))
+        cmds.xform(geo, ws=True, piv=(0,0,0))
+    if gtype == "cone":
+        geo = cmds.polyCone()
+        cmds.xform(geo, ws=True, t=(0, 1, 0))
+        cmds.xform(geo, ws=True, piv=(0,0,0))        
+    cmds.select(geo, r=True)
+    freeze()
 
 
 def save_script_win(*args):
@@ -462,14 +503,17 @@ def remove_namespace(*args):
         print "Did not delete any namespaces!"
 
 
-def add_lattice(*args):
+def add_to_deformer(*args):
     """
     select lattice then geo to add to the lattice
     """
     sel = cmds.ls(sl=True)
-    lat = sel[0]
+    if len(sel)<2:
+        cmds.warning("Need to select the deformer, then some geometry")
+        return()
+    deformer = sel[0]
     geo = sel[1:]
-    rig.add_geo_to_deformer(lat, geo)
+    rig.add_geo_to_deformer(deformer, geo)
 
 
 def group_freeze(*args):
@@ -582,6 +626,19 @@ def changeColor(color, *args):
                     cmds.setAttr("%s.overrideEnabled" % shape, 1)
                     cmds.setAttr("%s.overrideColor" % shape, color)
 
+
+def create_constraint(ctype, offset=True, *args):
+    sel = cmds.ls(sl=True, type="transform")
+    if len(sel)<2:
+        return()
+    if "prnt" in ctype:
+        cmds.parentConstraint( mo=offset)
+    if "pnt" in ctype:
+        cmds.pointConstraint(mo=offset)
+    if "ornt" in ctype:
+        cmds.orientConstraint(mo=offset)
+    if "scl" in ctype:
+        cmds.scaleConstraint(mo=offset)
 
 def copy_skinning(*args):
     """select the orig bound mesh, then the new unbound target mesh and run"""

@@ -1155,6 +1155,7 @@ def add_geo_to_deformer(deformer, geo, *args):
     if isinstance(geo, basestring):
         geo = [geo]
 
+# this doesn't work in terms of getting the object type (lattice needs to get shape, cluster needs to get cluster, etc)
     defType = cmds.objectType(deformer)
     if defType == "lattice":
         for g in geo:
@@ -1168,6 +1169,8 @@ def add_geo_to_deformer(deformer, geo, *args):
     elif defType == "cluster":
         for g in geo:
             cmds.cluster(deformer, edit=True, geometry=g)
+    else:
+        cmds.warning("I don't recognize the deformer type of: {0}".format(deformer))
 
 
 def remove_geo_from_deformer(deformer, geo, *args):
@@ -1757,3 +1760,7 @@ def create_set(name=None, *args):
     if not name:
         name = "userSet1"
     sets = cmds.sets(sel, name=name)
+
+
+def display_layer_from_selection(*args):
+    cmds.createDisplayLayer(name="auto_DL")
