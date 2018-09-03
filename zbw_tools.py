@@ -98,9 +98,12 @@ def tools_UI(*args):
     widgets["actionFrLO"] = cmds.frameLayout(l="ACTIONS", w=280, h=330, bv=True, bgc=(0, 0, 0))
     widgets["actionRCLO"] = cmds.rowColumnLayout(bgc=(0.3, 0.3, 0.3), nc=2)
     widgets["grpFrzBut"] = cmds.button(l="group freeze selected", w=140, bgc=(.5, .7, .5), c=group_freeze)
-    widgets["selCrvHier"] = cmds.button(l="sel crv hier", w=140, bgc=(.5, .7, .5), c=select_curve_hierarchy)
+    widgets["selHier"] = cmds.button(l="sel hierarchy", w=140, bgc=(.5, .7, .5))
+    cmds.popupMenu(b=1)
+    cmds.menuItem(l="Select Full Hierarchy", c= select_hi)
+    cmds.menuItem(l="Select Curve Hierarchy", c=partial(select_hierarchy, "curve"))
+    cmds.menuItem(l="Select Joint Hierarchy", c=partial(select_hierarchy, "joint"))
     widgets["grpCnctBut"] = cmds.button(l="group freeze + connect", w=140, bgc=(.5, .7, .5), c=freeze_and_connect)
-    widgets["slctHiBut"] = cmds.button(l="select hierarchy", w=140, bgc=(.5, .7, .5), c=select_hi)
     widgets["prntChnBut"] = cmds.button(l="parent chain selected", w=140, bgc=(.5, .7, .5), c=parent_chain)
     widgets["hideShp"] = cmds.button(l="sel shape vis toggle", w=140, bgc=(.5, .7, .5), c=hide_shape)
     widgets["bBox"] = cmds.button(l="bounding box control", w=140, bgc=(.5, .7, .5), c=bBox)
@@ -524,14 +527,18 @@ def group_freeze(*args):
         rig.group_freeze(obj)
 
 
-def select_curve_hierarchy(*args):
+def select_hierarchy(sType, *args):
     """
         select top node(s) and this will (inclusively) select all the curve xforms below it
     """
     sel = cmds.ls(sl=True, type="transform")
     crvXforms = []
     for top in sel:
-        cshps = cmds.listRelatives(top, allDescendents=True, f=True, type="nurbsCurve")
+        cshps = None
+        if sType == "curve":
+            cshps = cmds.listRelatives(top, allDescendents=True, f=True, type="nurbsCurve")
+        elif sType == "joint":
+            cshps = cmds.listRelatives(top, allDescendents=True, f=True, type="joint")
         if cshps:
             for cshp in cshps:
                 xf = cmds.listRelatives(cshp, p=True, f=True)[0]
