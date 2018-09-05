@@ -301,6 +301,7 @@ dupe lores crv (upper?) and pump both low res crvs into that a blend shape (this
 setup a reverse network (to some ctrl) so the BS drives blinkcrv from crv (hi/low) to the other
 Dupe each hires crv and connect via wire deformer (set scale of wireDef to 0) to each hirez dupe
 and push those hirez dupes as blend shapes (end of chain) into the existing hirez crvs. These blend drive the blinking of each hirez
+also: like the two ends (maybe just have one control for both top and bottom if we're doing both)
 """
 
 def sphereCrvRig():

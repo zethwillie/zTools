@@ -67,6 +67,7 @@ def tools_UI(*args):
     cmds.menuItem(l="circle", c=partial(control, "circle"))
     cmds.menuItem(l="sphere", c=partial(control, "sphere"))
     cmds.menuItem(l="square", c=partial(control, "square"))
+    cmds.menuItem(l="star", c=partial(control, "star"))
     cmds.menuItem(l="cube", c=partial(control, "cube"))
     cmds.menuItem(l="lollipop", c=partial(control, "lollipop"))
     cmds.menuItem(l="barbell", c=partial(control, "barbell"))
@@ -483,6 +484,18 @@ def create_master_pack(self):
 
     cmds.parent(mst3Grp, mst2)
     cmds.parent(mst2Grp, mst1)
+
+    geoGrp = cmds.group(empty=True, name = "GEO")
+    geoNoXform = cmds.group(empty=True, name="GEO_noTransform")
+    geoXform = cmds.group(empty=True, name="GEO_transform")
+
+    rigGrp = cmds.group(empty=True, name = "RIG")
+    rigNoXform = cmds.group(empty=True, name="RIG_noTransform")
+    rigXform = cmds.group(empty=True, name="RIG_transform")   
+
+    cmds.parent([geoXform, geoNoXform], geoGrp)
+    cmds.parent([rigNoXform, rigXform], rigGrp)
+    cmds.parent([geoGrp, rigGrp], mst3)
 
 
 def extract_deltas(*args):
