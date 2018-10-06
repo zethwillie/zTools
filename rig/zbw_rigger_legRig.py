@@ -43,8 +43,9 @@ class LegRig(BL.BaseLimb):
         # can add this in tht ui? need to?
         self.revFootPts = [(5, 1, 3), (5, 0, 4), (5, 0, -2)]
 
-        self.revFootNames = ["ball", "toe", "heel"]
-        self.revFootLocs = {"orig": [], "mir": []}
+        # Here we should turn these into joints and parent them into the ball joint
+        self.revFootNames = ["{0}_ball".format(self.origPrefix), "{0}_toe".format(self.origPrefix), "{0}_heel".format(self.origPrefix)]
+        self.revFootJnt = {"orig": [], "mir": []}
         self.footPivots = {}
         self.ikShape = "box"
         self.ikOrient = False
@@ -54,14 +55,15 @@ class LegRig(BL.BaseLimb):
         BL.BaseLimb.pose_initial_joints(self)
         # need to work on orienting the joints here. . . which attrs to lock (just unlock all?)
         for i in range(len(self.revFootNames)):
-            loc = \
-            cmds.spaceLocator(name="{0}_LOC".format(self.revFootNames[i]))[0]
-            cmds.xform(loc, ws=True, t=self.revFootPts[i])
-            self.revFootLocs["orig"].append(loc)
-            # cmds.parent(self.revFootLocs[0], self.joints[2])
-            # cmds.parent(self.revFootLocs[1:], self.revFootLocs[0])
+            cmds.select(cl=True)
+            jnt = cmds.joint(name="{0}_pivot_JNT".format(self.revFootNames[i]))
+            cmds.xform(jnt, ws=True, t=self.revFootPts[i])
+            self.revFootJnt["orig"].append(jnt)
+            cmds.parent(jnt, self.joints[3])
+
 
     def make_limb_rig(self):
+        self.detach_reverse_joints()
         self.clean_initial_joints()
         # add manual adjust joint orientation here. . .
         if self.mirror:
@@ -82,20 +84,36 @@ class LegRig(BL.BaseLimb):
         self.create_sets()
         self.label_deform_joints()
 
+
+
+    def create_ik_rig(self):
+        BL.BaseLimb.create_ik_rig(self, leg=True)
+
+
+    def detach_reverse_joints(self):
+        for i in range(len(self.revFootJnt["orig"])):
+            self.revFootJnt["orig"][i] = cmds.parent(self.revFootJnt["orig"][i], w=True)[0]
+
+        # parent stuff, unparent in reverse foot after mirroring
+        cmds.parent(self.revFootJnt["orig"][2], self.revFootJnt["orig"][1])
+        cmds.parent(self.revFootJnt["orig"][1], self.revFootJnt["orig"][0])
+
+
     def create_reverse_foot(self):
-        mirrorScale = (1, 1, 1)
+        mirJnt = None
         if self.mirror:
             if self.mirrorAxis == "yz":
-                mirrorScale = (-1, 1, 1)
+                mirJnt = cmds.mirrorJoint(self.revFootJnt["orig"][0], mirrorBehavior=True, mirrorYZ=True, searchReplace = [self.origPrefix, self.mirPrefix])
+                for jnt in mirJnt:
+                    self.revFootJnt["mir"].append(jnt)
             elif self.mirrorAxis == "xy":
-                mirrorScale = (1, 1, -1)
+                mirJnt = cmds.mirrorJoint(self.revFootJnt["orig"][0], mirrorBehavior=True, mirrorXY=True, searchReplace = [self.origPrefix, self.mirPrefix])
+                for jnt in mirJnt:
+                    self.revFootJnt["mir"].append(jnt)
             elif self.mirrorAxis == "xz":
-                mirrorScale = (1, -1, 1)
-            for loc in self.revFootLocs["orig"]:
-                cmds.xform(loc, ws=True, sp=(0, 0, 0))
-                dupe = cmds.duplicate(loc)[0]
-                cmds.xform(dupe, s=mirrorScale)
-                self.revFootLocs["mir"].append(dupe)
+                mirJnt = cmds.mirrorJoint(self.revFootJnt["orig"][0], mirrorBehavior=True, mirrorXZ=True, searchReplace = [self.origPrefix, self.mirPrefix])
+                for jnt in mirJnt:
+                    self.revFootJnt["mir"].append(jnt)
 
         for side in self.fkJoints.keys():
             if side == "orig":
@@ -121,50 +139,43 @@ class LegRig(BL.BaseLimb):
                          dv=0.0, k=True)
 
             # create grp for each loc
-            for loc in self.revFootLocs[side]:
-                grp = cmds.group(em=True,
-                                 name="{0}_{1}_{2}".format(sideName, self.part,
-                                                           loc.replace("LOC",
-                                                                       "PIV")))
-                pos = cmds.pointPosition(loc)
-                cmds.xform(grp, ws=True, t=pos)
+            for jnt in self.revFootJnt[side]:
+                grp = cmds.group(em=True, name="{0}_{1}_{2}".format(sideName, self.part, jnt.replace("JNT","PIV")))
+                rig.snap_to(jnt, grp)
                 self.footPivots[side].append(grp)
+
+            #parent all to world
+            for piv in self.footPivots[side]:
+                cmds.parent(piv, self.ikCtrls[side][0])
+                cmds.setAttr(piv+".r", 0, 0, 0)
 
             # parent ball to toe, toe to heel, heel to to ctrl
             cmds.parent(self.footPivots[side][0], self.footPivots[side][1])
             cmds.parent(self.footPivots[side][1], self.footPivots[side][2])
-            cmds.parent(self.footPivots[side][2], self.ikCtrls[side][0])
+            # cmds.parent(self.footPivots[side][2], self.ikCtrls[side][0])
 
             # parent ik to ball grp
             cmds.parent(self.ikHandles[side][0], self.footPivots[side][0])
             # create new ik from ankle to ball, parent under 
             ikName = "{0}_{1}_ballIK".format(sideName, self.part)
-            ballHandle = cmds.ikHandle(startJoint=self.ikJoints[side][2],
-                                       endEffector=self.ikJoints[side][3],
-                                       name=ikName, solver="ikRPsolver")[0]
+            ballHandle = cmds.ikHandle(startJoint=self.ikJoints[side][2], endEffector=self.ikJoints[side][3], name=ikName, solver="ikRPsolver")[0]
             self.ikHandles[side].append(ballHandle)
             cmds.parent(ballHandle, self.footPivots[side][0])
             cmds.setAttr("{0}.visibility".format(ballHandle), 0)
             # create ctrl at ball, grpFreeze, orient constrain ikBall to this
-            ballCtrl, ballGrp = zrt.create_control_at_joint(
-                self.ikJoints[side][3], "circle", "x",
-                "{0}_ball_{1}".format(sideName, self.ctrlSuffix),
-                self.groupSuffix, orient=True)
+            ballCtrl, ballGrp = zrt.create_control_at_joint(self.ikJoints[side][3], "circle", "x", "{0}_ball_{1}".format(sideName, self.ctrlSuffix), self.groupSuffix, orient=True)
             cmds.setAttr("{0}.v".format(ballCtrl), 0)
             self.reverseFootBallCtrls[side] = ballCtrl
             cmds.parent(ballGrp, self.footPivots[side][1])
+            cmds.orientConstraint(ballCtrl, self.ikJoints[side][3])
+
             # connect attrs
             for i in range(len(rollAttrs)):
-                cmds.connectAttr(
-                    "{0}.{1}".format(self.ikCtrls[side][0], rollAttrs[i]),
-                    "{0}.rx".format(self.footPivots[side][i]))
-                cmds.connectAttr(
-                    "{0}.{1}".format(self.ikCtrls[side][0], twistAttrs[i]),
-                    "{0}.ry".format(self.footPivots[side][i]))
-            cmds.connectAttr("{0}.toeFlap".format(self.ikCtrls[side][0]),
-                             "{0}.rz".format(self.reverseFootBallCtrls[side]))
+                cmds.connectAttr("{0}.{1}".format(self.ikCtrls[side][0], rollAttrs[i]), "{0}.rx".format(self.footPivots[side][i]))
+                cmds.connectAttr("{0}.{1}".format(self.ikCtrls[side][0], twistAttrs[i]), "{0}.ry".format(self.footPivots[side][i]))
+            cmds.connectAttr("{0}.toeFlap".format(self.ikCtrls[side][0]), "{0}.rz".format(self.reverseFootBallCtrls[side]))
             # delete pv locs
-            cmds.delete(self.revFootLocs[side])
+            cmds.delete(self.revFootJnt[side])
 
             # connect pv to foot, follow attr etc
 

@@ -977,7 +977,7 @@ def create_space_buffer_grps(ctrl="", *args):
 
 def group_freeze(obj, suffix="GRP", *arg):
     """
-    takes an object in worldspace and snaps a group to it, then parents obj to that group
+    takes an object in worldspace and snaps a group to it, then parents obj to that group. Also parents back under orig parent of the obj
     i.e. zeros out the obj's translates and rotations
     Args:
         obj (string): the object to put under the group (to zero it's transforms)

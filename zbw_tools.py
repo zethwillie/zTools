@@ -104,6 +104,7 @@ def tools_UI(*args):
     cmds.menuItem(l="Select Full Hierarchy", c= select_hi)
     cmds.menuItem(l="Select Curve Hierarchy", c=partial(select_hierarchy, "curve"))
     cmds.menuItem(l="Select Joint Hierarchy", c=partial(select_hierarchy, "joint"))
+    cmds.menuItem(l="Select Poly Hierarchy", c=partial(select_hierarchy, "poly"))
     widgets["grpCnctBut"] = cmds.button(l="group freeze + connect", w=140, bgc=(.5, .7, .5), c=freeze_and_connect)
     widgets["prntChnBut"] = cmds.button(l="parent chain selected", w=140, bgc=(.5, .7, .5), c=parent_chain)
     widgets["hideShp"] = cmds.button(l="sel shape vis toggle", w=140, bgc=(.5, .7, .5), c=hide_shape)
@@ -125,8 +126,12 @@ def tools_UI(*args):
     cmds.menuItem(l="orient - no offset", c=partial(create_constraint, "ornt", False))
     cmds.menuItem(l="parent - no offset", c=partial(create_constraint, "prnt", False))
     cmds.menuItem(l="scale - no offset", c=partial(create_constraint, "scl", False))
-    widgets["zeroPiv"] = cmds.button(l="Zero Pivot", w=140, bgc=(.5, .7, .5),c=zero_pivot)
-    widgets["centerPiv"] = cmds.button(l="Center Pivot", w=140, bgc=(.5, .7, .5), c=center_pivot)
+    #widgets["zeroPiv"] = cmds.button(l="Zero Pivot", w=140, bgc=(.5, .7, .5),c=zero_pivot)
+    widgets["centerPiv"] = cmds.button(l="Pivot", w=140, bgc=(.5, .7, .5))
+    cmds.popupMenu(b=1)
+    cmds.menuItem(l="Center Pivot", c=center_pivot)
+    cmds.menuItem(l="Snap pivots to last", c=snap_pivot)
+    cmds.menuItem(l="Snap pivots to origin", c=zero_pivot)
     widgets["clnJntBut"] = cmds.button(l="Scrub Jnt Chain", w=140, bgc=(.5, .7, .5), c=clean_joints)
     widgets["createBut"] = cmds.button(l="Create: ", w=140, bgc=(.5, .7, .5))
     cmds.popupMenu(b=1)
@@ -142,11 +147,13 @@ def tools_UI(*args):
     widgets["hmmrBut"] = cmds.button(l="Hammer Weights", w=140, bgc=(.5, .7, .5), c=hammer_skin_weights)
     widgets["showHide"] = cmds.button(l="ShowHide", w=140, bgc=(.5, .7, .5))
     cmds.popupMenu(b=1)
-    cmds.menuItem(l="polys only")
-    cmds.menuItem(l="curves only")
-    cmds.menuItem(l="joints only")
-    cmds.menuItem(l="joints off")
-    cmds.menuItem(l="polys and curves only")
+    cmds.menuItem(l="Show all", c=partial(show_hide_in_panels, "showAll"))
+    cmds.menuItem(l="Polys only", c=partial(show_hide_in_panels, "polys"))
+    cmds.menuItem(l="Curves only", c=partial(show_hide_in_panels, "curves"))
+    cmds.menuItem(l="Polys and curves only", c=partial(show_hide_in_panels, "polyCurve"))
+    cmds.menuItem(l="Joints only", c=partial(show_hide_in_panels, "joints"))
+    cmds.menuItem(l="Joints off", c=partial(show_hide_in_panels, "jointsOff"))
+
     cmds.rowColumnLayout(w=140, nc=2, cs=[(1, 5), (2,5)])
     widgets["deleteH"] = cmds.button(l="del hist", w=65, bgc=(.7, .7, .5), c=partial(deleteH, 0))
     widgets["deleteAnim"] = cmds.button(l="del Anim", w=65, bgc=(.7, .5, .5), c=partial(deleteH, 1))
@@ -420,7 +427,7 @@ def line_width(mode, *args):
                 shps = cmds.listRelatives(obj, s=True)
                 if shps:
                     for shp in shps:
-                        val = cmds.getAttr("{0}.lineWidth".format(shp))
+                        val = cmds.getAttr("{0}.lineWidth" .format(shp))
                         if mode == 0:
                             if val <= 1:
                                 continue
@@ -464,6 +471,39 @@ def center_pivot(*args):
     sel = cmds.ls(sl=True)
     for obj in sel:
         cmds.xform(obj, cp=True, p=True)
+
+
+def snap_pivot(*args):
+    sel = cmds.ls(sl=True)
+
+    if not sel or len(sel)==1:
+        return()
+
+    src = sel[-1]
+    tgts = sel[:-1]
+
+    pos = cmds.xform(src, q=True, ws=True, rp=True)
+    for tgt in tgts:
+        cmds.xform(tgt, ws=True, piv=pos)
+
+
+def show_hide_in_panels(objs, *args):
+    """polys, curves, joints, jointsOff, polyCurve, showAll"""
+    panels = cmds.getPanel(type="modelPanel")
+    for p in panels:
+        if objs == "polys" or objs=="curves" or objs=="joints" or objs == "polyCurve":
+            cmds.modelEditor(p, e=True, allObjects=False)
+        if objs == "polys" or objs=="polyCurve":
+            cmds.modelEditor(p, e=True, polymeshes=True)
+        if objs == "curves" or objs == "polyCurve":
+            cmds.modelEditor(p, e=True, nurbsCurves=True)
+        if objs == "joints":
+            cmds.modelEditor(p, e=True, joints=True)
+        if objs == "jointsOff":
+            cmds.modelEditor(p, e=True, joints=False)
+        if objs == "showAll":
+            cmds.modelEditor(p, e=True, allObjects=True)
+
 
 
 def create_joint(*args):
@@ -548,25 +588,34 @@ def group_freeze(*args):
 
 def select_hierarchy(sType, *args):
     """
-        select top node(s) and this will (inclusively) select all the curve xforms below it
+        select top node(s) and this will (inclusively) select all the xforms below it of the given type ('curve', 'poly', 'joint')
     """
     sel = cmds.ls(sl=True, type="transform")
-    crvXforms = []
+    selectList = []
+
     for top in sel:
+        xforms = []
         cshps = None
         if sType == "curve":
-            cshps = cmds.listRelatives(top, allDescendents=True, f=True, type="nurbsCurve")
-        elif sType == "joint":
-            cshps = cmds.listRelatives(top, allDescendents=True, f=True, type="joint")
+            cshps = cmds.listRelatives(top, allDescendents=True , f=True, type="nurbsCurve")
+        elif sType == "poly":
+            cshps = cmds.listRelatives(top, allDescendents=True , f=True, type="mesh")
         if cshps:
             for cshp in cshps:
                 xf = cmds.listRelatives(cshp, p=True, f=True)[0]
-                crvXforms.append(xf)
-        # sort list by greatest number of path splits first (deepest)
-        crvXforms.sort(key=lambda a: a.count("|"), reverse=True)
-    
-    list(set(crvXforms))
-    cmds.select(crvXforms, r=True)
+                xforms.append(xf)
+        elif sType == "joint":
+            jnts = cmds.listRelatives(top, allDescendents=True, f=True, type="joint")
+            xforms = jnts
+
+        if xforms:
+            # sort list by greatest number of path splits first (deepest)
+            xforms.sort(key=lambda a: a.count("|"), reverse=True)
+            list(set(xforms))
+            for x in xforms:
+                selectList.append(x)
+
+    cmds.select(selectList, r=True)
 
 
 def freeze_and_connect(*args):

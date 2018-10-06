@@ -231,7 +231,7 @@ class BaseLimb(object):
             self.switchCtrls[side] = ctrl
 
 
-    def create_ik_rig(self):
+    def create_ik_rig(self, leg=False):
         for side in self.ikJoints.keys():
             jnts = self.ikJoints[side]
             if side == "orig":
@@ -242,6 +242,11 @@ class BaseLimb(object):
             handle = cmds.ikHandle(startJoint=jnts[0], endEffector=jnts[2], name=name, solver="ikRPsolver")[0]
             cmds.setAttr("{0}.visibility".format(handle), 0)
             ctrl, grp = zrt.create_control_at_joint(jnts[2], self.ikShape, self.primaryAxis, "{0}_{1}".format(name, self.ctrlSuffix), grpSuffix=self.groupSuffix, orient=self.ikOrient)
+            # add option for aiming this only at the 'ball' jnt in y for leg
+            if leg:
+                ac = cmds.aimConstraint(self.deformJoints[side][3], grp, aim=[0, 0, 1], upVector=[0, 1, 0], skip=["x", "z"])
+                cmds.delete(ac)
+                
             cmds.parent(handle, ctrl)
             oc = cmds.orientConstraint(ctrl, jnts[2], mo=True)
             self.ikCtrls[side] = [ctrl]

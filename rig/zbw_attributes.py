@@ -145,25 +145,22 @@ def attrUI(*args):
 
     # connection stuff
     cmds.text("Select a source object and a channel:")
-    widgets["connector"] = cmds.textFieldButtonGrp(l="Connector", w=250, bl="<<<",
-                                                   cal=[(1, "left"), (2, "left"), (3, "left")], cw3=[60, 140, 30],
-                                                   bc=partial(get_selected_channel, "connector"))
+    cmds.rowColumnLayout(nc=2, cw=[60, 190])
+    cmds.button(l="Connector", bgc=(.8, .8, .8), w=60, c=partial(select_tfbg_obj, "connector", True))
+    widgets["connector"] = cmds.textFieldButtonGrp(l="", w=180, bl="<<<", cal=[(1, "left"), (2, "left"), (3, "left")], cw3=[1, 140, 30], bc=partial(get_selected_channel, "connector"))
+    cmds.setParent(widgets["connectionColLO"])
     cmds.separator(h=3, st="none")
-    cmds.text("Select a target object and channel:")
-    widgets["connectee"] = cmds.textFieldButtonGrp(l="Connectee", w=250, bl="<<<",
-                                                   cal=[(1, "left"), (2, "left"), (3, "left")], cw3=[60, 140, 30],
-                                                   bc=partial(get_selected_channel, "connectee"))
+    cmds.text("Select a target object(s)'s channel:")
+    widgets["connectee"] = cmds.textFieldButtonGrp(l="Connectee", w=250, bl="<<<", cal=[(1, "left"), (2, "left"), (3, "left")], cw3=[60, 140, 30], bc=partial(get_selected_channel, "connectee", attrOnly=True))
     cmds.separator(h=3, st="none")
-    widgets["connectBut"] = cmds.button(l="Connect Two Channels", w=240, h=20, bgc=(.5, .5, .5), c=connectChannels)
+    widgets["connectBut"] = cmds.button(l="Connect Channels", w=240, h=20, bgc=(.5, .5, .5), c=connect_channels)
     cmds.separator(h=3, st="none")
 
     cmds.setParent(widgets["connectColLO"])
     widgets["shapeFrame"] = cmds.frameLayout(l="Connect to Shape Visibility", cll=True, bgc=(.6, .8, .6))
     widgets["shapeColLO"] = cmds.columnLayout(bgc=(.8, .8, .8))
 
-    widgets["toShapeVis"] = cmds.textFieldButtonGrp(l="Vis Driver", w=250, bl="<<<",
-                                                    cal=[(1, "left"), (2, "left"), (3, "left")], cw3=[60, 140, 30],
-                                                    bc=partial(get_selected_channel, "toShapeVis"))
+    widgets["toShapeVis"] = cmds.textFieldButtonGrp(l="Vis Driver", w=250, bl="<<<", cal=[(1, "left"), (2, "left"), (3, "left")], cw3=[60, 140, 30], bc=partial(get_selected_channel, "toShapeVis"))
     cmds.separator(h=5, st="none")
     cmds.text("Now select the objs to drive:")
     widgets["shapeBut"] = cmds.button(l="Connect to Shapes' vis", w=240, h=20, bgc=(.5, .5, .5), c=connectShapeVis)
@@ -197,12 +194,9 @@ def attrUI(*args):
     widgets["cnctSBut"] = cmds.button(l="conn Scl", w=75, h=20, bgc=(.5, .5, .7), c=partial(connect_attrs, "s"))
     cmds.setParent(widgets["inOutColLO"])
     cmds.separator(h=3, st="none")
-    widgets["xyzCBG"] = cmds.checkBoxGrp(l="Connect Attr: ", ncb=3, la3=("x", "y", "z"), cal=[(1,"left"),(2,
-                                                                                                            "left")],
-                                         cw=[(1, 100),(2, 40),(3,40), (4,40)], va3=[1, 1, 1])
+    widgets["xyzCBG"] = cmds.checkBoxGrp(l="Connect Attr: ", ncb=3, la3=("x", "y", "z"), cal=[(1,"left"),(2, "left")], cw=[(1, 100),(2, 40),(3,40), (4,40)], va3=[1, 1, 1])
     cmds.separator(h=3, st="none")
-    widgets["trnsfrAttrBut"] = cmds.button(l="Transfer Attributes (tgt, src)", w=240, bgc=(.5, .5, .5),
-                                           c=transfer_attrs)
+    widgets["trnsfrAttrBut"] = cmds.button(l="Transfer Attributes (tgt, src)", w=240, bgc=(.5, .5, .5), c=transfer_attrs)
 
     # show window
     cmds.showWindow(widgets["win"])
@@ -553,27 +547,24 @@ def breakConnections(*args):
     pass
 
 
-def get_selected_channel(tfbg, *args):
+def get_selected_channel(tfbg, attrOnly=False, *args):
     """
     gets the selected channel of the selected objects
     tfbg = the key of the widget for the ui (from widgets dict). string
     """
 
-    obj = ""
-    channel = ""
-
     cBox = mel.eval('$temp=$gChannelBoxName')
-    sel = cmds.ls(sl=True, l=True)
+    objs = cmds.ls(sl=True, l=True)
 
-    if sel:
-        if not len(sel) == 1:
+    if objs and not attrOnly:
+        # replace objs with the first in objs
+        if not len(objs) == 1:
             cmds.warning("You have to select ONE node!")
         else:
-            obj = sel[0]
-    else:
-        cmds.warning("You have to select ONE node!")
+            objs = [objs[0]]
 
-    if sel:
+    if objs:
+        # get selected channel
         channels = cmds.channelBox(cBox, q=True, sma=True, ssa=True, sha=True, soa=True)
 
         if channels:
@@ -584,21 +575,40 @@ def get_selected_channel(tfbg, *args):
         else:
             cmds.warning("You have to select ONE channel!")
 
-    if obj and channel:
-        full = "%s.%s" % (obj, channel)
-        cmds.textFieldButtonGrp(widgets[tfbg], e=True, tx=full)
+    if attrOnly:
+        if objs and channel:
+            cmds.textFieldButtonGrp(widgets[tfbg], e=True, tx=channel)
+    else:
+        if objs and channel:
+            full = "{0}.{1}".format(objs[0], channel)
+            cmds.textFieldButtonGrp(widgets[tfbg], e=True, tx=full)
 
 
-def connectChannels(*args):
+def select_tfbg_obj(tfbgKey, split=False, *args):
+    """split means split the text on '.' (to get rid of the attr)"""
+    tfbg = widgets[tfbgKey]
+    obj = cmds.textFieldButtonGrp(tfbg, q=True, tx=True)
+    if obj:
+        try: 
+            if split:
+                obj = obj.split(".")[0]
+            cmds.select(obj, r=True)
+        except:
+            cmds.warning("couldn't select: {0}".format(obj))
+
+
+def connect_channels(*args):
     """connects two channels together from the test fields"""
 
+    sel = cmds.ls(sl=True)
     connector = cmds.textFieldButtonGrp(widgets["connector"], q=True, tx=True)
     connectee = cmds.textFieldButtonGrp(widgets["connectee"], q=True, tx=True)
-    try:
-        cmds.connectAttr(connector, connectee, f=True)
-        print("Connected {0} -----> {1}".format(connector, connectee))
-    except:
-        cmds.warning("Couldn't connect those attrs. . . Sorry!")
+    for obj in sel:
+        try:
+            cmds.connectAttr(connector, "{0}.{1}".format(obj, connectee), f=True)
+            print("Connected {0} -----> {1}.{2}".format(connector, obj, connectee))
+        except:
+            cmds.warning("Couldn't connect: {0} -----> {1}".format(connector, obj + "." + connectee))
 
 
 def getInput(*args):

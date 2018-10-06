@@ -119,6 +119,8 @@ def create_follow_constraints(tgt=None, spaceNames=None, spaceObjs=None):
         cmds.addAttr(tgt, ln="follow", at="enum", en="{0}".format(":".join(spaceNames)), dv=1, k=True)
     cnstr = cmds.parentConstraint(spaceGrps, tgt, mo=True)[0]  
 
+# group freeze the tgt obj, adn do the constraints on that grp
+
     # create setDrivenKey
     for i in range(len(spaceGrps)):
         tmpList = spaceNames[:]
