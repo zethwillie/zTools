@@ -2,7 +2,7 @@ import unittest
 import zTools.rig.zbw_rig as rig
 
 
-class RigTestMethods(unittest.TestCase):
+class ZbwRigTestMethods(unittest.TestCase):
     def setUp(self):
         print "Setting up the tests"
         # open a maya headless scene

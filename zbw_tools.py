@@ -62,7 +62,7 @@ def tools_UI(*args):
     widgets["ctrlFrLO"] = cmds.frameLayout(l="CONTROLS", w=270, h=50, bv=True,bgc=(0.0, 0.0, 0.0))
     widgets["ctrlInFLO"] = cmds.formLayout(bgc=(0.3, 0.3, 0.3))
     widgets["ctrlAxisRBG"] = cmds.radioButtonGrp(l="Axis", nrb=3, la3=("x", "y", "z"),cw=([1, 33], [2, 33], [3, 33]),cal=([1, "left"], [2, "left"],[3, "left"]), sl=1)
-    widgets["ctrlBut"] = cmds.button(l="Create Control", w=100, bgc=(.7,.7,.5))
+    widgets["ctrlBut"] = cmds.button(l="Create", w=50, bgc=(.7,.7,.5))
     cmds.popupMenu(b=1)
     cmds.menuItem(l="circle", c=partial(control, "circle"))
     cmds.menuItem(l="sphere", c=partial(control, "sphere"))
@@ -84,12 +84,37 @@ def tools_UI(*args):
     cmds.menuItem(l="arrowSquare", c=partial(control, "arrowSquare"))
     cmds.menuItem(l="4ArrowSquare", c=partial(control, "4arrowSquare"))
     cmds.menuItem(l="MASTER PACK", c=create_master_pack)
+    
+    widgets["swapBut"] = cmds.button(l="Swap", w=50, bgc=(.7,.5,.5))
+    cmds.popupMenu(b=1)
+    cmds.menuItem(l="circle", c=partial(swap, "circle"))
+    cmds.menuItem(l="sphere", c=partial(swap, "sphere"))
+    cmds.menuItem(l="square", c=partial(swap, "square"))
+    cmds.menuItem(l="star", c=partial(swap, "star"))
+    cmds.menuItem(l="cube", c=partial(swap, "cube"))
+    cmds.menuItem(l="lollipop", c=partial(swap, "lollipop"))
+    cmds.menuItem(l="barbell", c=partial(swap, "barbell"))
+    cmds.menuItem(l="cross", c=partial(swap, "cross"))
+    cmds.menuItem(l="bentCross", c=partial(swap, "bentCross"))
+    cmds.menuItem(l="arrow", c=partial(swap, "arrow"))
+    cmds.menuItem(l="bentArrow", c=partial(swap, "bentArrow"))
+    cmds.menuItem(l="arrowCross", c=partial(swap, "arrowCross"))
+    cmds.menuItem(l="splitCircle", c=partial(swap, "splitCircle"))
+    cmds.menuItem(l="cylinder", c=partial(swap, "cylinder"))
+    cmds.menuItem(l="octagon", c=partial(swap, "octagon"))
+    cmds.menuItem(l="halfCircle", c=partial(swap, "halfCircle"))
+    cmds.menuItem(l="arrowCircle", c=partial(swap, "arrowCircle"))
+    cmds.menuItem(l="arrowSquare", c=partial(swap, "arrowSquare"))
+    cmds.menuItem(l="4ArrowSquare", c=partial(swap, "4arrowSquare"))
+
 
     cmds.formLayout(widgets["ctrlInFLO"], e=True, af=[
         (widgets["ctrlAxisRBG"],"left", 0),
         (widgets["ctrlAxisRBG"], "top", 0),
         (widgets["ctrlBut"], "left", 170),
         (widgets["ctrlBut"], "top", 0),
+        (widgets["swapBut"], "left", 220),
+        (widgets["swapBut"], "top", 0),
     ])
     # TODO - add scale factor field for control creation
 
@@ -338,6 +363,18 @@ def control(type="none", *args):
     rig.create_control(name="Ctrl", type=type, axis=axis, color="yellow")
 
 
+def swap(type="none", *args):
+    axisRaw = cmds.radioButtonGrp(widgets["ctrlAxisRBG"], q=True, sl=True)
+    if axisRaw == 1:
+        axis = "x"
+    if axisRaw == 2:
+        axis = "y"
+    if axisRaw == 3:
+        axis = "z"
+
+    rig.swap_shape(type=type, axis=axis, scale=1.0, color=None)
+
+
 def zAction(dict=None, action=None, *args):
     """
     grabs the action key from the given dictionary and executes that value
@@ -503,7 +540,6 @@ def show_hide_in_panels(objs, *args):
             cmds.modelEditor(p, e=True, joints=False)
         if objs == "showAll":
             cmds.modelEditor(p, e=True, allObjects=True)
-
 
 
 def create_joint(*args):

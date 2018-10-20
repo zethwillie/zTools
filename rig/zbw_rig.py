@@ -305,6 +305,44 @@ def create_control(name="default", type="circle", axis="x", color="darkBlue",
     return (ctrl)
 
 
+def swap_shape(type="circle", axis="x", scale = 1.0, color=None, *args):
+    """
+    swaps the shape of selected obj for given shape type
+    """
+    sel = cmds.ls(sl=True)
+
+    for obj in sel:
+        # get color
+        newColor = color
+        shp = cmds.listRelatives(obj, s=True)[0]
+        if not shp:
+            return()
+        shpColor = None
+        try:
+            shpColor = convert_number_color_to_text(cmds.getAttr("{0}.overrideColor".format(shp)))
+        except:
+            pass
+        if not newColor:
+            newColor = shpColor
+        if not newColor:
+            newColor = "yellow"
+        print "{0} --- {1} ---- {2}".format(obj, shpColor, newColor)
+        if type_check(obj, "nurbsCurve"):
+            shapes = cmds.listRelatives(obj, s=True)
+            ctrl = create_control(type=type, color = newColor, axis=axis)
+            ctrlShape = cmds.listRelatives(ctrl)[0]
+            scale_nurbs_control(ctrl, scale, scale, scale)
+            cmds.parent(ctrlShape, obj, relative=True, shape=True)
+            if shapes:
+                cmds.delete(shapes)
+            cmds.delete(ctrl)
+
+
+def convert_number_color_to_text(num, *args):
+    # given an int, convert it to color based on our dict
+    return(colors.keys()[colors.values().index(num)])
+
+
 def create_message(host="none", attr="none", target="none", *args):
     """creates a message attr on object with target as value. Args are: 'host'-some object to hold the message attr, 'attr'-the name of the message attribute to create, and 'target'-the host to be the value of the message attr"""
     cmds.addAttr(host, at='message', ln=attr)
