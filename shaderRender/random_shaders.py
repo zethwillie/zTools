@@ -1,6 +1,9 @@
 import maya.cmds as cmds
 import random
 
+
+# UI to pull up list of all shaders - select from list
+
 # random shader
 sel = cmds.ls(sl=True)
 shds = sel[:3]
