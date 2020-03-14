@@ -4,6 +4,8 @@ poseName = "defaultPose"
 locs = []
 dms = []
 
+# NORMALIZE THE VALUES? OR LOCK TO 1 unit
+
 # check for matrix plug-in
 # create cone
 # make a control adn put all the input/output on that
