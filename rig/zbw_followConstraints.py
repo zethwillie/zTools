@@ -69,6 +69,7 @@ def add_object_to_field(field):
     sel = cmds.ls(sl=True, type="transform", l=True)
     if sel:
         obj = sel[0]
+    obj = rig.remove_front_pipe(obj)
     cmds.textFieldGrp(field, e=True, tx=obj)
 
 
@@ -100,6 +101,7 @@ def gather_info(*args):
 
 
 def create_follow_constraints(tgt=None, spaceNames=None, spaceObjs=None):
+    # refactor this part
     if not tgt:
         tgt = cmds.ls(sl=True)[0]
 
@@ -123,11 +125,12 @@ def create_follow_constraints(tgt=None, spaceNames=None, spaceObjs=None):
 
     # create setDrivenKey
     for i in range(len(spaceGrps)):
+        spaceGrp = rig.remove_front_pipe(spaceGrps[i])
         tmpList = spaceNames[:]
         attr = tmpList.pop(i)
         index = get_enum_index_from_string(tgt, "follow", attr)
         cmds.setAttr("{0}.follow".format(tgt), i)
-        cmds.setDrivenKeyframe("{0}.{1}W{2}".format(cnstr, spaceGrps[i], i), cd="{0}.follow".format(tgt), value=1)
+        cmds.setDrivenKeyframe("{0}.{1}W{2}".format(cnstr, spaceGrp, i), cd="{0}.follow".format(tgt), value=1)
         for a in range(len(spaceGrps)):
             if a != index:
                 cmds.setDrivenKeyframe("{0}.{1}W{2}".format(cnstr, spaceGrps[a], a), cd="{0}.follow".format(tgt), value=0)
@@ -135,10 +138,12 @@ def create_follow_constraints(tgt=None, spaceNames=None, spaceObjs=None):
 
     return(cnstr)
 
+
 def get_enum_index_from_string(node, attr, value):
     enumList = cmds.attributeQuery(attr, node=node, listEnum=True)[0].split(":")
     index = enumList.index(value)
     return(index)
+
 
 def followConstraints(*args):
     follow_constraints_UI()

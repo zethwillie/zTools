@@ -1801,4 +1801,30 @@ def create_set(name=None, *args):
 
 
 def display_layer_from_selection(*args):
+    """creates a display layer using maya's autosettings from the selection"""
     cmds.createDisplayLayer(name="auto_DL")
+
+
+def remove_front_pipe(name, *args):
+    """remove a leading pipe in given name, returns cleaned name"""
+    if name[0] == "|":
+        cleanName = name[1:]
+    else:
+        cleanName = name
+    return(cleanName)
+
+
+def get_bind_joints_from_geo(geo=None, *args):
+    """returns bind joints from all selected geometry"""
+    if not geo:
+        geo = cmds.ls(sl=True, type="transform")
+    if not geo:
+        return()
+    allJnts = []
+    
+    for g in geo:
+        jnts = cmds.skinCluster(g, q=True, influence=True)
+        allJnts.extend(jnts)
+    
+    jnts = list(set(allJnts))    
+    return(jnts)
