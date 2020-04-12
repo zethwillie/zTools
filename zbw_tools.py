@@ -375,9 +375,6 @@ def swap(type="none", *args):
     rig.swap_shape(type=type, axis=axis, scale=1.0, color=None)
 
 
-# change below to become a dynmaic import: action[0] should be just import, action[1] should be function call
-# i.e. instead of exec(x), should be import dict[action[0]]; reload dict[action[0]; dict[action[0]].dict[action[1]]
-
 def zAction(dic=None, action=None, *args):
     """
     grabs the action key from the given dictionary
