@@ -1,6 +1,6 @@
 # dictionaries of tools registered for zTools 
-# key = what to call from dict
-# value = code to run the tool
+# used to call from zTools using zTools.zAction, zTools.zMelAction
+# value = [module, function] for python, [procedure] for mel
 
 zRigDict = {
     "attr": ["zTools.rig.zbw_attributes", "attributes"],
