@@ -17,6 +17,7 @@ import os
 import maya.cmds as cmds
 import maya.mel as mel
 import maya.OpenMaya as om
+import importlib
 
 import zTools.rig.zbw_rig as rig
 reload(rig)
@@ -232,9 +233,9 @@ def tools_UI(*args):
     widgets["follBut"] = cmds.button(l="zbw_makeFollicle", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict,"foll"))
     widgets["jntRadBut"] = cmds.button(l="zbw_jointRadius", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict,"jntRadius"))
     widgets["typFindBut"] = cmds.button(l="zbw_typeFinder", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict,"typFind"))
-    widgets["cmtRename"] = cmds.button(l="cometRename", w=140, bgc=(.5, .5, .5), c=partial(zAction, zRigDict, "cmtRename"))
+    widgets["cmtRename"] = cmds.button(l="cometRename", w=140, bgc=(.5, .5, .5), c=partial(zMelAction, zRigDict, "cmtRename"))
     #widgets["abSym"] = cmds.button(l="abSymMesh", w=140, bgc=(.5, .5, .5), c=partial(zAction, zRigDict,"abSym"))
-    widgets["cmtJntOrnt"] = cmds.button(l="cometJntOrient", w=140, bgc=(.5, .5, .5), c=partial(zAction, zRigDict,"cmtJntOrnt"))
+    widgets["cmtJntOrnt"] = cmds.button(l="cometJntOrient", w=140, bgc=(.5, .5, .5), c=partial(zMelAction, zRigDict,"cmtJntOrnt"))
     #widgets["extract"] = cmds.button(l="Extract Deltas", w=135, bgc=(.5, .5,.5), c=extract_deltas)
 
     # color layout
@@ -306,7 +307,7 @@ def tools_UI(*args):
     widgets["MselBufBut"] = cmds.button(l="zbw_selectionBuffer", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict,"selBuf"))
     widgets["MsnapBut"] = cmds.button(l="zbw_snap", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict, "snap"))
     #widgets["MabSym"] = cmds.button(l="abSymMesh", w=140, bgc=(.5, .5, .5), c=partial(zAction, zRigDict,"abSym"))
-    widgets["McmtRename"] = cmds.button(l="cometRename", w=140, bgc=(.5, .5, .5), c=partial(zAction, zRigDict,"cmtRename"))
+    widgets["McmtRename"] = cmds.button(l="cometRename", w=140, bgc=(.5, .5, .5), c=partial(zMelAction, zRigDict,"cmtRename"))
     widgets["cube"] = cmds.button(l="zeroed cube", w=140, bgc=(.5, .7, .5), c= partial(zeroed_geo, "cube"))
     widgets["cylinder"] = cmds.button(l="zeroed cylinder", w=140, bgc=(.5, .7, .5), c=partial(zeroed_geo, "cylinder"))
 
@@ -374,19 +375,32 @@ def swap(type="none", *args):
     rig.swap_shape(type=type, axis=axis, scale=1.0, color=None)
 
 
-def zAction(dict=None, action=None, *args):
+# change below to become a dynmaic import: action[0] should be just import, action[1] should be function call
+# i.e. instead of exec(x), should be import dict[action[0]]; reload dict[action[0]; dict[action[0]].dict[action[1]]
+
+def zAction(dic=None, action=None, *args):
     """
-    grabs the action key from the given dictionary and executes that value
+    grabs the action key from the given dictionary
+    then imports the first value (module), reloads it
+    then gets the function from the second value and runs that 
     """
-    if action and dict:
-        x = dict[action]
-        print "executing: {}".format(x)
-        exec (x)
+    if action and dic:
+        funcName = dic[action][1]
+        mod = importlib.import_module(dic[action][0])
+        reload(mod)
+        func =  getattr(mod, funcName)
+        func()
 
     else:
         cmds.warning(
             "zbw_tools.zAction: There was a problem with either the key or the dictionary given! (key: {0}, "
-            "action: {1}".format(action, dict))
+            "action: {1}".format(action, dic))
+
+
+def zMelAction(dic=None, action=None, *args):
+    """calls mel cmd from dict, and evals it"""
+    print dic[action][0]
+    mel.eval(dic[action][0])
 
 
 def snap_b_to_a(*args):
