@@ -211,7 +211,13 @@ def create_control(name="default", type="circle", axis="x", color="darkBlue",
     shape is determined by second arg: "cube", "octagon", "sphere", "diamond", "barbell", "lollipop", "cross", "bentCross", "arrow", "bentArrow", "halfCircle", "splitCircle", "cylinder", "square", "circle", "arrowCross"
     third arg can be 'x',, 'y', , 'z'  and is the axis along which the control lies.
     The colors are: 'lightBlue', 'darkGreen', 'lightPurple', 'yellow', 'darkPurple', 'pink', 'blue', 'purple', 'lightGreen', 'black', 'orange', 'white', 'darkYellow', 'brown', 'lightYellow', 'darkBlue', 'royalBlue', 'darkBrown', 'lightRed', 'medBlue', 'lightBrown', 'darkRed', 'yellowGreen', 'medGreen', 'green', 'red'
-    Arguments: name, type, axis, color
+    ARGS:
+        name(string):
+        type(string): 
+        axis(string): x, y or z
+        color(string):
+    RETURN:
+        string: control name
     """
 
     # deal with axis, x is default
@@ -1771,6 +1777,36 @@ def linear_interpolate_scalar(a, b, percent):
     percent is 0-1 float
     """
     return ((float(b) - float(a)) * percent + a)
+
+
+def create_joint_chain(startVec, endVec, numJnts, name="joint", suffix="JNT"):
+    """
+    Creates a chain of joints from startVec to endVec 
+    ARGS:
+        startVec(vector): position of first joint
+        endVec(vector): position of second joint
+        numJnts(int): number of joints to create
+        name(str): base name for joints
+        suffix(str): suffix to add after name (a '_' will be added inbetween)
+    RETURN:
+        list: joint names in order
+    """
+    cmds.select(cl=True)
+    joints = []
+    start = om.MVector(startVec[0], startVec[1], startVec[2])
+    end = om.MVector(endVec[0], endVec[1], endVec[2])
+    vec = end-start
+
+    for x in range(numJnts):
+        factor = 1/float(numJnts-1)
+        pos = linear_interpolate_vector(start, end, factor*x)
+        jnt = cmds.joint(name="{0}{1}_{2}".format(name, x, suffix),  p=pos)
+        joints.append(jnt)
+
+    cmds.joint(joints[0], e=True, ch=True, orientJoint="xyz", secondaryAxisOrient="yup")
+    cmds.select(joints[0], r=True)
+    
+    return(joints)
 
 
 def clean_joint_chain(jnt, *args):

@@ -21,12 +21,13 @@ zRigDict = {
     "BSpirit": ["BSpiritCorrectiveShape"],
     "follow": ["zTools.rig.zbw_followConstraints", "followConstraints"],
     "splineIK": ["zTools.rig.zbw_splineRig", "splineRig"],
-    "leg": ["zTools.rig.zbw_rigger_legRig as leg; reload(leg); LEG=leg.LegRigUI"],
-    "arm": ["zTools.rig.zbw_rigger_armRig as arm; reload(arm); ARM = arm.ArmRigUI"],
+    "leg": ["zTools.rig.zbw_rigger_legRig",  "LegRigUI"],
+    "arm": ["zTools.rig.zbw_rigger_armRig", "ArmRigUI"],
     "typFind": ["zTools.rig.zbw_typeFinder", "typeFinder"],
     "wire": ["zTools.rig.zbw_wireRig", "wireRig"],
     "sphereCrvRig": ["zTools.rig.zbw_sphereCrvRig", "sphereCrvRig"],
     "softJoint": ["zTools.rig.zbw_softSelectionToJoint", "softSelectionToJoint"],
+    "ikSpine":["zTools.rig.zbw_ikSpine", "ikSpine"],
 }
 
 zAnimDict = {

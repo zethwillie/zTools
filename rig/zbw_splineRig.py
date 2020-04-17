@@ -202,7 +202,7 @@ def setup_spline_advanced_twist(handle, startObj, endObj, fwdAxis=0, upAxis=0):
     """
     ARGS:
         handle(str): the ikspline handle
-        startObj(str): the transform of the start obj
+        startObj(str): the xform of the start obj
         endObj(str): the xform of the end obj
         fwdAxis(int): 0 is x, 1 is -x, etc
         upAxis(int): 0, 1, 2 = +y, -y, closest y, (then z then x)

@@ -281,8 +281,8 @@ def tools_UI(*args):
     cmds.setParent(widgets["rigsCLO"])
     widgets["rigsCharFrameLO"] = cmds.frameLayout(l="CHARACTER RIGGING", w=280, bv=True, bgc=(0, 0, 0))
     widgets["rigsCharRCLO"] = cmds.rowColumnLayout(nc=2, bgc=(0.3, 0.3, 0.3))
-    widgets["legBut"] = cmds.button(l="Leg Rig", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict,"leg"))
-    widgets["armBut"] = cmds.button(l="Arm Rig", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict, "arm"))
+    widgets["legBut"] = cmds.button(l="Leg Rig", w=140, bgc=(.7, .5, .5), c=partial(zClassAction, zRigDict,"leg"))
+    widgets["armBut"] = cmds.button(l="Arm Rig", w=140, bgc=(.7, .5, .5), c=partial(zClassAction, zRigDict, "arm"))
     
     cmds.setParent(widgets["rigsCLO"])
     widgets["rigsCharTFrameLO"] = cmds.frameLayout(l="CHARACTER TOOLS", w=280, bv=True, bgc=(0, 0, 0))
@@ -291,6 +291,7 @@ def tools_UI(*args):
     widgets["splineBut"] = cmds.button(l="Spline IK Rig", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict, "splineIK"))
     widgets["followBut"] = cmds.button(l="Follow Constraints", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict,"follow"))
     widgets["mgRig"] = cmds.button(l="spherical Crv Rig", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict, "sphereCrvRig"))
+    widgets["ikSpine"] = cmds.button(l="ikSpine", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict, "ikSpine"))
 
 
     cmds.setParent(widgets["tab"])
@@ -385,7 +386,7 @@ def zAction(dic=None, action=None, *args):
         funcName = dic[action][1]
         mod = importlib.import_module(dic[action][0])
         reload(mod)
-        func =  getattr(mod, funcName)
+        func = getattr(mod, funcName)
         func()
 
     else:
@@ -399,6 +400,20 @@ def zMelAction(dic=None, action=None, *args):
     print dic[action][0]
     mel.eval(dic[action][0])
 
+
+def zClassAction(dic=None, action=None, *args):
+    """class import from action[0], then runs code from action[1]"""
+    if action and dic:
+        funcName = dic[action][1]
+        mod = importlib.import_module(dic[action][0])
+        reload(mod)
+        func =  getattr(mod, funcName)
+        func()
+
+    else:
+        cmds.warning(
+            "zbw_tools.zAction: There was a problem with either the key or the dictionary given! (key: {0}, "
+            "action: {1}".format(action, dic))
 
 def snap_b_to_a(*args):
     """
