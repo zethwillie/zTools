@@ -49,6 +49,7 @@ zShdDict = zReg.zShdDict
 colors = rig.colors
 
 def tools_UI(*args):
+    """UI for tools"""
     if cmds.window("toolsWin", exists=True):
         cmds.deleteUI("toolsWin")
 
@@ -63,7 +64,7 @@ def tools_UI(*args):
     widgets["ctrlFrLO"] = cmds.frameLayout(l="CONTROLS", w=270, h=50, bv=True,bgc=(0.0, 0.0, 0.0))
     widgets["ctrlInFLO"] = cmds.formLayout(bgc=(0.3, 0.3, 0.3))
     widgets["ctrlAxisRBG"] = cmds.radioButtonGrp(l="Axis", nrb=3, la3=("x", "y", "z"),cw=([1, 33], [2, 33], [3, 33]),cal=([1, "left"], [2, "left"],[3, "left"]), sl=1)
-    widgets["ctrlBut"] = cmds.button(l="Create", w=50, bgc=(.7,.7,.5))
+    widgets["ctrlBut"] = cmds.button(l="Create..", w=50, bgc=(.7,.7,.5))
     cmds.popupMenu(b=1)
     cmds.menuItem(l="circle", c=partial(control, "circle"))
     cmds.menuItem(l="sphere", c=partial(control, "sphere"))
@@ -86,7 +87,7 @@ def tools_UI(*args):
     cmds.menuItem(l="4ArrowSquare", c=partial(control, "4arrowSquare"))
     cmds.menuItem(l="MASTER PACK", c=create_master_pack)
     
-    widgets["swapBut"] = cmds.button(l="Swap", w=50, bgc=(.7,.5,.5))
+    widgets["swapBut"] = cmds.button(l="Swap..", w=50, bgc=(.7,.5,.5))
     cmds.popupMenu(b=1)
     cmds.menuItem(l="circle", c=partial(swap, "circle"))
     cmds.menuItem(l="sphere", c=partial(swap, "sphere"))
@@ -125,7 +126,7 @@ def tools_UI(*args):
     widgets["actionFrLO"] = cmds.frameLayout(l="ACTIONS", w=280, h=330, bv=True, bgc=(0, 0, 0))
     widgets["actionRCLO"] = cmds.rowColumnLayout(bgc=(0.3, 0.3, 0.3), nc=2)
     widgets["grpFrzBut"] = cmds.button(l="group freeze selected", w=140, bgc=(.5, .7, .5), c=group_freeze)
-    widgets["selHier"] = cmds.button(l="sel hierarchy", w=140, bgc=(.5, .7, .5))
+    widgets["selHier"] = cmds.button(l="sel hierarchy..", w=140, bgc=(.5, .7, .5))
     cmds.popupMenu(b=1)
     cmds.menuItem(l="Select Full Hierarchy", c= select_hi)
     cmds.menuItem(l="Select Curve Hierarchy", c=partial(select_hierarchy, "curve"))
@@ -138,9 +139,8 @@ def tools_UI(*args):
     widgets["cpSkinWtsBut"] = cmds.button(l="copy skin & weights", w=140, bgc=(.5, .7, .5), c=copy_skinning)
     widgets["remNSBut"] = cmds.button(l="remove all namespaces", w=140, bgc=(.5, .7, .5), c=remove_namespace)
     widgets["cntrLoc"] = cmds.button(l="sel vtx cntr jnt", w=140,bgc=(.5, .7, .5), c=center_joint)
-    widgets["addToDef"] = cmds.button(l="add to deformer", w=140, bgc=(.5, .7, .5), c=add_to_deformer)
     widgets["snapto"] = cmds.button(l="snap B to A", w=140, bgc=(.5, .7, .5),c=snap_b_to_a)
-    widgets["constrain"] = cmds.button(l="Create Constraint", w=140, bgc=(.5, .7, .5))
+    widgets["constrain"] = cmds.button(l="Create Constraint..", w=140, bgc=(.5, .7, .5))
     cmds.popupMenu(b=1)
     cmds.menuItem(l="parent - maintain offset", c=partial(create_constraint, "prnt", True))
     cmds.menuItem(l="parent & scale - maintain offset", c=partial(create_constraint, "prntscl", True))
@@ -159,19 +159,19 @@ def tools_UI(*args):
     cmds.menuItem(l="Snap pivots to last", c=snap_pivot)
     cmds.menuItem(l="Snap pivots to origin", c=zero_pivot)
     widgets["clnJntBut"] = cmds.button(l="Scrub Jnt Chain", w=140, bgc=(.5, .7, .5), c=clean_joints)
-    widgets["createBut"] = cmds.button(l="Create: ", w=140, bgc=(.5, .7, .5))
+    widgets["createBut"] = cmds.button(l="Create..", w=140, bgc=(.5, .7, .5))
     cmds.popupMenu(b=1)
     cmds.menuItem(l="joint", c=create_joint)
     cmds.menuItem(l="locator", c=create_locator)
-    cmds.menuItem(l="set from sel", c=rig.create_set)
-    cmds.menuItem(l="displayLayer from sel", c=rig.display_layer_from_selection)
+    cmds.menuItem(l="set from selected", c=rig.create_set)
+    cmds.menuItem(l="displayLayer from selected", c=rig.display_layer_from_selection)
     cmds.menuItem(l="zeroed cube", c=partial(zeroed_geo, "cube"))
     cmds.menuItem(l="zeroed cylinder", c=partial(zeroed_geo, "cylinder"))
     cmds.menuItem(l="zeroed cone", c=partial(zeroed_geo, "cone"))
     widgets["sftJntBut"] = cmds.button(l="Joint from softSel", w=140, bgc=(.5, .7, .5), c=partial(zAction, zRigDict, "softJoint"))
     widgets["invertBut"] = cmds.button(l="Invert Shape", w=140, bgc=(.5, .7, .5), c=invert_shape)
     widgets["hmmrBut"] = cmds.button(l="Hammer Weights", w=140, bgc=(.5, .7, .5), c=hammer_skin_weights)
-    widgets["showHide"] = cmds.button(l="ShowHide", w=140, bgc=(.5, .7, .5))
+    widgets["showHide"] = cmds.button(l="ShowHide..", w=140, bgc=(.5, .7, .5))
     cmds.popupMenu(b=1)
     cmds.menuItem(l="Show all", c=partial(show_hide_in_panels, "showAll"))
     cmds.menuItem(l="Polys only", c=partial(show_hide_in_panels, "polys"))
@@ -180,6 +180,7 @@ def tools_UI(*args):
     cmds.menuItem(l="Joints only", c=partial(show_hide_in_panels, "joints"))
     cmds.menuItem(l="Joints off", c=partial(show_hide_in_panels, "jointsOff"))
     widgets["selBindJnts"] = cmds.button(l="Sel Bind Jnts", w=140, bgc=(.5, .7, .5), c=select_bind_joints_from_geo)
+    widgets["spacer"] = cmds.button(l="", w=140, bgc=(.5, .7, .5))
 
 
     cmds.rowColumnLayout(w=140, nc=2, cs=[(1, 5), (2,5)])
@@ -365,6 +366,7 @@ def control(type="none", *args):
 
 
 def swap(type="none", *args):
+    """swap shape of selected ctrls to 'type'"""
     axisRaw = cmds.radioButtonGrp(widgets["ctrlAxisRBG"], q=True, sl=True)
     if axisRaw == 1:
         axis = "x"
@@ -428,6 +430,10 @@ def snap_b_to_a(*args):
 
 
 def invert_shape(*args):
+    """
+    just runs the maya cmd to invert the shape. I belive it's based on 
+    selecting bound shape after modified shape
+    """
     # assign a shader to this. . .
     cmds.invertShape()
 
@@ -439,6 +445,9 @@ def zero_pivot(*args):
 
 
 def clean_joints(*args):
+    """
+    unrotates joints and orients them to current settings
+    """
     sel = cmds.ls(sl=True, type="joint")
     if sel:
         jnt = sel[0]
@@ -447,11 +456,17 @@ def clean_joints(*args):
 
 
 def freeze(t=1, r=1, s=1, *args):
+    """
+    freeze given channels
+    """
     sel = cmds.ls(sl=True)
     cmds.makeIdentity(sel, t=t, r=r, s=s, apply=True )
 
 
 def deleteH(mode, *args):
+    """
+    deletes history based on mode. 0 is history, anything else is non-deformer hist
+    """
     sel = cmds.ls(sl=True)
     if mode == 0:
         cmds.delete(sel, ch=True)
@@ -460,6 +475,7 @@ def deleteH(mode, *args):
 
 
 def zeroed_geo(gtype, *args):
+    """creates geo with pivot at origin"""
     geo = None
     if gtype == "cube":
         geo = cmds.polyCube()
@@ -478,10 +494,14 @@ def zeroed_geo(gtype, *args):
 
 
 def save_script_win(*args):
+    """saves scripts currently in script editor"""
     mel.eval("syncExecuterBackupFiles")
 
 
 def line_width(mode, *args):
+    """
+    thickens or thins selected nurbs curves (for display only)
+    """
     sel = cmds.ls(sl=True)
     if sel:
         for obj in sel:
@@ -504,12 +524,16 @@ def line_width(mode, *args):
 
 
 def joint_draw(value, *args):
+    """turns on/off the joint draw attributes"""
     jnts = cmds.ls(type="joint")
     for jnt in jnts:
         cmds.setAttr("{0}.drawStyle".format(jnt), value)
 
 
 def size_joints(mode, *args):
+    """
+    scales up down joint size (by 1.5 or 0.5 respectively)
+    """
     jnts = cmds.ls(type="joint")
     for jnt in jnts:
         jntRad = cmds.getAttr("{0}.radius".format(jnt))
@@ -524,12 +548,14 @@ def size_joints(mode, *args):
 
 
 def lra_toggle(value, *args):
+    """toggles local rotate axes on/off"""
     sel = cmds.ls(sl=True)
     for obj in sel:
         cmds.setAttr("{0}.displayLocalAxis".format(obj), value)
 
 
 def center_pivot(*args):
+    """centers pivot on selected"""
     sel = cmds.ls(sl=True)
     for obj in sel:
         cmds.xform(obj, cp=True, p=True)
@@ -667,6 +693,8 @@ def select_hierarchy(sType, *args):
                 xforms.append(xf)
         elif sType == "joint":
             jnts = cmds.listRelatives(top, allDescendents=True, f=True, type="joint")
+            if rig.type_check(top, "joint"):
+                jnts.append(top)
             xforms = jnts
 
         if xforms:

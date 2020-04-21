@@ -11,7 +11,7 @@ zRigDict = {
     "foll": ["zTools.rig.zbw_makeFollicle", "makeFollicle"],
     "ribbon": ["zTools.rig.zbw_ribbon", "ribbon"],
     "softMod": ["zTools.rig.zbw_softDeformer", "softDeformer"],
-    "jntRadius": ["zTools.rig.zbw_jointRadius", "Radius"],
+    "jntRadius": ["zTools.rig.zbw_jointRadius", "jointRadius"],
     "cmtRename": ["cometRename"],
     "trfmBuffer": ["zTools.rig.zbw_transformBuffer", "transformBuffer"],
     "crvTools": ["zTools.rig.zbw_curveTools", "curveTools"],
