@@ -2,7 +2,7 @@
 # file: zbw_tools.py
 # Author: zeth willie
 # Contact: zethwillie@gmail.com, www.williework.blogspot.com
-# Date Modified: 8/17/17
+# Date Modified: 4/20/20
 # To Use: type in python window  "import zbw_tools as tools; reload(tools); tools.tools()"
 # Notes/Descriptions: some rigging, anim, modeling and shading tools. *** requires zTools package in a python path.
 ########################
@@ -153,7 +153,7 @@ def tools_UI(*args):
     cmds.menuItem(l="parent - no offset", c=partial(create_constraint, "prnt", False))
     cmds.menuItem(l="scale - no offset", c=partial(create_constraint, "scl", False))
     #widgets["zeroPiv"] = cmds.button(l="Zero Pivot", w=140, bgc=(.5, .7, .5),c=zero_pivot)
-    widgets["centerPiv"] = cmds.button(l="Pivot", w=140, bgc=(.5, .7, .5))
+    widgets["centerPiv"] = cmds.button(l="Pivot..", w=140, bgc=(.5, .7, .5))
     cmds.popupMenu(b=1)
     cmds.menuItem(l="Center Pivot", c=center_pivot)
     cmds.menuItem(l="Snap pivots to last", c=snap_pivot)
@@ -614,10 +614,12 @@ def create_master_pack(self):
 
     geoGrp = cmds.group(empty=True, name = "GEO")
     geoNoXform = cmds.group(empty=True, name="GEO_noTransform")
+    cmds.setAttr("{0}.inheritsTransform".format(geoNoXform), 0)
     geoXform = cmds.group(empty=True, name="GEO_transform")
 
     rigGrp = cmds.group(empty=True, name = "RIG")
     rigNoXform = cmds.group(empty=True, name="RIG_noTransform")
+    cmds.setAttr("{0}.inheritsTransform".format(rigNoXform), 0)
     rigXform = cmds.group(empty=True, name="RIG_transform")   
 
     cmds.parent([geoXform, geoNoXform], geoGrp)

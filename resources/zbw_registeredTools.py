@@ -40,7 +40,7 @@ zAnimDict = {
     "randomSel": ["zTools.anim.zbw_randomSelection","randomSelection"],
     "randomAttr": ["zTools.anim.zbw_randomAttrs", "randomAttrs"],
     "clip": ["zTools.anim.zbw_setClipPlanes", "setClipPlanes"],
-    "tangents": ["zTools.anim.zbw_tangentsTan", "tangents"],
+    "tangents": ["zTools.anim.zbw_tangents", "tangents"],
     "studioLib": ["studiolibrary", "main"], 
     "animBot": ["animBot", "welcome"], 
 }
@@ -52,6 +52,6 @@ zModelDict = {
 
 zShdDict = {
     "shdTransfer": ["zTools.shaderRender.zbw_shadingTransfer", "shadingTransfer"],
-    "prvsShd": ["zTools.shaderRender.zbw_previsShaders", "zPrvsShd.previsShaders"],
+    "prvsShd": ["zTools.shaderRender.zbw_previsShaders", "previsShaders"],
     "shdSave": ["zTools.shaderRender.zbw_shaderSaver", "shaderSaver"],
 }

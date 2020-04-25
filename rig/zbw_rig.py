@@ -1032,7 +1032,10 @@ def group_freeze(obj, suffix="GRP", *arg):
     if parent:
         parent = parent[0]
 
-    grp = cmds.group(empty=True, name="{0}_{1}".format(obj, suffix))
+    grpname = "{0}_{1}".format(obj, suffix)
+#---------------- don't like this incrementing    
+    grpname = increment_name(grpname)
+    grp = cmds.group(empty=True, name=grpname)
     snap_to(obj, grp)
     cmds.parent(obj, grp)
 
@@ -1307,36 +1310,37 @@ def average_vectors(vecList, *args):
     return (avg)
 
 
-def integer_test(obj, *args):
+def integer_test(digit):
     """
-    tests whether obj is an integer or not
+    tests whether digit is an integer or not
     :param obj: some value
     :param args:
     :return:  boolean
     """
-    x = isinstance(obj, int)
-    return (x)
+    try:
+        int(digit)
+        return (True)
+    except ValueError:
+        return(False)
 
 
 def increment_name(name, *args):
     """
-    increments the given name string
+    increments the given name string by adding 1 to last digit
+    note: will not respect padding at the moment, so '_09' will become '_010'
     :param name:
     :param args:
     :return:
     """
-    # --------- figure out version that will add padding?
-    split = name.rpartition("_")
-    end = split[2]
-    isInt = integer_test(end)
-
-    if isInt:
-        newNum = int(end) + 1
-        newName = "%s%s%02d" % (split[0], split[1], newNum)
+    # --------- figure out version that will add padding? Use zfill
+    if not cmds.objExists(name):
+        return(name)
     else:
-        newName = "{0}_01".format(name)
-
-    return (newName)
+        if integer_test(name[-1]):
+            newname = "{0}{1}".format(name[:-1], int(name[-1])+1)
+        else:
+            newname = "{0}_1".format(name)
+        return(increment_name(newname))
 
 
 def get_soft_selection():
