@@ -1,6 +1,6 @@
 Some tools to speed up my work. You're welcome to use as you see fit, presented as is, no promises:)
 
-To use: In maya, in python shell or cmd line type (no quotes): "import zbw_tools; zbw_tools.tools()".
+To use: Drop the entire zTools folder into your scripts folder (or somewhere in your maya python path). In maya, in python shell or cmd line type (no quotes): "import zTools.zbw_tools; zbw_tools.tools()".
 
 I'm including some scripts in these folders that are not mine. I take no credit for their awesomeness, just like to have them handy for my own use.
 cometJointOrient.mel
