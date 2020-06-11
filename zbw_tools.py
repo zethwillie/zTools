@@ -53,8 +53,7 @@ def tools_UI(*args):
     if cmds.window("toolsWin", exists=True):
         cmds.deleteUI("toolsWin")
 
-    widgets["win"] = cmds.window("toolsWin", t="zTools", w=280, rtf=True,
-                                 s=True)
+    widgets["win"] = cmds.window("toolsWin", t="zTools", w=280, rtf=True, s=True)
     widgets["tab"] = cmds.tabLayout(w=280)
     widgets["rigCLO"] = cmds.columnLayout("TD", w=280)
     widgets["rigFLO"] = cmds.formLayout(w=280, bgc=(0.1, 0.1, 0.1))
@@ -69,8 +68,12 @@ def tools_UI(*args):
     cmds.menuItem(l="circle", c=partial(control, "circle"))
     cmds.menuItem(l="sphere", c=partial(control, "sphere"))
     cmds.menuItem(l="square", c=partial(control, "square"))
+    cmds.menuItem(l="triangle", c=partial(control, "triangle"))    
     cmds.menuItem(l="star", c=partial(control, "star"))
     cmds.menuItem(l="cube", c=partial(control, "cube"))
+    cmds.menuItem(l="tetrahedron", c=partial(control, "tetrahedron"))
+    cmds.menuItem(l="squarePyramid", c=partial(control, "squarePyramid"))
+    cmds.menuItem(l="octahedron", c=partial(control, "octahedron"))    
     cmds.menuItem(l="lollipop", c=partial(control, "lollipop"))
     cmds.menuItem(l="barbell", c=partial(control, "barbell"))
     cmds.menuItem(l="cross", c=partial(control, "cross"))
@@ -92,8 +95,12 @@ def tools_UI(*args):
     cmds.menuItem(l="circle", c=partial(swap, "circle"))
     cmds.menuItem(l="sphere", c=partial(swap, "sphere"))
     cmds.menuItem(l="square", c=partial(swap, "square"))
+    cmds.menuItem(l="triangle", c=partial(swap, "triangle"))
     cmds.menuItem(l="star", c=partial(swap, "star"))
     cmds.menuItem(l="cube", c=partial(swap, "cube"))
+    cmds.menuItem(l="tetrahedron", c=partial(swap, "tetrahedron"))
+    cmds.menuItem(l="squarePyramid", c=partial(swap, "squarePyramid"))
+    cmds.menuItem(l="octahedron", c=partial(swap, "octahedron"))
     cmds.menuItem(l="lollipop", c=partial(swap, "lollipop"))
     cmds.menuItem(l="barbell", c=partial(swap, "barbell"))
     cmds.menuItem(l="cross", c=partial(swap, "cross"))
@@ -122,8 +129,9 @@ def tools_UI(*args):
 
     # action layout
     cmds.setParent(widgets["rigFLO"])
-    widgets["actionFLO"] = cmds.formLayout(w=280, h=330, bgc=(0.3, 0.3, 0.3))
-    widgets["actionFrLO"] = cmds.frameLayout(l="ACTIONS", w=280, h=330, bv=True, bgc=(0, 0, 0))
+    actionHeight=440
+    widgets["actionFLO"] = cmds.formLayout(w=280, h=actionHeight, bgc=(0.3, 0.3, 0.3))
+    widgets["actionFrLO"] = cmds.frameLayout(l="ACTIONS", w=280, h=actionHeight, bv=True, bgc=(0, 0, 0))
     widgets["actionRCLO"] = cmds.rowColumnLayout(bgc=(0.3, 0.3, 0.3), nc=2)
     widgets["grpFrzBut"] = cmds.button(l="group freeze selected", w=140, bgc=(.5, .7, .5), c=group_freeze)
     widgets["selHier"] = cmds.button(l="sel hierarchy..", w=140, bgc=(.5, .7, .5))
@@ -180,6 +188,8 @@ def tools_UI(*args):
     cmds.menuItem(l="Joints only", c=partial(show_hide_in_panels, "joints"))
     cmds.menuItem(l="Joints off", c=partial(show_hide_in_panels, "jointsOff"))
     widgets["selBindJnts"] = cmds.button(l="Sel Bind Jnts", w=140, bgc=(.5, .7, .5), c=select_bind_joints_from_geo)
+    widgets["zeroSelected"] = cmds.button(l="Zero Xforms", w=140, bgc=(.5, .7, .5), c=zero_xforms)
+    widgets["shapesToAttr"] = cmds.button(l="BSs To Attr", w=140, bgc=(.5, .7, .5), c=shapes_to_channels)
     widgets["spacer"] = cmds.button(l="", w=140, bgc=(.5, .7, .5))
 
 
@@ -207,6 +217,8 @@ def tools_UI(*args):
     widgets["jntDrwOff"] = cmds.button(l="on", w=30, bgc=(.5, .7, .5), c=partial(joint_draw, 0))
     cmds.setParent(widgets["actionRCLO"])
 
+    # cmds.rowColumnLayout(w=140, nc=3, cs=[(1, 5), (2,5), (3, 5)])
+    # cmds.setParent(widgets["actionRCLO"])
     cmds.rowColumnLayout(w=140, nc=3, cs=[(1, 5), (2,17), (3, 5)])
     cmds.text("Joint Size ")
     widgets["jntSizeUp"] = cmds.button(l="-", w=30, bgc=(.7, .5, .5), c=partial(size_joints, 0))
@@ -219,7 +231,13 @@ def tools_UI(*args):
     widgets["lraOn"] = cmds.button(l="on", w=30, bgc=(.5, .7, .5), c=partial(lra_toggle, 1))
     cmds.setParent(widgets["actionRCLO"])
 
-    cmds.setParent(widgets["actionRCLO"])
+    cmds.rowColumnLayout(w=140, nc=3, cs=[(1, 5), (2,5), (3, 5)])
+    cmds.text("Tooltips        ")
+    widgets["tooltipsOff"] = cmds.button(l="Off", w=30, bgc=(.7, .5, .5), c=partial(toggle_tooltips, 0))
+    widgets["tooltipsOn"] = cmds.button(l="On", w=30, bgc=(.5, .7, .5), c=partial(toggle_tooltips, 1))
+    cmds.setParent(widgets["actionRCLO"])    
+
+    # cmds.setParent(widgets["actionRCLO"])
 
 #TODO -- add hide ai attributes
     # script Layout
@@ -264,9 +282,9 @@ def tools_UI(*args):
         (widgets["actionFLO"], "left", 0),
         (widgets["actionFLO"], "top", 50),
         (widgets["zScrptFLO"], "left", 0),
-        (widgets["zScrptFLO"], "top", 457),
+        (widgets["zScrptFLO"], "top", 500),
         (widgets["colorFLO"], "left", 0),
-        (widgets["colorFLO"], "top", 385),
+        (widgets["colorFLO"], "top", 430),
     ])
 
     cmds.setParent(widgets["tab"])
@@ -837,6 +855,32 @@ def copy_skinning(*args):
                                  sa="closestPoint", ia="closestJoint")
         except:
             cmds.warning("couldn't copy skin weights from {0} to {1}".format(orig, target))
+
+
+def zero_xforms(*args):
+    sel = cmds.ls(sl=True, type="transform")
+    if not sel:
+        return()
+    for obj in sel:
+        cmds.setAttr("{0}.translate".format(obj), 0, 0, 0)
+        cmds.setAttr("{0}.rotate".format(obj), 0, 0, 0)
+        cmds.setAttr("{0}.scale".format(obj), 1, 1, 1)
+
+
+def toggle_tooltips(state, *args):
+    cmds.help(popupMode=state)
+
+
+def shapes_to_channels(*args):
+    "select the bs node, then the ctrl"
+    sel = cmds.ls(sl=True)
+    bsnode = sel[0]
+    ctrl = sel[1]
+    bs =  cmds.listAttr("{0}.w".format(bsnode), m=True)
+
+    for b in bs:
+        cmds.addAttr(ctrl, ln=b, min=0, max=1, at="float", k=True)
+        cmds.connectAttr("{0}.{1}".format(ctrl, b), "{0}.{1}".format(bsnode, b))
 
 
 def center_joint(*args):

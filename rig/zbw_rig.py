@@ -245,6 +245,18 @@ def create_control(name="default", type="circle", axis="x", color="darkBlue",
     elif type == "square":
         ctrl = cmds.curve(n=name, d=1, p=cshp.shapes["square"])
 
+    elif type == "triangle":
+        ctrl = cmds.curve(n=name, d=1, p=cshp.shapes["triangle"])
+
+    elif type == "squarePyramid":
+        ctrl = cmds.curve(n=name, d=1, p=cshp.shapes["squarePyramid"])
+
+    elif type == "tetrahedron":
+        ctrl = cmds.curve(n=name, d=1, p=cshp.shapes["tetrahedron"])
+
+    elif type == "octahedron":
+        ctrl = cmds.curve(n=name, d=1, p=cshp.shapes["octahedron"])
+
     elif type == "circle":
         ctrl = cmds.curve(n=name, d=3, p=cshp.shapes["circle"])
         cmds.closeCurve(ctrl, ps=0, rpo=1, bb=0.5, bki=0, p=0.1)
@@ -436,7 +448,7 @@ def strip_to_translate(first="none", *args):
 
 
 def strip_to_rotate_translate(first="none", *args):
-    """strips for all selected or entered as args, sets all attrs but translate to locked and hidden"""
+    """strips for all selected or entered as args, sets all attrs but translate rotate to locked and hidden"""
     attrs = ["sx", "sy", "sz", "visibility"]
     objs = []
     if first == "none":
