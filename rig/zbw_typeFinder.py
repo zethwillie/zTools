@@ -158,7 +158,7 @@ def selectItemInList(*args):
 	sel = queryListSelection()
 
 	if sel:
-		print "selecting: {0}".format(sel)
+		print("selecting: {0}".format(sel))
 		# check whether the noExpand should be there (for sets: do we want to select the set or expand to select it's elements?)
 		cmds.select(sel, r=True, noExpand=False)
 	else:

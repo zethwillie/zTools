@@ -7,7 +7,7 @@ mainTweakGrp = cmds.group(em=True, name="tweak_cards")
 
 # skin
 for card in cards:
-    print "++++++\n" + card
+    print("++++++\n" + card)
     skinGrp = None
     tweakGrp = None
     # get parent, if grp version doesn't exist make it nad parent to correct grp

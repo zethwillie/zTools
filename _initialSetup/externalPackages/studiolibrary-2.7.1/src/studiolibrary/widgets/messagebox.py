@@ -692,7 +692,7 @@ def testMessageBox():
                   QtWidgets.QDialogButtonBox.Cancel
 
         result = MessageBox.question(None, title, text, buttons=buttons)
-        print result
+        print(result)
 
         title = "Test long text message"
         text = "This is to test a very long message. " \
@@ -706,7 +706,7 @@ def testMessageBox():
                   QtWidgets.QDialogButtonBox.Cancel
 
         result = MessageBox.question(None, title, text, buttons=buttons)
-        print result
+        print(result)
 
         title = "Test checkbox"
         text = "Testing the don't show check box. "
@@ -714,7 +714,7 @@ def testMessageBox():
         buttons = QtWidgets.QDialogButtonBox.Ok | \
                   QtWidgets.QDialogButtonBox.Cancel
 
-        print studiolibrary.widgets.MessageBox.input(
+        print(studiolibrary.widgets.MessageBox.input())
             None,
             "Rename",
             "Rename the selected item?",
@@ -728,7 +728,7 @@ def testMessageBox():
             buttons=buttons,
             enableDontShowCheckBox=True
         )
-        print result
+        print(result)
 
         title = "Create a new thumbnail icon"
         text = "This will override the existing thumbnail. " \
@@ -744,12 +744,12 @@ def testMessageBox():
             buttons=buttons,
             enableDontShowCheckBox=True
         )
-        print result
+        print(result)
 
         title = "Error saving item!"
         text = "An error has occurred while saving an item."
         result = MessageBox.critical(None, title, text)
-        print result
+        print(result)
 
         if result == QtWidgets.QDialogButtonBox.Yes:
             title = "Error while saving!"

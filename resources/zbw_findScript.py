@@ -55,9 +55,9 @@ def searchPaths(*args):
         else:
             cmds.textFieldGrp(widgets["resultTxt"], e=True, tx = "no results found!")
             
-        print "\nfound %s in the following directories:"%trimmed
+        print("\nfound %s in the following directories:"%trimmed)
         for x in range(0, len(pathList)):
-            print "%s  =======>>>  %s"%(nameList[x],pathList[x])       
+            print("%s  =======>>>  %s"%(nameList[x],pathList[x]))
          
     else:
         cmds.textFieldGrp(widgets["resultTxt"], e=True, tx = "more than 3 letters, please!")         

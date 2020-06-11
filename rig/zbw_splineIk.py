@@ -55,7 +55,7 @@ def createJointsAlongCurve(crv="", numJnts=3, *args):
     for x in range(0, numJnts+1):
         perc = 1.0/numJnts
         cmds.setAttr("{}.parameter".format(poc),x*perc)
-        print x*perc
+        # print x*perc
         pos = cmds.getAttr("{}.position".format(poc))[0]
         jnt = cmds.joint(p=pos)
         jnts.append(jnt)
@@ -74,8 +74,9 @@ def orientJointChain(*args):
 
         dotN = mth.dotN(v1, v2) # figure out how to reverse joint orientation
         if dotN < 0:
-            print jnts[y], "dot neg"
-            # reorient (inverse secondary axis)
+            print(jnts[y], "dot neg")
+            pass
+        # reorient (inverse secondary axis)
 
     # for jnt in jnts:
     # 	print mth.dotN(cmds.getAttr("{}.jointOrient".format(jnts[0]))[0], cmds.getAttr("{}.jointOrient".format(jnt))[0])

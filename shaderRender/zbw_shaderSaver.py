@@ -91,9 +91,9 @@ class Shader_Saver_UI(win.Window):
         getFile = open(self.path, "r")
         #getFile.read(self.path)
         for line in getFile:
-            print line
+            print(line)
         getFile.close()
-        print "connections = %s"%connections
+        print("connections = %s"%connections)
 
 
     def assign_shader_list(self, *args):

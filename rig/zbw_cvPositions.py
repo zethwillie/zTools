@@ -9,5 +9,5 @@ for cv in cvs:
     pos = cmds.pointPosition(cv)
     posList.append(pos)
 
-print posList
+print(posList)
 

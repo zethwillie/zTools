@@ -109,7 +109,7 @@ class GeoObject(object):
                     cmds.textField(self.shadText, e=True, tx=self.shaderName)
 
     def dropCommand(self, targetGeo, sldrGrp, *args):
-        print "dropCommand passingAttr = %s\ndrop passingSG = %s"%(GeoObject.passingAttr, GeoObject.passingSG)
+        print("dropCommand passingAttr = %s\ndrop passingSG = %s"%(GeoObject.passingAttr, GeoObject.passingSG))
         #connect geo to passed sg
         cmds.sets(targetGeo, e=True, forceElement=GeoObject.passingSG)
         #connect slider to passed attr
@@ -129,7 +129,7 @@ class GeoObject(object):
     def dragCommand(self, sg, attr, *args):
         GeoObject.passingSG = self.shadingGroup
         GeoObject.passingAttr = self.colorAttr
-        print "drag just set sg: %s\nand attr: %s"%(GeoObject.passingSG, GeoObject.passingAttr)
+        print("drag just set sg: %s\nand attr: %s"%(GeoObject.passingSG, GeoObject.passingAttr))
         ###################-----------self here is the dragged object
 
     def select(self):
@@ -163,10 +163,10 @@ def getHierGeo(*args):
         for mstr in sel:
              relsSh = cmds.listRelatives(mstr, ad=True, f=True, type=["nurbsSurface", "mesh"])
              if relsSh:
-             	for shp in relsSh:
-             		geoList.append(cmds.listRelatives(shp, p=True)[0])
+                for shp in relsSh:
+                    geoList.append(cmds.listRelatives(shp, p=True)[0])
              else:
-             	cmds.warning("No shapes gotten!")
+                cmds.warning("No shapes gotten!")
     else:
         cmds.warning("Nothing selected!")
     geoSet = set(geoList)

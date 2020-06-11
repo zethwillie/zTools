@@ -332,7 +332,7 @@ def swap_shape(type="circle", axis="x", scale = 1.0, color=None, *args):
             newColor = shpColor
         if not newColor:
             newColor = "yellow"
-        print "{0} --- {1} ---- {2}".format(obj, shpColor, newColor)
+        #print "{0} --- {1} ---- {2}".format(obj, shpColor, newColor)
         if type_check(obj, "nurbsCurve"):
             shapes = cmds.listRelatives(obj, s=True)
             ctrl = create_control(type=type, color = newColor, axis=axis)

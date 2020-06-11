@@ -32,7 +32,7 @@ def create_ctrls():
     initialJnt = cmds.joint(name="{0}_initJnt".format(sel), p=(0, 0, 0))
     cmds.setAttr("{0}.v".format(initialJnt), 0)
     cls = cmds.skinCluster(initialJnt, sel, normalizeWeights=2)[0]
-    print "++++++++++++++++++ ", cls
+    print("++++++++++++++++++ ", cls)
 
     for i in range(0, len(cvs), 3):
         nextCvs = []

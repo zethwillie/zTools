@@ -130,7 +130,7 @@ def getAttr(*args):
     obj = cmds.textFieldGrp(widgets["objTFG"], q=True, tx=True)
     cmds.select(obj, r=True)
     channels = cmds.channelBox ('mainChannelBox', query=True, selectedMainAttributes=True)
-    print channels
+    # print channels
     if (channels and (len(channels)==1)):
         if (cmds.attributeQuery(channels[0], node=obj, enum=True)):
             enumValue = cmds.attributeQuery(channels[0], node=obj, listEnum=True)

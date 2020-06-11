@@ -1,4 +1,4 @@
-gMainProgressBar = maya.mel.eval('$tmp = $gMainProgressBar');
+gMainProgressBar = maya.mel.eval('$tmp = $gMainProgressBar')
 
 cmds.progressBar( gMainProgressBar,
 				edit=True,

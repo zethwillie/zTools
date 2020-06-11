@@ -10,16 +10,16 @@ def nameFix(name):
     changing items on top of obj
     """
     mayaObjs = cmds.ls(name)
-    print "---------\nI'm in nameFix for: {0}, and there are --{1}-- instances of this clash".format(name,
-                                                                                                     len(mayaObjs))
+    print("---------\nI'm in nameFix for: {0}, and there are --{1}-- instances of this clash".format(name,
+                                                                                                     len(mayaObjs)))
     mayaObjs.sort(key=lambda a: a.count("|"), reverse=True)  # this sorts by greatest number of "|"
 
     if mayaObjs:
         if len(mayaObjs) > 1:
             for x in range(0, len(mayaObjs) - 1):
                 cmds.rename(mayaObjs[x], "{0}_{1}".format(mayaObjs[x].rpartition("|")[2], x))
-                print "zbw_clash.nameFix: Changed name of {0} --> {1}".format(mayaObjs[x], "{0}_{1}".format(
-                    mayaObjs[x].rpartition("|")[2], x))
+                print("zbw_clash.nameFix: Changed name of {0} --> {1}".format(mayaObjs[x], "{0}_{1}".format(
+                    mayaObjs[x].rpartition("|")[2], x)))
 
 
 def detectClashes(fixClashes=True):
@@ -37,16 +37,16 @@ def detectClashes(fixClashes=True):
                 clashingNames.append(node.split("|")[-1])  # add it to the list
 
     clashes = set(clashingNames)  # get rid of dupes, so only one of each name
-    print "\n==========================="
-    print "Clashing objects: {}".format(list(clashes))
+    print("\n===========================")
+    print("Clashing objects: {}".format(list(clashes)))
 
     if fixClashes and clashes:
         fixFirstClash(clashes, 0)
 
     elif clashes and not fixClashes:
         for clash in clashes:
-            print "CLASH -->", clash
-            print cmds.ls(clash)
+            print("CLASH -->", clash)
+            print(cmds.ls(clash))
 
     if not clashes:
         cmds.warning("No transform clashes found")
@@ -69,16 +69,16 @@ def detectShapeClashes(fixClashes=False):
                 # mayaResolvedName.append(node)
 
     clashes = set(clashingNames)
-    print "\n==========================="
-    print "Clashing shapes: {}".format(list(clashes))
+    print("\n===========================")
+    print("Clashing shapes: {}".format(list(clashes)))
 
     if fixClashes and clashes:
         fixFirstClash(clashes, 1)
 
     if clashes and not fixClashes:
         for clash in clashes:
-            print "SHAPE CLASH -->", clash
-            print cmds.ls(clash)
+            print("SHAPE CLASH -->", clash)
+            print(cmds.ls(clash))
 
     if not clashes:
         cmds.warning("No shape clashes found")

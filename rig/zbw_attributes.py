@@ -645,7 +645,7 @@ def getInput(*args):
         inAttr = cmds.listConnections(full, plugs=True, scn=conv, d=False, s=True)
         if inAttr:
             for each in inAttr:
-                print "%s -----> %s" % (each, full)
+                print("%s -----> %s" % (each, full))
         else:
             cmds.warning("No input connections on this attr!")
         inNodes = cmds.listConnections(full, scn=conv, d=False, s=True)
@@ -689,7 +689,7 @@ def getOutput(*args):
         outAttr = cmds.listConnections(full, plugs=True, scn=conv, d=True, s=False)
         if outAttr:
             for each in outAttr:
-                print "%s ----> %s" % (full, each)
+                print("%s ----> %s" % (full, each))
         else:
             cmds.warning("No output connections on this attr!")
         outNodes = cmds.listConnections(full, scn=conv, d=True, s=False)

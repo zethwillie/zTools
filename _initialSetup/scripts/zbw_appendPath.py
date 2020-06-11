@@ -93,7 +93,7 @@ def bottomPath(*args):
         dropped = sys.path.pop(index)
         sys.path.append(dropped)
         refresh()
-        print "Moved '%s' to bottom of list"%sys.path[0]
+        print("Moved '%s' to bottom of list"%sys.path[0])
     else:
         cmds.warning("You need to select an entry on the path list to move it to the bottom")
 
@@ -105,7 +105,7 @@ def topPath(*args):
         index = indexRaw[0]-1
         sys.path[0:0] = [sys.path.pop(index)]
         refresh()
-        print "Moved '%s' to top of list"%sys.path[0]
+        print("Moved '%s' to top of list"%sys.path[0])
     else:
         cmds.warning("You need to select an entry on the path list to move it to the top")
 
@@ -117,7 +117,7 @@ def removePath(*args):
         index = indexRaw[0]-1
         dropped = sys.path.pop(index)
         refresh()
-        print "Removed '%s' from sys.path"%dropped
+        print("Removed '%s' from sys.path"%dropped)
     else:
         cmds.warning("You need to select an entry on the path list to remove it")
 
@@ -141,7 +141,7 @@ def printMe():
     sel = cmds.textScrollList(widgets["listTSL"], q=True, si=True)
 
     #print that text to script editor
-    print sel[0]
+    print(sel[0])
 
 def append(*args):
     paths = []

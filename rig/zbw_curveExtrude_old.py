@@ -67,7 +67,7 @@ def prepExtrude(*args):
     extrude(name)
 
 def extrude(name = "defaultName", *args):
-    print "starting extrude"
+    print("starting extrude")
     sel = cmds.ls(sl=True)
     guideCrv = sel[0]
 
@@ -192,7 +192,7 @@ def extrude(name = "defaultName", *args):
     # reference
     # extrude -ch true -rn true -po 1 -et 2 -ucp 1 -fpt 1 -upn 1 -rotation 0 -scale 1 -rsp 1 "nurbsCircle1" "curve4" ;
 
-    print "ending extrude"
+    print("ending extrude")
 
 
 def getSliderRange(*args):

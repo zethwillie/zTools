@@ -54,7 +54,7 @@ def sphere_curve_rig_UI(*args):
     cmds.showWindow(widgets["win"])
 
 def second_fill(tfg, *args):
-    print "in center fill"
+    print("in center fill")
     if tfg == "center":
         obj = cmds.textFieldButtonGrp(widgets["cntrPivTFBG"], q=True, tx=True)
         cmds.textFieldButtonGrp(widgets["cntrPiv2TFBG"], e=True, tx=obj)

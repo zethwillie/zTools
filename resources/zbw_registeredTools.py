@@ -27,7 +27,7 @@ zRigDict = {
     "wire": ["zTools.rig.zbw_wireRig", "wireRig"],
     "sphereCrvRig": ["zTools.rig.zbw_sphereCrvRig", "sphereCrvRig"],
     "softJoint": ["zTools.rig.zbw_softSelectionToJoint", "softSelectionToJoint"],
-    "ikSpine":["zTools.rig.zbw_ikSpine", "ikSpine"],
+    "ikfkSpine":["zTools.rig.zbw_ikfkSpine", "IkFkRig"],
 }
 
 zAnimDict = {

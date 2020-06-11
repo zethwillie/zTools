@@ -13,7 +13,7 @@ def remove_namespaces(*args):
 
     namespaces = [ns for ns in cmds.namespaceInfo(lon=True, r=True) if ns not in defaults]
     namespaces.sort(key=num_children, reverse=True) # reverse the list
-    print "Namespaces: ", namespaces
+    print("Namespaces: ", namespaces)
 
     cleaned = []
     for ns in namespaces:
@@ -25,6 +25,6 @@ def remove_namespaces(*args):
         except RuntimeError as e:
             # namespace isn't empty, so you might not want to kill it?
             cmds.warning("Had an issue deleting namespace: {0}. Skipping!".format(ns))
-            print e
+            print(e)
     
     return(cleaned)

@@ -55,7 +55,7 @@ class TestPose(test_base.TestBase):
         srcPath = self.dataPath("test_older_version.dict")
 
         pose = mutils.Pose.fromPath(srcPath)
-        print pose.objects()
+        print(pose.objects())
 
     def test_non_unique_names(self):
         """

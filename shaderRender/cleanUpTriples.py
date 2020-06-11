@@ -5,7 +5,7 @@ ts = "blinn1_TripleSwitch"
 list = cmds.listAttr(ts, m=True, st=["*input*"])
 for input in list:
     shp = cmds.connectionInfo("{0}.{1}.inShape".format(ts, input), sfd=True).partition(".")[0]
-    print shp
+    print(shp)
     if shp == myShape:
         # clear out the shape node
         cmds.disconnectAttr("{0}.instObjGroups[0]".format(shp), "{0}.{1}.inShape".format(ts, input))

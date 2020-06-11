@@ -12,7 +12,7 @@ def undo(function):
         try:
             functionReturn = function(*args, **kwargs)
         except:
-            print sys.exc_info()[1]
+            print(sys.exc_info()[1])
         finally:
             cmds.undoInfo(closeChunk=True)
             cmds.undoInfo(printQueue=True)

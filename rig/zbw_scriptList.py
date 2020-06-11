@@ -40,7 +40,7 @@ def getScripts(*args):
     
     #get the script path
     usd = cmds.internalVar(usd=True)
-    print usd
+    #print usd
     #get list of files there
     fls = os.listdir(usd)
     fls.sort()
@@ -49,7 +49,7 @@ def getScripts(*args):
 ########### sort files (by name)
     counter = 1
     for fl in fls:
-        print fl
+        #print fl
         if (fl.rpartition(".")[2] != "pyc") and (fl[-1] != "~"):
             #if not in our dictionary, color it red
             if (fl.rpartition(".")[0] in pythonRun):

@@ -4,7 +4,7 @@ import zTools.rig.zbw_rig as rig
 
 class ZbwRigTestMethods(unittest.TestCase):
     def setUp(self):
-        print "Setting up the tests"
+        print("Setting up the tests")
         # open a maya headless scene
 
 
@@ -18,7 +18,7 @@ class ZbwRigTestMethods(unittest.TestCase):
 
 
     def tearDown(self):
-        print "Tearing down the tests"
+        print("Tearing down the tests")
 
 # suite = unittest.TestLoader().loadTestsFromTestCase(RigTestMethods)
 # unittest.TextTestRunner(verbosity=2).run(suite)

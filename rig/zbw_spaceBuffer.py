@@ -87,12 +87,12 @@ def createSpaceBuffers(*args):
     if cmds.getAttr("{0}.t".format(tgt))[0]==(0,0,0):
         cmds.connectAttr("{0}.t".format(src2), "{0}.t".format(tgt))
     else:
-        print "{0} had non-zero translate values! Skipping connection.".format(tgt)
+        cmds.warning("{0} had non-zero translate values! Skipping connection.".format(tgt))
     
     if cmds.getAttr("{0}.r".format(tgt))[0]==(0,0,0):
         cmds.connectAttr("{0}.r".format(src2), "{0}.r".format(tgt))
     else:
-        print "{0} had non-zero rotate values! Skipping connection.".format(tgt)
+        cmds.warning("{0} had non-zero rotate values! Skipping connection.".format(tgt))
 
 def spaceBuffer():
     spaceBufferUI()

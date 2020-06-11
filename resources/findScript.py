@@ -9,7 +9,7 @@ def activeScript(scriptName):
     nameList = []
     
     trimmed = scriptName.partition(".")[0]
-    print trimmed
+    print(trimmed)
     
     for pth in sys.path:
         try: 
@@ -25,9 +25,9 @@ def activeScript(scriptName):
             pass
             #cmds.warning("couldn't get into %s"%pth)
             
-    print "found %s in the following directories:"%trimmed
+    print("found %s in the following directories:"%trimmed)
     for x in range(0, len(pathList)):
-         print "%s---%s"%(nameList[x],pathList[x])
+         print("%s---%s"%(nameList[x],pathList[x]))
          
          
 activeScript("zbw_appendPath.py")

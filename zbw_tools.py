@@ -292,7 +292,7 @@ def tools_UI(*args):
     widgets["splineBut"] = cmds.button(l="Spline IK Rig", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict, "splineIK"))
     widgets["followBut"] = cmds.button(l="Follow Constraints", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict,"follow"))
     widgets["mgRig"] = cmds.button(l="spherical Crv Rig", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict, "sphereCrvRig"))
-    widgets["ikSpine"] = cmds.button(l="ikSpine", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict, "ikSpine"))
+    widgets["ikSpine"] = cmds.button(l="ikfkSpine", w=140, bgc=(.7, .5, .5), c=partial(zClassAction, zRigDict, "ikfkSpine"))
 
 
     cmds.setParent(widgets["tab"])
@@ -399,7 +399,7 @@ def zAction(dic=None, action=None, *args):
 
 def zMelAction(dic=None, action=None, *args):
     """calls mel cmd from dict, and evals it"""
-    print dic[action][0]
+    print(dic[action][0])
     mel.eval(dic[action][0])
 
 
@@ -649,9 +649,9 @@ def remove_namespace(*args):
     """removes namespaces . . . """
     ns = rmns.remove_namespaces()
     if ns:
-        print "Removed namespaces: ", ns
+        print("Removed namespaces: ", ns)
     else:
-        print "Did not delete any namespaces!"
+        print("Did not delete any namespaces!")
 
 
 def add_to_deformer(*args):
@@ -742,6 +742,7 @@ def freeze_and_connect(*args):
                 pass
 
     cmds.delete(sel[0])
+    return(ctrlList, grpList)
 
 
 def parent_chain(*args):

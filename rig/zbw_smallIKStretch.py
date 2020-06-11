@@ -41,7 +41,7 @@ def smallIKStretch(*args):
     ik = cmds.ikHandle( n="%s_IK"%origJnt, sj=origJnt, ee=origChild)[0]
     cmds.parent(ik, orig2Loc)
 
-    print orig2Loc
+    # print orig2Loc
     #measure from the base measure joint to the ik handle
     origM = rig.measure_distance_nodes((origJnt + "orig_dist"), mJnt1, mJnt2)
     activeM = rig.measure_distance_nodes((origJnt + "active_dist"), mJnt1, orig2Loc)

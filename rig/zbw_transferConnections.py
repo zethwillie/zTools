@@ -74,17 +74,17 @@ def transfer_connections_do(srcIn, tgtIn, inputs, outputs, *args):
 #---------------- use other scripts. For skin clusters we need to use the other scripts also. . . 
     if inputs:
         if cncts[0]:
-            print cncts[0]
+            print(cncts[0])
             return()
             for cnct in cncts[0]:
                 src = cnct[0]
                 tgtRaw = cnct[1]
                 tgt = tgtRaw.replace(srcIn, tgtIn)
-                print src + "  =======>  " + tgt
+                print(src + "  =======>  " + tgt)
                 try: 
                     cmds.connectAttr(src, tgt, f=True)
                 except Exception, e:
-                    print e
+                    print(e)
         else:
             cmds.warning("No connections on input side of {0}".format(srcIn))
 
@@ -95,11 +95,11 @@ def transfer_connections_do(srcIn, tgtIn, inputs, outputs, *args):
                 srcRaw = cnct[0]
                 tgt = cnct[1]
                 src = srcRaw.replace(srcIn, tgtIn)
-                print src + "  ======>  " + tgt
+                print(src + "  ======>  " + tgt)
                 try:
                     cmds.connectAttr(src, tgt, f=True)
                 except Exception, e:
-                    print e
+                    print(e)
         else:
             cmds.warning("No connections on output side of {0}".format(srcIn))
 

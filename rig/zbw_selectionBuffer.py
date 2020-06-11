@@ -45,9 +45,9 @@ def grabSel(*args):
 
 
 def checkSel(*args):
-	print "\n IN THE SELECTION BUFFER:"
+	print("\n IN THE SELECTION BUFFER:")
 	for obj in selection:
-		print obj
+		print(obj)
 
 
 def restoreSel(*args):

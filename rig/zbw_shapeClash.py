@@ -7,7 +7,7 @@ reload(clash)
 # get all shape node clashes
 def shapeClash():
     clashes = clash.detectShapeClashes(fixClashes = False)
-    print "in Shape Clashes:", clashes
+    print("in Shape Clashes:", clashes)
 # put them all into a list
 
 # button to fix the shape nodes for each clash incident

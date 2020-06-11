@@ -1,4 +1,6 @@
     # get source skin(s)
+if True: # delete this
+
     meshes = []
     for skin in cmds.listConnections(joints, type='skinCluster'):
         if skin:

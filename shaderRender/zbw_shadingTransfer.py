@@ -72,7 +72,7 @@ def copyShader(src = "", tgts = [], *args):
             tshp = cmds.listRelatives(tgt, s=True)[0]
             cmds.sets(tshp, e=True, forceElement=sg)
     else:
-        print "Copy shader assignment cancelled"
+        print("Copy shader assignment cancelled")
         return()
 
 
@@ -108,7 +108,7 @@ def transferUV(src, tgts, deleteHistory=False, *args):
                         intObj = shp
                         break
                 if intObj:
-                    print "transferring uvs to {0}.intermediateObject".format(intObj)
+                    print("transferring uvs to {0}.intermediateObject".format(intObj))
                     cmds.setAttr("{0}.intermediateObject".format(intObj), 0)
                 # try this instead? Maybe don't need intermediate object?
                 # cmds.polyTransfer(t, uv=1, ao=src)
@@ -116,7 +116,7 @@ def transferUV(src, tgts, deleteHistory=False, *args):
                     cmds.delete(intObj, constructionHistory=True)
                     cmds.setAttr("{0}.intermediateObject".format(intObj), 1)
                 else:
-                    print "transferring uvs to {0} shape"
+                    print("transferring uvs to {0} shape")
                     cmds.transferAttributes(srcShp, t, uvs=2, sampleSpace=4)
                     cmds.delete(t, ch=True)
 
@@ -126,7 +126,7 @@ def transferUV(src, tgts, deleteHistory=False, *args):
                 cmds.transferAttributes(srcShp, t, uvs=2, sampleSpace=4)
 
     else:
-        print "Transfer UVs cancelled!"
+        print("Transfer UVs cancelled!")
         return()
 
 

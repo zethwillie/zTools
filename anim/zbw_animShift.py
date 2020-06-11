@@ -193,7 +193,7 @@ class AnimShift(object):
             #catch the base object  and frame for later use
             self.baseObj = obj
 
-         	cmds.text(self.widgets["doneText"], e=True, l='"Base Obj Set! Base Frame is: %s"'%self.frame, vis=True, bgc=(.5,.6,.5))
+            cmds.text(self.widgets["doneText"], e=True, l='"Base Obj Set! Base Frame is: %s"'%self.frame, vis=True, bgc=(.5,.6,.5))
 
     def captureChanges(self, *args):
         """method to capture value changes"""
@@ -265,7 +265,7 @@ class AnimShift(object):
             cmds.floatFieldGrp(self.widgets["difSyFFG"], e=True, v1=dsy)
             cmds.floatFieldGrp(self.widgets["difSzFFG"], e=True, v1=dsz)
 
-         	cmds.text(self.widgets["doneText"], e=True, l='"Shift Values Captured! Now Select Objs to Shift!"', vis=True, bgc=(.6,.6,.5))
+            cmds.text(self.widgets["doneText"], e=True, l='"Shift Values Captured! Now Select Objs to Shift!"', vis=True, bgc=(.6,.6,.5))
         else:
             cmds.warning("You don't have anything in the base object field!")
 
@@ -373,11 +373,11 @@ class AnimShift(object):
         # cmds.textFieldGrp(self.widgets["baseTFG"], e=True, tx="")
         size = len(sel)
         if size == 1:
-     		cmds.text(self.widgets["doneText"], e=True, l='"%s Shifted! Select Other Objs to Shift or Clear!"'%sel[0], vis=True, bgc=(.5,.5,.6))
-     	elif size > 1:
-     		cmds.text(self.widgets["doneText"], e=True, l='"%s Objects Shifted! Select Others to Shift or Clear!"'%size, vis=True, bgc=(.5,.5,.6))
-     	else:
-     		cmds.text(self.widgets["doneText"], e=True, l='"You Need To Select Something To Shift!"'%size, vis=True, bgc=(.5,.5,.6))
+            cmds.text(self.widgets["doneText"], e=True, l='"%s Shifted! Select Other Objs to Shift or Clear!"'%sel[0], vis=True, bgc=(.5,.5,.6))
+        elif size > 1:
+            cmds.text(self.widgets["doneText"], e=True, l="%s Objects Shifted! Select Others to Shift or Clear!", vis=True, bgc=(.5,.5,.6))
+        else:
+            cmds.text(self.widgets["doneText"], e=True, l="You Need To Select Something To Shift!", vis=True, bgc=(.5,.5,.6))
 
     def clearAll(self, *args):
         """clears all the fields"""

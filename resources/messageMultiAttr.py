@@ -9,4 +9,4 @@ cmds.connectAttr("locator1.message", 'null1.myAttr[0]')
 cmds.connectAttr("locator2.message", 'null1.myAttr[1]')
 
 
-print cmds.listConnections("null1.myAttr")
+print(cmds.listConnections("null1.myAttr"))

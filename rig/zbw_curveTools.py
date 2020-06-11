@@ -483,7 +483,7 @@ def getNormalizedTangent(pt = ""):
         return
 
     crv = pt.partition(".")[0]
-    print pt, crv
+    print(pt, crv)
     cvs = cmds.ls("{0}.cv[*]".format(crv), fl=True)
     denom = len(cvs)
     num = float(pt.partition("[")[2].rpartition("]")[0])

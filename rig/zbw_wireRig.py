@@ -69,7 +69,7 @@ def rebuildCrv(crv):
   name = cmds.textFieldGrp(widgets["nameTFG"],q=True, tx=True)
   crvName = name + "_CRV"
   newCrv = cmds.rebuildCurve(n=crvName, ch=0, rpo=True, d=3, s=(num-1))[0]
-  print "rebuilt curve name is :" + newCrv
+  # print "rebuilt curve name is :" + newCrv
   
   return newCrv
   
