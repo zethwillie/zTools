@@ -43,6 +43,52 @@ colors = {
     "orange": 12}
 
 
+def select_hierarchy(topNode=None, sType=None, *args):
+    """
+    select hierarchy by type
+    if top node not given, will take each selection
+    sTypes = ["curve", "poly", "joint"]
+    Args:
+        topNode (string): top level object of hierarchy
+        sType (string): "curve", "poly", or "joint"
+    """
+    sel = None
+    if topNode:
+        sel = topNode
+    else:
+        sel = cmds.ls(sl=True, type="transform")
+    if not sel:
+        return()
+    
+    selectList = []
+    for top in sel:
+        xforms = []
+        cshps = None
+        if sType == "curve":
+            cshps = cmds.listRelatives(top, allDescendents=True , f=True, type="nurbsCurve")
+        elif sType == "poly":
+            cshps = cmds.listRelatives(top, allDescendents=True , f=True, type="mesh")
+        if cshps:
+            for cshp in cshps:
+                xf = cmds.listRelatives(cshp, p=True, f=True)[0]
+                xforms.append(xf)
+        elif sType == "joint":
+            jnts = cmds.listRelatives(top, allDescendents=True, f=True, type="joint")
+            if rig.type_check(top, "joint"):
+                jnts.append(top)
+            xforms = jnts
+
+        if xforms:
+            # sort list by greatest number of path splits first (deepest)
+            xforms.sort(key=lambda a: a.count("|"), reverse=True)
+            list(set(xforms))
+            for x in xforms:
+                selectList.append(x)
+
+    cmds.select(selectList, r=True)
+    return(selectList)
+
+
 def get_two_selection(*args):
     """
     gets two objects (only first 2) from selection and returns them in selected order as a list
