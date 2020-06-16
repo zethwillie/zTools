@@ -3,14 +3,15 @@ import json
 import os
 import zTools.rig.zbw_rig as rig
 reload(rig)
+import zTools.zbw_tools as tools
+reload(tools)
 
 # SHOULD I ADD IN THE GEO AND SKIN WEIGHTING SO i CAN PASS THAT ON?
+# try it with cylinders for each joint weighted to 1, then combine them WITH skin clusters
+
+# come up with a more elegant way to deal with joint/ctrl stuff. Maybe expand out to rig class stuff? Or bring that into here? 
 # add joint orient to window? for control creation
-# add ik to fingers
-# add groups to controls to autodrive them, add attrs w values or preset sdk
-# create control for above
-# move groups to hand joint
-# encapsulate this for reversed hand
+# add ik to fingers?
 
 
 '''
@@ -35,6 +36,7 @@ for jnt in sel:
 with open(r'c://users/zeth/Desktop/handData.txt', 'w') as outfile:
     json.dump(joint_dictionary, outfile)
 '''
+
 class HandRig(object):
     def __init__(self):
         self.joint_dictionary = {}
@@ -45,12 +47,14 @@ class HandRig(object):
 
         self.hand_rig_UI()
 
+
     def hand_rig_UI(self):
         if cmds.window("handWin", exists=True):
             cmds.deleteUI("handWin")
 
         self.win = cmds.window("handWin", t="zbw_hand_rig", w=280)
         cmds.columnLayout()
+        self.mirror = cmds.checkBoxGrp(l="Mirror: ", ncb=1, v1=True, cal=[(1,"left"),(2,"left")], cw=[(1, 50), (2,20)])
         cmds.text("Create joints, orient them, then click rig")
         cmds.button(l="Import Joints", w=280, h=50, bgc=(.7, .5, .5), c=self.joint_setup)
         cmds.separator(h=10)
@@ -83,28 +87,89 @@ class HandRig(object):
             
         for jnt in self.joint_dictionary.keys():
             cmds.makeIdentity(jnt)
-            
-        # here we pause to move and orient joints
+
 
     def build_rig(self, *args):
-        # make all of these encapsulated
-        self.leftJoints = [cmds.rename(x, "lf_{0}".format(x)) for x in self.joint_dictionary.keys()]
-        # create and add controls for left
-        lfCtrl = rig.create_control("ctrl", "lollipop", "y", "royalBlue")
-        rig.scale_nurbs_control(lfCtrl, .2, .2, .2)
-        cmds.select(lfCtrl, r=True)
-        cmds.select(self.leftJoints, add=True)
+        colors = ["lightBlue", "pink", "darkBlue", "darkRed"]
+        self.mirrored = cmds.checkBoxGrp(self.mirror, q=True, v1=True)
 
-        ctrls, grps = tools.freeze_and_connect()
-        cmds.select("lf_hand_JNTCtrl_GRP", r=True)
-        cmds.select(hi=True)
-        self.lfCtrlList = []
-        sel = cmds.ls(sl=True)        
-        sel.reverse()
-        list(set(sel))
-        for x in sel:
-            newCtrlObj = cmds.rename(x, x.replace("JNT", ""))
-            self.lfCtrlList.append(newCtrlObj)
-        # create a group for the left controls
-        self.lfCtrlGrp = cmds.group("lf_hand_Ctrl_GRP", name="lf_hand_GRP")
-        self.lfAttachGrp = cmds.group(self.lfCtrlGrp, name="lf_hand_attach_GRP")
+        if self.mirrored:
+            sides = ["lf", "rt"]
+        else:
+            sides = ["lf"]
+        self.sideJnts = []
+
+        # figure out which joints we have kept
+        culledJnts = []
+        for jnt in self.joint_dictionary.keys():
+            if cmds.objExists(jnt):
+                culledJnts.append(jnt)
+        
+        self.leftJoints = [cmds.rename(x, "lf_{0}".format(x)) for x in culledJnts]
+        self.sideJnts.append(self.leftJoints)
+        if self.mirrored:
+            self.rightJoints = cmds.mirrorJoint("lf_hand_JNT", mirrorBehavior=True, mirrorYZ=True, searchReplace = ["lf", "rt"])
+            self.sideJnts.append(self.rightJoints)
+        
+        # build rig for sides
+        for x in range(len(sides)):
+            sideJntsComplete = []
+            sideCtrl = rig.create_control("ctrl", "lollipop", "y", colors[x])
+            if x == 1:
+                self.reverse_control(sideCtrl)
+            rig.scale_nurbs_control(sideCtrl, .2, .2, .2)
+            
+            # get rid of end joints
+            for z in range(len(self.sideJnts[x])):
+                if "End" not in self.sideJnts[x][z]:
+                    sideJntsComplete.append(self.sideJnts[x][z])
+
+            # connect jnts and ctrls
+            cmds.select(sideCtrl, r=True)
+            cmds.select(sideJntsComplete, add=True)
+            ctrls, grps = tools.freeze_and_connect()
+
+            # rename ctrls to get rid of "JNT"
+            cmds.select("{0}_hand_JNTCtrl_GRP".format(sides[x]), r=True)
+            cmds.select(hi=True)
+            ctrlList = []
+            sel = cmds.ls(sl=True)        
+            sel.reverse()
+            list(set(sel))
+            for y in sel:
+                newCtrlObj = cmds.rename(y, y.replace("JNT", ""))
+                ctrlList.append(newCtrlObj)
+            
+            # hide hand ctrl
+            topShp = cmds.listRelatives("{0}_hand_Ctrl".format(sides[x]), s=True)[0]
+            cmds.setAttr("{0}.v".format(topShp), 0)
+
+# additional offset for attr ctrl of indiv finger joints? 
+            # create offset grps on ctrls
+            for ctrl in ctrlList:
+                shp = cmds.listRelatives(ctrl, s=True)
+                if shp:
+                    if cmds.objectType(shp)=="nurbsCurve":
+                        offsetGrp = rig.group_freeze(ctrl, "offset")
+
+            # create top groups for the left controls
+            ctrlGrp = cmds.group("{0}_hand_Ctrl_GRP".format(sides[x]), name="{0}_hand_GRP".format(sides[x]))
+            handPos = cmds.xform("{0}_hand_Ctrl_GRP".format(sides[x]), q=True, ws=True, rp=True)
+            cmds.xform(ctrlGrp, ws=True, preserve=True, rp=handPos)
+            attachGrp = cmds.group(ctrlGrp, name="{0}_hand_attach_GRP".format(sides[x]))
+            cmds.xform(attachGrp, ws=True, preserve=True, rp=handPos)
+
+            # create auto ctrls
+            autoCtrl = rig.create_control("{0}_hand_auto_CTRL".format(sides[x]), "circle", "y", colors[x+2])
+            autoGrp = rig.group_freeze(autoCtrl)
+            rig.snap_to("{0}_hand_Ctrl_GRP".format(sides[x]), autoGrp)
+            cmds.parent(autoGrp, "{0}_hand_Ctrl".format(sides[x]))
+            cmds.xform(autoGrp, ws=True, r=True, t=(0, 1, 0))
+            rig.strip_transforms(autoCtrl)
+            for attr in ["relaxed", "fist", "spread", "claw", "point"]:
+                cmds.addAttr(autoCtrl, ln=attr, at="float", min=0, max=10, dv=0, k=True)
+
+
+    def reverse_control(self, ctrl=None):
+        cmds.setAttr("{0}.rz".format(ctrl), 180)
+        cmds.makeIdentity(ctrl, apply=True)

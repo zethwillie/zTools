@@ -29,7 +29,7 @@ zRigDict = {
     "softJoint": ["zTools.rig.zbw_softSelectionToJoint", "softSelectionToJoint"],
     "ikfkSpine":["zTools.rig.zbw_ikfkSpine", "IkFkRig"],
     "handRig":["zTools.rig.zbw_hand_rig", "HandRig"],
-
+    "faceCtrl":["zTools.rig.zbw_faceControlTemplate", "face_ctrl_setup"]
 }
 
 zAnimDict = {

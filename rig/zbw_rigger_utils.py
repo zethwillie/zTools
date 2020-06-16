@@ -385,12 +385,13 @@ def create_stretch_setup(measureJnts, ikCtrl, limbName):
     return(upMult2, loMult2)
 
 
-def create_twist_extractor(rotJnt, tgtCtrl, parObj, tgtAttr=None):
+def create_twist_extractor(rotJnt, tgtCtrl, parObj, tgtAttr=None, axis="x"):
     """ 
     rotJnt is jnt we're getting rotation from 
     parObj is parent of that rotJnt (should be at same mtx of the rot jnt, and oriented to the rot jnt)
     tgtCtrl is the ctrl we'll drop the twist attr onto
     tgtAttr is what to call the attr we're creating on the tgtCtrl
+    axis is the attr of the quat we connect out of the decomposeMatrix to the quat to euler, i think this rougly corresponds to the twist axis
     """
 # TRY THIS AS CONSTAINTS? 
     baseLoc = cmds.spaceLocator(name="{0}_baseTswt_Loc".format(rotJnt))[0]
@@ -418,7 +419,13 @@ def create_twist_extractor(rotJnt, tgtCtrl, parObj, tgtAttr=None):
 
     # create quatToEuler
     qte = cmds.shadingNode("quatToEuler", asUtility=True, name="{0}_twist_qte".format(rotJnt))
-    cmds.connectAttr("{0}.outputQuat.outputQuatX".format(dm), "{0}.inputQuat.inputQuatX".format(qte))
+    if axis == "x":
+        cmds.connectAttr("{0}.outputQuat.outputQuatX".format(dm), "{0}.inputQuat.inputQuatX".format(qte))
+    if axis == "y":
+        cmds.connectAttr("{0}.outputQuat.outputQuatY".format(dm), "{0}.inputQuat.inputQuatX".format(qte))
+    if axis == "z":
+        cmds.connectAttr("{0}.outputQuat.outputQuatZ".format(dm), "{0}.inputQuat.inputQuatX".format(qte))
+
     cmds.connectAttr("{0}.outputQuat.outputQuatW".format(dm), "{0}.inputQuat.inputQuatW".format(qte))
 
     if not tgtAttr:
@@ -428,7 +435,14 @@ def create_twist_extractor(rotJnt, tgtCtrl, parObj, tgtAttr=None):
     if not attrTest:
         cmds.addAttr(tgtCtrl, ln=tgtAttr, at="float", dv=0, k=False)
 
-    cmds.connectAttr("{0}.outputRotate.outputRotateX".format(qte), "{0}.{1}".format(tgtCtrl, tgtAttr))
+# connect reverse mult
+    if axis == "x":
+        cmds.connectAttr("{0}.outputRotate.outputRotateX".format(qte), "{0}.{1}".format(tgtCtrl, tgtAttr))
+    if axis == "y":
+        multRev = cmds.shadingNode('multiplyDivide', asUtility=True, n="{0}_revMult".format(twstLoc))
+        cmds.setAttr("{0}.input2X".format(multRev), -1.0)
+        cmds.connectAttr("{0}.outputRotate.outputRotateX".format(qte), "{0}.input1X".format(multRev))
+        cmds.connectAttr("{0}.outputX".format(multRev), "{0}.{1}".format(tgtCtrl, tgtAttr))
     cmds.setAttr("{0}.{1}".format(tgtCtrl, tgtAttr), l=True)
 
     return("{0}.{1}".format(tgtCtrl, tgtAttr))

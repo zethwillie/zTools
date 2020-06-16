@@ -190,7 +190,8 @@ def tools_UI(*args):
     widgets["selBindJnts"] = cmds.button(l="Sel Bind Jnts", w=140, bgc=(.5, .7, .5), c=select_bind_joints_from_geo)
     widgets["zeroSelected"] = cmds.button(l="Zero Xforms", w=140, bgc=(.5, .7, .5), c=zero_xforms)
     widgets["shapesToAttr"] = cmds.button(l="BSs To Attr", w=140, bgc=(.5, .7, .5), c=shapes_to_channels)
-    widgets["spacer"] = cmds.button(l="", w=140, bgc=(.5, .7, .5))
+    widgets["faceCtrl"] = cmds.button(l="faceCtrlSetup", w=140, bgc=(.5, .7, .5), c=partial(zAction, zRigDict, "faceCtrl"))
+    #widgets["spacer"] = cmds.button(l="", w=140, bgc=(.5, .7, .5))
 
 
     cmds.rowColumnLayout(w=140, nc=2, cs=[(1, 5), (2,5)])

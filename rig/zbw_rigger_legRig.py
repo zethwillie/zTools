@@ -54,6 +54,7 @@ class LegRig(BL.BaseLimb):
     def pose_initial_joints(self):
         BL.BaseLimb.pose_initial_joints(self)
         # need to work on orienting the joints here. . . which attrs to lock (just unlock all?)
+        cmds.setAttr("{0}.rx".format(self.octrls[1]), 180)
         for i in range(len(self.revFootNames)):
             cmds.select(cl=True)
             jnt = cmds.joint(name="{0}_pivot_JNT".format(self.revFootNames[i]))
@@ -178,6 +179,28 @@ class LegRig(BL.BaseLimb):
             cmds.delete(self.revFootJnt[side])
 
             # connect pv to foot, follow attr etc
+
+    def create_twist_extraction_rig(self):
+        for side in self.deformJoints.keys():
+            if side == "orig":
+                sideName = self.origPrefix
+            if side == "mir":
+                sideName = self.mirPrefix
+
+            upTwistAttr = zrt.create_twist_extractor(rotJnt=self.deformJoints[side][0], tgtCtrl=self.switchCtrls[side], parObj=self.sideGroups[side][0], tgtAttr="upperTwist")
+
+            twistJointsUp, twistHooksUp = zrt.create_twist_joints(self.twistNum, self.deformJoints[side][0], self.deformJoints[side][0], self.deformJoints[side][1], upTwistAttr, "{0}_{1}_up".format(sideName, self.part), self.primaryAxis, grpSuffix=self.groupSuffix, jntSuffix=self.jntSuffix, reverse=True)
+            for jnt in twistJointsUp:
+                self.twistJoints[side].append(jnt)
+
+            loTwistAttr = zrt.create_twist_extractor(rotJnt=self.deformJoints[side][2], tgtCtrl=self.switchCtrls[side], parObj=self.deformJoints[side][1], tgtAttr="lowerTwist", axis="y")
+
+            twistJointsLo, twistHooksLo = zrt.create_twist_joints(self.twistNum, self.deformJoints[side][2], self.deformJoints[side][1], self.deformJoints[side][2], loTwistAttr, "{0}_{1}_low".format(sideName, self.part), self.primaryAxis, grpSuffix=self.groupSuffix, jntSuffix=self.jntSuffix, reverse=False)
+            for jnt in twistJointsLo:
+                self.twistJoints[side].append(jnt)
+
+        # add locator at actual elbow that is parent of other two?
+
 
     def clean_up_rig(self):
         BL.BaseLimb.clean_up_rig(self)
