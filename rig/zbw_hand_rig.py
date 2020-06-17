@@ -1,13 +1,16 @@
 import maya.cmds as cmds
 import json
 import os
+from functools import partial
 import zTools.rig.zbw_rig as rig
 reload(rig)
 import zTools.zbw_tools as tools
 reload(tools)
 
-# SHOULD I ADD IN THE GEO AND SKIN WEIGHTING SO i CAN PASS THAT ON?
-# try it with cylinders for each joint weighted to 1, then combine them WITH skin clusters
+
+# add cylinders for each joint weighted to 1, then combine them WITH skin clusters
+# add another button to create proxy geo 
+# add another button to bind the simple geometry
 
 # come up with a more elegant way to deal with joint/ctrl stuff. Maybe expand out to rig class stuff? Or bring that into here? 
 # add joint orient to window? for control creation
@@ -45,8 +48,11 @@ class HandRig(object):
             data = json.load(json_file)
             self.joint_dictionary = data
 
-        self.hand_rig_UI()
+        self.allJoints = []
+        self.proxyList = []
+        self.proxyJnts = []
 
+        self.hand_rig_UI()
 
     def hand_rig_UI(self):
         if cmds.window("handWin", exists=True):
@@ -59,6 +65,8 @@ class HandRig(object):
         cmds.button(l="Import Joints", w=280, h=50, bgc=(.7, .5, .5), c=self.joint_setup)
         cmds.separator(h=10)
         cmds.button(l="Rig Joints", w=280, h=50, bgc=(.5, .7, .5), c=self.build_rig)
+        cmds.button(l="Create Proxy Geo", w=280, h=50, bgc=(.5, .5, .7), c=self.create_proxy)
+        cmds.button(l="Bind Proxy Geo", w=280, h=50, bgc=(.7, .7, .5), c=self.prep_bind)
 
         cmds.showWindow(self.win)
         cmds.window(self.win, e=True, rtf=True)
@@ -111,6 +119,7 @@ class HandRig(object):
             self.rightJoints = cmds.mirrorJoint("lf_hand_JNT", mirrorBehavior=True, mirrorYZ=True, searchReplace = ["lf", "rt"])
             self.sideJnts.append(self.rightJoints)
         
+        self.bindJoints = []
         # build rig for sides
         for x in range(len(sides)):
             sideJntsComplete = []
@@ -170,6 +179,48 @@ class HandRig(object):
                 cmds.addAttr(autoCtrl, ln=attr, at="float", min=0, max=10, dv=0, k=True)
 
 
+            for a in sideJntsComplete:
+                if "hand" not in a:
+                    self.allJoints.append(a)
+
+
     def reverse_control(self, ctrl=None):
         cmds.setAttr("{0}.rz".format(ctrl), 180)
         cmds.makeIdentity(ctrl, apply=True)
+
+
+    def create_proxy(self, *args):
+        proxyGrp = cmds.group(em=True, name="hand_proxy_GRP")
+        geoList = []
+        jntList = []
+        for x in self.leftJoints:
+            # get rid of End jnts
+            if "End" not in x:
+                proxy = self.create_cylinder(x)
+                rig.snap_to(x, proxy)
+                cmds.parent(proxy, proxyGrp)
+                geoList.append(proxy)
+                jntList.append(x)
+        self.proxyList = geoList
+        self.proxyJnts = jntList
+
+
+    def create_cylinder(self, jnt, *args):
+        # create cylinder
+        cyl = cmds.polyCylinder(name="{0}_proxy_geo".format(jnt), axis=(1,0,0))[0]
+        # move pivot to origin
+        cmds.xform(cyl, ws=True, a=True, rp=[0,0,0])
+        return(cyl)
+
+    def prep_bind(self, *args):
+        self.bind_proxy(self.proxyJnts, self.proxyList)
+
+
+    def bind_proxy(self, jntList, geoList, *args):
+        # bind geo to the associated joint
+
+        for x in range(len(jntList)):
+            cmds.skinCluster(jntList[x], geoList[x], bindMethod=0, skinMethod=0, normalizeWeights=1, maximumInfluences=1, obeyMaxInfluences=True, tsb=True)
+
+        combined = cmds.polyUniteSkinned(geoList, ch=0, mergeUVSets=True, centerPivot=True)[0]
+        proxyCombined = cmds.rename(combined, "proxyCombined_GEO")
