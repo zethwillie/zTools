@@ -253,6 +253,7 @@ def tools_UI(*args):
     widgets["follBut"] = cmds.button(l="zbw_makeFollicle", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict,"foll"))
     widgets["jntRadBut"] = cmds.button(l="zbw_jointRadius", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict,"jntRadius"))
     widgets["typFindBut"] = cmds.button(l="zbw_typeFinder", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict,"typFind"))
+    widgets["proxyGeoBut"] = cmds.button(l="zbw_createProxyGeo", w=140, bgc=(.7, .5, .5), c=partial(zClassAction, zRigDict,"proxyGeo"))
     widgets["cmtRename"] = cmds.button(l="cometRename", w=140, bgc=(.5, .5, .5), c=partial(zMelAction, zRigDict, "cmtRename"))
     #widgets["abSym"] = cmds.button(l="abSymMesh", w=140, bgc=(.5, .5, .5), c=partial(zAction, zRigDict,"abSym"))
     widgets["cmtJntOrnt"] = cmds.button(l="cometJntOrient", w=140, bgc=(.5, .5, .5), c=partial(zMelAction, zRigDict,"cmtJntOrnt"))
@@ -846,7 +847,7 @@ def copy_skinning(*args):
         try:
             jnts = cmds.skinCluster(orig, q=True, influence=True)
         except:
-            cmds.warning("couldn't get skin weights from {}".format(orig))
+            cmds.warning("couldn't get skin weights from {0}".format(orig))
         try:
             targetClus = cmds.skinCluster(jnts, target, bindMethod=0, skinMethod=0,normalizeWeights=1, maximumInfluences=3,obeyMaxInfluences=False, tsb=True)[0]
         except:

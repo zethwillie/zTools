@@ -1926,3 +1926,53 @@ def get_bind_joints_from_geo(geo=None, *args):
     
     jnts = list(set(allJnts))    
     return(jnts)
+
+
+def create_proxy_geo(jnts=[], geoType="cylinder", axis=[1, 0, 0], pivot="base", scale=1.0, *args):
+    """
+    creates basic geo for proxies from a given list of joints, one geo per joint. Geo is of type 'geoType', along axis 'axis' and has a pivot at either the center or base of geo. Scale is 'scale' along axis and 0.5*scale along other axes
+    ARGS:
+        jnts(list): the joints to operate on
+        geoType(string): "cylinder", "cube"
+        axis(tuple): generally (1, 0, 0), (0, 1, 0), (0, 0, 1)
+        pivot(string): "base", "center"
+    RETURN:
+        list: the geo list
+    """
+    geoList = []
+
+    for jnt in jnts:
+        if geoType == "cylinder":
+            geo = cmds.polyCylinder(axis=axis, name="{0}_ProxyGeo".format(jnt), radius=0.5*scale, height=scale, ch=0)[0]
+        if geoType == "cube":
+            geo = cmds.polyCube(axis=axis, name="{0}_ProxyGeo".format(jnt), w=0.5*scale, h=1*scale, d=0.5*scale, ch=0)[0]
+
+        if pivot == "base":
+            cmds.xform(geo, ws=True, r=True, t=[axis[0]*0.5*scale, axis[1]*0.5*scale, axis[2]*0.5*scale])
+            cmds.xform(geo, ws=True, a=True, rp=[0, 0, 0])
+            cmds.xform(geo, ws=True, a=True, sp=[0, 0, 0])
+            cmds.makeIdentity(geo, apply=True)
+        cmds.DeleteHistory(geo)
+        snap_to(jnt, geo)
+        geoList.append(geo)
+
+    return(geoList)
+
+
+def bind_combine_proxy_geo(jntList=[], geoList=[], *args):
+    """
+    takes matching joint and geo lists and binds each geo to the respective joint. Freezes geos.
+    Then combines all geo into one called 'proxyCombined_GEO'
+    ARGS:
+        jntList(list)
+        geoList(list)
+    """
+    for x in range(len(jntList)):
+        geo = geoList[x]
+        jnt = jntList[x]
+        cmds.makeIdentity(geo, apply=True)
+        cmds.skinCluster(jnt, geo, bindMethod=0, skinMethod=0, normalizeWeights=1, maximumInfluences=1, obeyMaxInfluences=True, tsb=True)
+
+    combined = cmds.polyUniteSkinned(geoList, ch=0, mergeUVSets=True, centerPivot=True)[0]
+    proxyCombined = cmds.rename(combined, "proxyCombined_GEO")
+    return(proxyCombined)

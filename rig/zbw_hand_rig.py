@@ -8,9 +8,8 @@ import zTools.zbw_tools as tools
 reload(tools)
 
 
-# add cylinders for each joint weighted to 1, then combine them WITH skin clusters
-# add another button to create proxy geo 
-# add another button to bind the simple geometry
+# proxy stuff need to go to zbw_rig, do for both sides
+# clean this up to be more elegant
 
 # come up with a more elegant way to deal with joint/ctrl stuff. Maybe expand out to rig class stuff? Or bring that into here? 
 # add joint orient to window? for control creation
@@ -58,14 +57,16 @@ class HandRig(object):
         if cmds.window("handWin", exists=True):
             cmds.deleteUI("handWin")
 
-        self.win = cmds.window("handWin", t="zbw_hand_rig", w=280)
+        self.win = cmds.window("handWin", t="zbw_hand_rig", w=280, s=True)
         cmds.columnLayout()
         self.mirror = cmds.checkBoxGrp(l="Mirror: ", ncb=1, v1=True, cal=[(1,"left"),(2,"left")], cw=[(1, 50), (2,20)])
         cmds.text("Create joints, orient them, then click rig")
         cmds.button(l="Import Joints", w=280, h=50, bgc=(.7, .5, .5), c=self.joint_setup)
         cmds.separator(h=10)
         cmds.button(l="Rig Joints", w=280, h=50, bgc=(.5, .7, .5), c=self.build_rig)
+        cmds.separator(h=10)
         cmds.button(l="Create Proxy Geo", w=280, h=50, bgc=(.5, .5, .7), c=self.create_proxy)
+        cmds.separator(h=10)
         cmds.button(l="Bind Proxy Geo", w=280, h=50, bgc=(.7, .7, .5), c=self.prep_bind)
 
         cmds.showWindow(self.win)
@@ -224,3 +225,5 @@ class HandRig(object):
 
         combined = cmds.polyUniteSkinned(geoList, ch=0, mergeUVSets=True, centerPivot=True)[0]
         proxyCombined = cmds.rename(combined, "proxyCombined_GEO")
+
+
