@@ -18,9 +18,11 @@ reload(tools)
 
 '''
 # to serialize info
-sel = cmds.ls(sl=True)
-
 joint_dictionary = {}
+
+savePath = r"path/to/file.txt"
+
+sel = cmds.ls(sl=True)
 
 for jnt in sel:
     name = jnt
@@ -35,7 +37,7 @@ for jnt in sel:
     part = cmds.getAttr("{0}.type".format(jnt))
     joint_dictionary[name] = {"parent":par, "translate":trans, "rotation":rot, "scale":scl, "orientation":jo, "side":side, "part":part}
 
-with open(r'c://users/zeth/Desktop/handData.txt', 'w') as outfile:
+with open(savePath, 'w') as outfile:
     json.dump(joint_dictionary, outfile)
 '''
 

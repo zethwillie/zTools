@@ -1060,7 +1060,7 @@ def create_space_buffer_grps(ctrl="", *args):
     # grab the ctrl (must have group above)?
     ctrlParent = parent_check(ctrl)
     if not ctrlParent:
-        cmds.error("doubleProxyGrp: don't have a parent group on the ctrl!")
+        cmds.error("zbw_rig.create_space_buffer_grps: don't have a parent group on the ctrl!")
         return
 
     # create groups for the proxy
@@ -1103,7 +1103,7 @@ def group_freeze(obj, suffix="GRP", *arg):
     return (grp)
 
 
-def connect_transforms(source="", target="", t=True, r=True, s=True, *args):
+def connect_transforms(source="", target="", t=True, r=True, s=True, f=False, *args):
     """
     simple direct connection between transform attrs
     Args:
@@ -1117,11 +1117,11 @@ def connect_transforms(source="", target="", t=True, r=True, s=True, *args):
     """
     if source and target:
         if t:
-            cmds.connectAttr("{0}.t".format(source), "{0}.t".format(target))
+            cmds.connectAttr("{0}.t".format(source), "{0}.t".format(target), f=f)
         if r:
-            cmds.connectAttr("{0}.r".format(source), "{0}.r".format(target))
+            cmds.connectAttr("{0}.r".format(source), "{0}.r".format(target), f=f)
         if s:
-            cmds.connectAttr("{0}.s".format(source), "{0}.s".format(target))
+            cmds.connectAttr("{0}.s".format(source), "{0}.s".format(target), f=f)
 
 
 def get_frame_range(*args):
