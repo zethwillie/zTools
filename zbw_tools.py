@@ -306,6 +306,7 @@ def tools_UI(*args):
     widgets["armBut"] = cmds.button(l="Arm Rig", w=140, bgc=(.7, .5, .5), c=partial(zClassAction, zRigDict, "arm"))
     widgets["ikSpine"] = cmds.button(l="ikfkSpine", w=140, bgc=(.7, .5, .5), c=partial(zClassAction, zRigDict, "ikfkSpine"))
     widgets["handBut"] = cmds.button(l="handRig", w=140, bgc=(.7, .5, .5), c=partial(zClassAction, zRigDict, "handRig"))
+    widgets["mgRig"] = cmds.button(l="eyelidRig", w=140, bgc=(.7, .5, .5), c=partial(zClassAction, zRigDict, "eyelidRig"))    
 
     cmds.setParent(widgets["rigsCLO"])
     widgets["rigsCharTFrameLO"] = cmds.frameLayout(l="CHARACTER TOOLS", w=280, bv=True, bgc=(0, 0, 0))
@@ -313,8 +314,6 @@ def tools_UI(*args):
     widgets["ribBut"] = cmds.button(l="Ribbon Rig", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict,"ribbon"))
     widgets["splineBut"] = cmds.button(l="Spline IK Rig", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict, "splineIK"))
     widgets["followBut"] = cmds.button(l="Follow Constraints", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict,"follow"))
-    widgets["mgRig"] = cmds.button(l="spherical Crv Rig", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict, "sphereCrvRig"))
-
 
 
     cmds.setParent(widgets["tab"])

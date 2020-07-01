@@ -25,7 +25,7 @@ zRigDict = {
     "arm": ["zTools.rig.zbw_rigger_armRig", "ArmRigUI"],
     "typFind": ["zTools.rig.zbw_typeFinder", "typeFinder"],
     "wire": ["zTools.rig.zbw_wireRig", "wireRig"],
-    "sphereCrvRig": ["zTools.rig.zbw_sphereCrvRig", "sphereCrvRig"],
+    "eyelidRig": ["zTools.rig.zbw_eyelidRig", "EyelidRigUI"],
     "softJoint": ["zTools.rig.zbw_softSelectionToJoint", "softSelectionToJoint"],
     "ikfkSpine":["zTools.rig.zbw_ikfkSpine", "IkFkRig"],
     "handRig":["zTools.rig.zbw_hand_rig", "HandRig"],

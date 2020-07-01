@@ -1976,3 +1976,11 @@ def bind_combine_proxy_geo(jntList=[], geoList=[], *args):
     combined = cmds.polyUniteSkinned(geoList, ch=0, mergeUVSets=True, centerPivot=True)[0]
     proxyCombined = cmds.rename(combined, "proxyCombined_GEO")
     return(proxyCombined)
+
+
+def is_close(a, b, rel_tol=1e-07, abs_tol=0.0):
+    """
+    tests if numbers are within the given (or absolute) tolerance
+    Return: boolean
+    """
+    return(abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol))
