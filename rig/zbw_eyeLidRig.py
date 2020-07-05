@@ -37,7 +37,7 @@ class EyelidRigUI(object):
         self.botCrv = cmds.textFieldButtonGrp(l="Bot Curve: ", cw=[(1, 100), (2, 160),(3, 30)], cal=[(1, "left"),(2, "left"),(3, "left")], bl=">>>", bc=partial(self.get_curves, "bot"))
         cmds.separator(h=10)
  
-        self.numCtrlIFG = cmds.intFieldGrp(l="Number of Ctrls: ", v1=5, cw=[(1, 100), (2, 180)], cal=[(1, "left"),(2, "left")])
+        self.numCtrlIFG = cmds.intFieldGrp(l="Number of Ctrls: ", v1=5, cw=[(1, 100), (2, 180)], cal=[(1, "left"),(2, "left")], en=False)
         cmds.separator(h=10)
 
         self.blendCBG = cmds.checkBoxGrp(l="Group for Blend Shape: ", ncb=1, v1=1, cw=[(1, 140), (2, 180)], cal=[(1, "left"),(2, "left")])
@@ -492,14 +492,14 @@ class EyelidRigBuild(object):
             for ctrl in self.eyeRig[side]["ctrlList"]:
                 rig.scale_nurbs_control(ctrl, 0.5, 0.5, 0.5)
             # parent constrain
-            for x in [1, 3]:
+            for x in [1, -2]:
                 ctrl = self.eyeRig[side]["ctrlList"][x]
                 rig.scale_nurbs_control(ctrl, 0.5, 0.5, 0.5)
                 pc = cmds.parentConstraint([self.eyeRig[side]["ctrlList"][x-1], self.eyeRig[side]["ctrlList"][x+1]], cmds.listRelatives(ctrl, p=True)[0], mo=True)
                 rig.assign_color(ctrl, "light{0}".format(self.color.capitalize()))
-#---------------- make attr for constraint? 
+
         # connect corners xforms
-        for x in [0, 4]:
+        for x in [0, -1]:
             botBufferGrp = rig.group_freeze(self.eyeRig["bot"]["ctrlList"][x])
             rig.connect_transforms(self.eyeRig["top"]["ctrlList"][x], botBufferGrp, f=True)
             cmds.addAttr(self.eyeRig["top"]["ctrlList"][x], ln="botCornerCtrlVis", at="short", min=0, max=1, dv=0, k=True)
@@ -531,7 +531,6 @@ class EyelidRigBuild(object):
         cmds.parent(self.blinkCrvs[0], noXformGrp)
         cmds.parent([xformGrp, noXformGrp], topGrp)
 
-#---------------- look at this. . . what do we want to do per blend option?
         # if we're doing a blend shape setup
         if self.blend:
             for side in self.sides:
@@ -543,6 +542,7 @@ class EyelidRigBuild(object):
                 cmds.parent(noxform, noXformGrp)
             cmds.parent(self.blinkCrvGrp, noXformGrp)
 
+        # if we're doing a starndard joint rig
         if not self.blend:
             for side in self.sides:
                 cmds.parent(self.eyeRig[side]["crvList"][1], noXformGrp)

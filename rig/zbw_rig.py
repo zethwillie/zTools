@@ -1003,10 +1003,10 @@ def positions_along_curve(crv="", numPts=3, *args):
         cmds.connectAttr("{}.local".format(shp), "{}.inputCurve".format(poc))
         cmds.setAttr("{}.turnOnPercentage".format(poc), 1)
         lineLen = cmds.arclen(crv, ch=False)
-        dist = float(numPts) / lineLen
+        dist = float(numPts) / lineLen  
 
-        for x in range(0, numPts + 1):
-            perc = 1.0 / numPts
+        for x in range(0, numPts):
+            perc = 1.0 / (numPts-1)
             cmds.setAttr("{}.parameter".format(poc), x * perc)
             pos = cmds.getAttr("{}.position".format(poc))[0]
             posList.append(pos)
@@ -1040,9 +1040,7 @@ def rebuild_curve(curve="", num=5, keep=False, ch=False, name="", *args):
             if num < 3:
                 num = 3
 
-            newCurve = \
-            cmds.rebuildCurve(curve, rebuildType=0, spans=num, keepRange=0,
-                              replaceOriginal=not keep, name=name, ch=ch)[0]
+            newCurve = cmds.rebuildCurve(curve, rebuildType=0, spans=num, keepRange=0, replaceOriginal=not keep, name=name, ch=ch)[0]
 
     return newCurve
 
@@ -1070,7 +1068,7 @@ def create_space_buffer_grps(ctrl="", *args):
     snap_to(ctrlParent, parGrp)
     snap_to(ctrl, ctrlGrp)
     cmds.parent(ctrlGrp, parGrp)
-    # constrain groups 
+    # constrain groups
     cmds.parentConstraint(ctrlParent, parGrp, mo=True)
     cmds.parentConstraint(ctrl, ctrlGrp, mo=True)
     # return groups
