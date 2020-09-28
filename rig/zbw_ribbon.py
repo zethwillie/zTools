@@ -15,6 +15,13 @@ reload(win)
 import maya.OpenMaya as om
 import maya.cmds as cmds
 
+
+#---------------- only in U
+#---------------- use a premade surface option, check that it's in U, swap if not (reverseSurface -d 3 -ch 1 -rpo 1 "nurbsPlane1"; )
+#---------------- option for simple added in (for arms, etc)
+
+
+
 ##################
 #---------------- DO WE EVEN NEED A MED RES RIBBON?
 #---------------- OPTION: bind CTRL grp aim at the next bind CTRL top grp? (all except end jnt) Remember to add a new grp above the ctrl of bind jnts for the aiming
@@ -164,7 +171,6 @@ class RibbonUI(win.Window):
         #mid parent constrain to either?, aim to either, point to either?
 #---------------- parse these based on options to do or not in UI
         self.medSkinCluster = cmds.skinCluster(self.ctrlJntList, self.medRibbon, maximumInfluences=3, smoothWeights=0.5, obeyMaxInfluences=True, toSelectedBones=True, normalizeWeights=1)
-        self.bindSkinCluster = cmds.skinCluster(self.medJnts, self.bindRibbon, maximumInfluences=self.numMedDiv, smoothWeights=0.5, obeyMaxInfluences=True, toSelectedBones=True, normalizeWeights=1)
         
         return()
         #start packaging stuff up

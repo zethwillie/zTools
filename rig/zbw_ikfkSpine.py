@@ -4,8 +4,17 @@ reload(rig)
 import zTools.zbw_tools as tools
 reload(tools)
 
+#---------------- Don't scale top two joints? THen have to figure out how to grow or shrink the remaining (use a ramp value node or set range?) 
+#---------------- add a copy of last joint and put in there for ik spline
+#---------------- SET ROTATION ORDERS ON JOINTS AND CONTROLS (AND TWIST?)
+#---------------- put rotate order in ui, then also add it to controls. Connect the control RO to all the joint RO's
+#---------------- clamp top chest to control (Don't scale top?)
+#----------------translate stretch controls
+
+
 #---------------- squash and stretch on a ramp which tells where the effect takes place along the curve (ie. move joints up and down curve?)
 #---------------- maybe a switch for dual quat skinning in fk mode and normal in ik mode?
+
 
 class IkFkRig(object):
     def __init__(self):
@@ -233,6 +242,13 @@ class IkFkRig(object):
 
 
     def setup_ik_scaling(self):
+        # attr
+        if self.ax == "x":
+            ax = "sx"
+        if self.ax == "y":
+            ax = "sy"
+        if self.ax == "z":
+            ax = "sz"
         self.measureCrv = cmds.duplicate(self.ikCrv,name="{0}_measure_CRV".format(self.name))[0]
         splPoc = cmds.arclen(self.ikCrv, ch=True)
         msrPoc = cmds.arclen(self.measureCrv, ch=True)
@@ -248,7 +264,7 @@ class IkFkRig(object):
         cmds.connectAttr("{0}.outputX".format(scaleDefaultMult), "{0}.color2.color2R".format(envelopeBlend))
 
         for jnt in self.ikJntList:
-            cmds.connectAttr("{0}.output.outputR".format(envelopeBlend), "{0}.sx".format(jnt))
+            cmds.connectAttr("{0}.output.outputR".format(envelopeBlend), "{0}.{1}".format(jnt, ax))
 
 
     def create_fk_rig(self):

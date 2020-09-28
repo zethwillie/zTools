@@ -30,7 +30,8 @@ zRigDict = {
     "ikfkSpine":["zTools.rig.zbw_ikfkSpine", "IkFkRig"],
     "handRig":["zTools.rig.zbw_hand_rig", "HandRig"],
     "faceCtrl":["zTools.rig.zbw_faceControlTemplate", "face_ctrl_setup"], 
-    "proxyGeo":["zTools.rig.zbw_createProxyGeo", "CreateProxyGeo"]
+    "proxyGeo":["zTools.rig.zbw_createProxyGeo", "CreateProxyGeo"],
+    "poseReader":["zTools.rig.zbw_poseReader", "PoseReader"]
 }
 
 zAnimDict = {

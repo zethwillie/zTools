@@ -254,10 +254,10 @@ def tools_UI(*args):
     widgets["jntRadBut"] = cmds.button(l="zbw_jointRadius", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict,"jntRadius"))
     widgets["typFindBut"] = cmds.button(l="zbw_typeFinder", w=140, bgc=(.7, .5, .5), c=partial(zAction, zRigDict,"typFind"))
     widgets["proxyGeoBut"] = cmds.button(l="zbw_createProxyGeo", w=140, bgc=(.7, .5, .5), c=partial(zClassAction, zRigDict,"proxyGeo"))
+    widgets["proxyGeoBut"] = cmds.button(l="zbw_poseReader", w=140, bgc=(.7, .5, .5), c=partial(zClassAction, zRigDict,"poseReader"))    
     widgets["cmtRename"] = cmds.button(l="cometRename", w=140, bgc=(.5, .5, .5), c=partial(zMelAction, zRigDict, "cmtRename"))
-    #widgets["abSym"] = cmds.button(l="abSymMesh", w=140, bgc=(.5, .5, .5), c=partial(zAction, zRigDict,"abSym"))
     widgets["cmtJntOrnt"] = cmds.button(l="cometJntOrient", w=140, bgc=(.5, .5, .5), c=partial(zMelAction, zRigDict,"cmtJntOrnt"))
-    #widgets["extract"] = cmds.button(l="Extract Deltas", w=135, bgc=(.5, .5,.5), c=extract_deltas)
+ 
 
     # color layout
     cmds.setParent(widgets["rigFLO"])
@@ -276,7 +276,6 @@ def tools_UI(*args):
     widgets["dkPurpleCNV"] = cmds.canvas(w=48, h=20, rgb=(.15, 0, .25), pc=partial(changeColor, colors["darkPurple"]))
     widgets["dkRedCNV"] = cmds.canvas(w=48, h=20, rgb=(.5, .0, 0), pc=partial(changeColor, colors["darkRed"]))
     widgets["ltBrownCNV"] = cmds.canvas(w=48, h=20, rgb=(.7, .5, .0), pc=partial(changeColor, colors["lightBrown"]))
-# ---------------- add three more colors
     # formlayout stuff
     cmds.formLayout(widgets["rigFLO"], e=True, af=[
         (widgets["ctrlFLO"], "left", 0),
