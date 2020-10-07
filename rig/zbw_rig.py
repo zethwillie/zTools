@@ -1131,15 +1131,44 @@ def get_frame_range(*args):
     return (min, max)
 
 
-def insert_group_above(obj, *args):
+def insert_group_above(obj, suffix="GRP", *args):
     par = cmds.listRelatives(obj, p=True)
-    grp = cmds.group(em=True, n="{}_Grp".format(obj))
+    grp = cmds.group(em=True, n="{0}_{1}".format(obj, suffix))
     snap_to(obj, grp)
     cmds.parent(obj, grp)
     if par:
         cmds.parent(grp, par[0])
 
     return (grp)
+
+
+def create_negate_group(obj=None, suffix="GRP", t=True, r=True, s=True, *args):
+    if not obj:
+        "zbw_rig.create_negate_group: please provide some transform to negate"
+        return()
+    par = cmds.listRelatives(obj, p=True)
+    grp = cmds.group(em=True, n="{0}_neg_{1}".format(obj, suffix))
+    snap_to(obj, grp)
+    cmds.parent(obj, grp)
+
+    if t:
+        mult = cmds.createNode("multiplyDivide", name="{0}_t_neg_MD".format(obj))
+        cmds.setAttr(mult+".input2", -1.0, -1.0, -1.0)
+        cmds.connectAttr(obj+".t", mult+".input1")
+        cmds.connectAttr(mult+".output", grp+".t")
+    if r:
+        mult = cmds.createNode("multiplyDivide", name="{0}_r_neg_MD".format(obj))
+        cmds.setAttr(mult+".input2", -1.0, -1.0, -1.0)
+        cmds.connectAttr(obj+".r", mult+".input1")
+        cmds.connectAttr(mult+".output", grp+".r")
+    if s:
+        mult = cmds.createNode("multiplyDivide", name="{0}_t_neg_MD".format(obj))
+        cmds.setAttr(mult+".operation", 2)
+        cmds.setAttr(mult+".input1", 1.0, 1.0, 1.0)
+        cmds.connectAttr(obj+".s", mult+".input2")
+        cmds.connectAttr(mult+".output", grp+".s")
+    if par:
+        cmds.parent(grp, par[0])
 
 
 def bounding_box_ctrl(sel=[], prnt=True, *args):

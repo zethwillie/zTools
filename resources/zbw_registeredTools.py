@@ -31,7 +31,9 @@ zRigDict = {
     "handRig":["zTools.rig.zbw_hand_rig", "HandRig"],
     "faceCtrl":["zTools.rig.zbw_faceControlTemplate", "face_ctrl_setup"], 
     "proxyGeo":["zTools.rig.zbw_createProxyGeo", "CreateProxyGeo"],
-    "poseReader":["zTools.rig.zbw_poseReader", "PoseReader"]
+    "poseReader":["zTools.rig.zbw_poseReader", "PoseReader"],
+    "dupeBlends":["zTools.rig.zbw_dupeBlends", "dupeBlends"],
+    "animPolish":["js_animPolish.js_animPolish_ui", "ui"],
 }
 
 zAnimDict = {
@@ -46,7 +48,8 @@ zAnimDict = {
     "clip": ["zTools.anim.zbw_setClipPlanes", "setClipPlanes"],
     "tangents": ["zTools.anim.zbw_tangents", "tangents"],
     "studioLib": ["studiolibrary", "main"], 
-    "animBot": ["animBot", "welcome"], 
+    "animBot": ["animBot", "welcome"],
+    "pulldown": ["zTools.anim.zbw_animPullDown", "animPullDown"],
 }
 
 zModelDict = {

@@ -42,8 +42,7 @@ def crvToolsUI():
                                         c = reverse_curve)
     widgets["align_attachBut"] = cmds.button(l="Quick align/attach! (2 selected, move 2nd->1st)", w=280, h=30,
                                             bgc = (.5, .5, .4), c= align_attach)
-    widgets["reparaBut"] = cmds.button(l="Reparameterize Selected Crvs to 0-1!", width = 280, h=30, bgc = (.5, .5,
-                                                                                                           .4), c = reparameter)
+    widgets["reparaBut"] = cmds.button(l="Reparameterize Selected Crvs to 0-1!", width = 280, h=30, bgc = (.5, .5,.4), c = reparameter)
     widgets["pivStartBut"] = cmds.button(l="Move Pivot to Start!", width = 135, h=30, bgc = (.5, .4, .4),
                                          c = partial(move_pivot, 0))
     widgets["pivEndBut"] = cmds.button(l="Move Pivot to End!", width = 135, h=30, bgc = (.5, .4, .4), c = partial(
@@ -83,12 +82,7 @@ def crvToolsUI():
     widgets["lineBut"] = cmds.button(l="Create Line!", w = 280, h=30, bgc = (.5, .5, .4), c = create_line)
     widgets["crvSelBut"] = cmds.button(l="Create Curve Through Selection!", w = 280, h=30, bgc = (.5, .4, .4),
                                      c = curve_through_selection)
-    widgets["crvSelRBG"] = cmds.radioButtonGrp(l="Type of curve creation:", nrb=2, l1="CV", l2="EP", cal=[(1,
-                                                                                                           "left"),
-                                                                                                          (2,
-                                                                                                           "left"),
-                                                                                                          (3, "left")],
-                                               cw=[(1, 150), (2, 50), (3, 50)], sl=1)
+    widgets["crvSelRBG"] = cmds.radioButtonGrp(l="Type of curve creation:", nrb=2, l1="CV", l2="EP", cal=[(1, "left"), (2,"left"), (3, "left")], cw=[(1, 150), (2, 50), (3, 50)], sl=1)
 
     cmds.formLayout(widgets["lineFLO"], e=True, af=[
         (widgets["lineText"], "left", 10),

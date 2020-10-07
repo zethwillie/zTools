@@ -129,7 +129,7 @@ def tools_UI(*args):
 
     # action layout
     cmds.setParent(widgets["rigFLO"])
-    actionHeight=440
+    actionHeight=470
     widgets["actionFLO"] = cmds.formLayout(w=280, h=actionHeight, bgc=(0.3, 0.3, 0.3))
     widgets["actionFrLO"] = cmds.frameLayout(l="ACTIONS", w=280, h=actionHeight, bv=True, bgc=(0, 0, 0))
     widgets["actionRCLO"] = cmds.rowColumnLayout(bgc=(0.3, 0.3, 0.3), nc=2)
@@ -191,6 +191,8 @@ def tools_UI(*args):
     widgets["zeroSelected"] = cmds.button(l="Zero Xforms", w=140, bgc=(.5, .7, .5), c=zero_xforms)
     widgets["shapesToAttr"] = cmds.button(l="BSs To Attr", w=140, bgc=(.5, .7, .5), c=shapes_to_channels)
     widgets["faceCtrl"] = cmds.button(l="faceCtrlSetup", w=140, bgc=(.5, .7, .5), c=partial(zAction, zRigDict, "faceCtrl"))
+    widgets["negGrp"] = cmds.button(l="negateGrp", w=140, bgc=(.5, .7, .5), c=make_negate_group)
+    widgets["dupeBlends"] = cmds.button(l="dupeBlends", w=140, bgc=(.5, .7, .5), c=partial(zAction, zRigDict, "dupeBlends"))        
     #widgets["spacer"] = cmds.button(l="", w=140, bgc=(.5, .7, .5))
 
 
@@ -257,7 +259,7 @@ def tools_UI(*args):
     widgets["proxyGeoBut"] = cmds.button(l="zbw_poseReader", w=140, bgc=(.7, .5, .5), c=partial(zClassAction, zRigDict,"poseReader"))    
     widgets["cmtRename"] = cmds.button(l="cometRename", w=140, bgc=(.5, .5, .5), c=partial(zMelAction, zRigDict, "cmtRename"))
     widgets["cmtJntOrnt"] = cmds.button(l="cometJntOrient", w=140, bgc=(.5, .5, .5), c=partial(zMelAction, zRigDict,"cmtJntOrnt"))
- 
+    widgets["animPolish"] = cmds.button(l="animPolish", w=140, bgc=(.5, .5, .5), c=partial(zAction, zRigDict,"animPolish"))
 
     # color layout
     cmds.setParent(widgets["rigFLO"])
@@ -283,9 +285,9 @@ def tools_UI(*args):
         (widgets["actionFLO"], "left", 0),
         (widgets["actionFLO"], "top", 50),
         (widgets["zScrptFLO"], "left", 0),
-        (widgets["zScrptFLO"], "top", 500),
+        (widgets["zScrptFLO"], "top", 520),
         (widgets["colorFLO"], "left", 0),
-        (widgets["colorFLO"], "top", 430),
+        (widgets["colorFLO"], "top", 450),
     ])
 
     cmds.setParent(widgets["tab"])
@@ -347,6 +349,7 @@ def tools_UI(*args):
     widgets["clean"] = cmds.button(l="zbw_cleanKeys", w=140, bgc=(.7, .5, .5), c=partial(zAction, zAnimDict, "clean"))
     widgets["dupe"] = cmds.button(l="zbw_dupeSwap", w=140, bgc=(.7, .5, .5), c=partial(zAction, zAnimDict, "dupe"))
     widgets["huddle"] = cmds.button(l="zbw_huddle", w=140, bgc=(.7, .5, .5), c=partial(zAction, zAnimDict,"huddle"))
+    widgets["pulldown"] = cmds.button(l="zbw_animPulldown", w=140, bgc=(.7, .5, .5), c=partial(zAction, zAnimDict,"pulldown"))    
     widgets["randomSel"] = cmds.button(l="zhw_randomSel", w=140, bgc=(.7, .5, .5),c=partial(zAction, zAnimDict,"randomSel"))
     widgets["randomAttr"] = cmds.button(l="zbw_randomAttr", w=140, bgc=(.7, .5, .5),c=partial(zAction, zAnimDict,"randomAttr"))
     widgets["clip"] = cmds.button(l="zbw_setClipPlanes", w=140, bgc=(.7, .5, .5), c=partial(zAction, zAnimDict,"clip"))
@@ -447,6 +450,15 @@ def snap_b_to_a(*args):
         tgt = sel[1:]
         for t in tgt:
             rig.snap_to(src, t)
+
+def make_negate_group(*args):
+    sel = cmds.ls(sl=True)
+    if not sel:
+        cmds.warning("zTools.make_negate_group: select one or more transforms to negate")
+        return()
+
+    for obj in sel:
+        rig.create_negate_group(obj=obj, suffix="GRP")
 
 
 def invert_shape(*args):
