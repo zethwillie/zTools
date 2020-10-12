@@ -401,7 +401,7 @@ def tools_UI(*args):
     widgets["randomAttr"] = cmds.button(l="zbw_randomAttr", w=140, bgc=(.7, .5, .5),c=partial(zAction, zAnimDict,"randomAttr"), ann=zAnn["rndAttr"])
     widgets["clip"] = cmds.button(l="zbw_setClipPlanes", w=140, bgc=(.7, .5, .5), c=partial(zAction, zAnimDict,"clip"), ann=zAnn["clip"])
     widgets["tangents"] = cmds.button(l="zbw_tangents", w=140, bgc=(.7, .5, .5), c=partial(zAction, zAnimDict, "tangents"), ann=zAnn["tangents"])
-    widgets["studLib"] = cmds.button(l="Studio Library", w=140, bgc=(.5, .5,.5), c=part ial(zAction, zAnimDict, "studioLib"), ann=zAnn["studioLib"])
+    widgets["studLib"] = cmds.button(l="Studio Library", w=140, bgc=(.5, .5,.5), c=partial(zAction, zAnimDict, "studioLib"), ann=zAnn["studioLib"])
     widgets["atools"] = cmds.button(l="animBot", w=140, bgc=(.5, .5,.5), c=partial(zAction, zAnimDict, "animBot"), ann=zAnn["animBot"])
 
 #---------------- reset cameras? change (reset) overcan to 0.8 in userPrefs?
