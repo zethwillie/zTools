@@ -67,7 +67,7 @@ class HandRig(object):
         self.win = cmds.window("handWin", t="zbw_hand_rig", w=280, s=True)
         cmds.columnLayout()
         self.mirror = cmds.checkBoxGrp(l="Mirror: ", ncb=1, v1=True, cal=[(1,"left"),(2,"left")], cw=[(1, 50), (2,20)])
-        cmds.text("Create joints, orient them, then click rig")
+        cmds.text("1. Create joints, position/orient them, then create rig")
         cmds.button(l="Import Joints", w=280, h=50, bgc=(.7, .5, .5), c=self.joint_setup)
         cmds.separator(h=10)
         cmds.button(l="Rig Joints", w=280, h=50, bgc=(.5, .7, .5), c=self.build_rig)
