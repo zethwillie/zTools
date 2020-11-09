@@ -198,9 +198,9 @@ def tools_UI(*args):
     widgets["zSmallFrLO"] = cmds.frameLayout(l="QUICK ACTIONS", w=280, bv=True, bgc=(0.0, 0.0, 0.0))
     widgets["zSmallForm"] = cmds.formLayout(w=280, bgc=(0.3, 0.3, 0.3))
 
-    widgets["deleteH"] = cmds.button(l="Del History", w=82, bgc=(.5, .5,.5), c=partial(deleteH, 0), ann=zAnn["delHis"])
-    widgets["deleteNDH"] = cmds.button(l="Del ND History", w=82, bgc=(.5, .5,.5), c=partial(deleteH, 1), ann=zAnn["delNDHis"])    
-    widgets["deleteAnim"] = cmds.button(l="Del Animation", w=82, bgc=(.5, .5,.5), c=partial(deleteH, 2), ann=zAnn["delAnim"])
+    widgets["deleteH"] = cmds.button(l="Del History", w=82, bgc=(.5, .7,.5), c=partial(deleteH, 0), ann=zAnn["delHis"])
+    widgets["deleteNDH"] = cmds.button(l="Del ND History", w=82, bgc=(.5, .5,.7), c=partial(deleteH, 1), ann=zAnn["delNDHis"])    
+    widgets["deleteAnim"] = cmds.button(l="Del Animation", w=82, bgc=(.7, .5,.5), c=partial(deleteH, 2), ann=zAnn["delAnim"])
 
     widgets["freezeT"] = cmds.button(l="Freeze T", w=60, bgc=(.7, .7, .7), c=partial(freeze, 1, 0, 0), ann=zAnn["freeze"])
     widgets["freezeR"] = cmds.button(l="Freeze R", w=60, bgc=(.7, .7, .7), c=partial(freeze, 0, 1, 0), ann=zAnn["freeze"])
@@ -212,12 +212,12 @@ def tools_UI(*args):
     widgets["linThnBut"] = cmds.button(l="+", w=25, bgc=(.5, .7, .5), c=partial(line_width, 1))
 
     widgets["jntDrwTxt"] = cmds.text(l="Joint Draw:", ann=zAnn["jntDrw"])
-    widgets["jntDrwOn"] = cmds.button(l="On", w=25, bgc=(.5, .7, .5), c=partial(joint_draw, 2))
-    widgets["jntDrwOff"] = cmds.button(l="Off", w=25, bgc=(.7, .5,.5), c=partial(joint_draw, 0))
+    widgets["jntDrwOn"] = cmds.button(l="On", w=25, bgc=(.5, .7, .5), c=partial(joint_draw, 0))
+    widgets["jntDrwOff"] = cmds.button(l="Off", w=25, bgc=(.7, .5,.5), c=partial(joint_draw, 2))
 
     widgets["jntSizeTxt"] = cmds.text(l="Joint Size:", ann=zAnn["jntSz"])
-    widgets["jntSizeUp"] = cmds.button(l="+", w=25, bgc=(.5, .7, .5), c=partial(size_joints, 0))
-    widgets["jntSizeDn"] = cmds.button(l="-", w=25, bgc=(.7, .5, .5), c=partial(size_joints, 1))
+    widgets["jntSizeUp"] = cmds.button(l="+", w=25, bgc=(.5, .7, .5), c=partial(size_joints, 1))
+    widgets["jntSizeDn"] = cmds.button(l="-", w=25, bgc=(.7, .5, .5), c=partial(size_joints, 0))
 
     widgets["lraTxt"] = cmds.text(l="Loc Rot Ax:", ann=zAnn["lra"])
     widgets["lraOff"] = cmds.button(l="Off", w=25, bgc=(.7, .5, .5), c=partial(lra_toggle, 0))
@@ -558,11 +558,16 @@ def deleteH(mode, *args):
     deletes history based on mode. 0 is history, 1 is non-deformer, anything else is non-deformer hist
     """
     sel = cmds.ls(sl=True)
+    if not sel:
+        return()
     if mode == 0:
         cmds.delete(sel, ch=True)
     if mode == 1:
         cmds.bakePartialHistory(sel, prePostDeformers=True)
     if mode == 2:
+        check = cmds.confirmDialog(title="Delete Anim?", message="Delete time based anim?", button=["Yes", "No"], defaultButton="Yes", cancelButton="No", dismissString="No")
+        if check == "No":
+            return()
         cmds.delete(sel, c=True, timeAnimationCurves=True, unitlessAnimationCurves=False)
 
 
