@@ -119,9 +119,11 @@ class HandRig(object):
         
         self.leftJoints = [cmds.rename(x, "lf_{0}".format(x)) for x in culledJnts]
         self.sideJnts.append(self.leftJoints)
+        self.add_to_bind_set(self.leftJoints)
         if self.mirrored:
             self.rightJoints = cmds.mirrorJoint("lf_hand_JNT", mirrorBehavior=True, mirrorYZ=True, searchReplace = ["lf", "rt"])
             self.sideJnts.append(self.rightJoints)
+            self.add_to_bind_set(self.leftJoints)
 
         self.create_ctrls()
         
@@ -158,7 +160,8 @@ class HandRig(object):
             for y in sel:
                 newCtrlObj = cmds.rename(y, y.replace("JNT", ""))
                 self.ctrlSides[x].append(newCtrlObj)
-
+            # add to set
+            self.add_to_ctrl_set(self.ctrlSides[x])
 
         self.hand_control_setup()
 
@@ -213,6 +216,27 @@ class HandRig(object):
             for fing in finger:
                 for knuck in fing:
                     attr = cmds.addAttr(ctrl, ln="{0}_{1}".format(knuck, adir), at="float", k=True)
+
+
+    def add_to_bind_set(self, jlist):
+        name = "BIND_SET"
+        if not cmds.objExists(name):
+            cmds.sets(name=name)
+        cmds.sets(jlist, include=name)
+
+
+    def add_to_ctrl_set(self, clist):
+        name = "CTRL_SET"
+        if not cmds.objExists(name):
+            cmds.sets(name=name)
+        cmds.sets(clist, include=name)
+        cmds.select(name)
+        sel = cmds.ls(sl=True)
+        for x in sel:
+            if not rig.type_check(x, "nurbsCurve"):
+                cmds.sets(x, remove=name)
+            if not rig.type_check(x, "transform"):
+                cmds.sets(x, remove=name)
 
 
     def reverse_control(self, ctrl=None):
