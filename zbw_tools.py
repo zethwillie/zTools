@@ -300,7 +300,7 @@ def tools_UI(*args):
     widgets["proxyGeoBut"] = cmds.button(l="zbw_createProxyGeo", w=140, bgc=(.7, .5, .5), c=partial(zClassAction, zRigDict,"proxyGeo"), ann=zAnn["proxy"])
     widgets["proxyGeoBut"] = cmds.button(l="zbw_poseReader", w=140, bgc=(.7, .5, .5), c=partial(zClassAction, zRigDict,"poseReader"), ann=zAnn["pose"])    
     widgets["cmtRename"] = cmds.button(l="cometRename", w=140, bgc=(.5, .5, .5), c=partial(zMelAction, zRigDict, "cmtRename"), ann=zAnn["rename"])
-    widgets["cmtJntOrnt"] = cmds.button(l="cometJntOrient", w=140, bgc=(.5, .5, .5), c=partial(zMelAction, zRigDict,"jntOrient"), ann=zAnn["jntOrient"])
+    widgets["cmtJntOrnt"] = cmds.button(l="cometJntOrient", w=140, bgc=(.5, .5, .5), c=partial(zMelAction, zRigDict,"cmtJntOrnt"), ann=zAnn["jntOrient"])
     widgets["animPolish"] = cmds.button(l="animPolish", w=140, bgc=(.5, .5, .5), c=partial(zAction, zRigDict,"animPolish"), ann=zAnn["animPolish"])
 
     # color layout
