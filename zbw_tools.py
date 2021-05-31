@@ -184,6 +184,7 @@ def tools_UI(*args):
     cmds.menuItem(l="Snap pivots to last", c=snap_pivot)
     cmds.menuItem(l="Snap pivots to origin", c=zero_pivot)
     widgets["clnJntBut"] = cmds.button(l="Clean Jnt Chain", w=140, bgc=(.5, .7, .5), c=clean_joints, ann=zAnn["cleanJnts"])
+    widgets["jntRot2Ornt"] = cmds.button(l="Jnt Rot->Orient", w=140, bgc=(.5,.7, .5), c=joint_rotate_to_orient, ann=zAnn["jntRot2Ornt"])
     widgets["sftJntBut"] = cmds.button(l="Joint from softSel", w=140, bgc=(.5, .7, .5), c=partial(zAction, zRigDict, "softJoint"), ann=zAnn["softSelJnt"])
     widgets["cpSkinWtsBut"] = cmds.button(l="copy skin & weights", w=140, bgc=(.5, .7, .5), c=copy_skinning, ann=zAnn["copySkin"])
     widgets["selBindJnts"] = cmds.button(l="Select Bind Jnts", w=140, bgc=(.5, .7, .5), c=select_bind_joints_from_geo, ann=zAnn["selBind"])
@@ -498,6 +499,18 @@ def snap_b_to_a(*args):
         tgt = sel[1:]
         for t in tgt:
             rig.snap_to(src, t)
+
+
+def joint_rotate_to_orient(*args):
+    sel =  cmds.ls(sl=True)
+
+    for obj in sel:
+        rot = cmds.getAttr(obj+".r")[0]
+        cmds.setAttr(obj+".jointOrientX", rot[0])
+        cmds.setAttr(obj+".jointOrientY", rot[1])
+        cmds.setAttr(obj+".jointOrientZ", rot[2])
+        cmds.setAttr(obj+".r", 0, 0, 0)
+
 
 def make_negate_group(*args):
     sel = cmds.ls(sl=True)

@@ -10,9 +10,7 @@ def nameFix(name):
     changing items on top of obj
     """
     mayaObjs = cmds.ls(name)
-    print("---------\nI'm in nameFix for: {0}, and there are --{1}-- instances of this clash".format(name,
-                                                                                                     len(mayaObjs)))
-    mayaObjs.sort(key=lambda a: a.count("|"), reverse=True)  # this sorts by greatest number of "|"
+    print("---------\nI'm in nameFix for: {0}, and there are --{1}-- instances of this clash".format(name,mayaObjs.sort(key=lambda a: a.count("|"), reverse=True))  # this sorts by greatest number of "|"
 
     if mayaObjs:
         if len(mayaObjs) > 1:

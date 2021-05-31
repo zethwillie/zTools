@@ -1248,7 +1248,7 @@ def scale_nurbs_control(ctrl=None, x=1, y=1, z=1, origin=False, *args):
     """
     if not ctrl or not type_check(ctrl, "nurbsCurve"):
         cmds.warning(
-            "zbw_rig.scaleNurbsCtrl: I wsan't passed a nurbsCurve object")
+            "zbw_rig.scaleNurbsCtrl: I wasn't passed a nurbsCurve object")
         return ()
 
     piv = cmds.xform(ctrl, q=True, ws=True, rp=True)

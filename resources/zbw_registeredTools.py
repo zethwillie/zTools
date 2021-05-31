@@ -151,5 +151,6 @@ zAnnDict = {
     "animBot": "animBot via ?, not included",
 
     "saveScript":"saves contents of script window",
-    "windows":"cleans up windows when lost via losing a monitor or something like that"
+    "windows":"cleans up windows when lost via losing a monitor or something like that",
+    "jntRot2Ornt":"takes joint's rot attrs and transfers to jntOrient attr",
 }

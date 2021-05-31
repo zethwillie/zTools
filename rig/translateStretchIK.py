@@ -4,6 +4,7 @@ import zTools.rig.zbw_rig as rig
 
 #ikhandle, pvctrl, measure jnts, ik mid/end
 #---------------- make it so you can change the axis of the joints
+#---------------- MAKE SURE TO ADD THE LOCATOR SO STRETCH DOESN'T KICK IN FROM BALL ROTATE, ETC
 
 def build_translate_stretch(partname, ikctrl, pvctrl, measureTop, measureMid, measureEnd, ikmid, ikend):
     #get distances
