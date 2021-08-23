@@ -4,6 +4,7 @@ from functools import partial
 
 
 #---------------- clear fields button
+#---------------- check and delete follow attrs if they exists (warn first)
 
 widgets = {}
 def follow_constraints_UI():

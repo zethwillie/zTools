@@ -563,7 +563,7 @@ def freeze(t=1, r=1, s=1, *args):
     freeze given channels
     """
     sel = cmds.ls(sl=True)
-    cmds.makeIdentity(sel, t=t, r=r, s=s, apply=True )
+    cmds.makeIdentity(sel, t=t, r=r, s=s, apply=True)
 
 
 def deleteH(mode, *args):

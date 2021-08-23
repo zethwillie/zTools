@@ -21,25 +21,18 @@ cvs ={"xyz":[5, 15],"-xyz":[0, 4],"xy-z":[10, 14],"x-yz":[6, 8],"-x-yz":[3, 7],"
 
 for a in cvs["xyz"]:
     cmds.xform("{0}.cv[{1}]".format(ctrl, a), ws=True, t=(X.y, Y.y, Z.y))
-
 for a in cvs["-xyz"]:
     cmds.xform("{0}.cv[{1}]".format(ctrl, a), ws=True, t=(X.x, Y.y, Z.y))
-    
 for a in cvs["x-yz"]:
     cmds.xform("{0}.cv[{1}]".format(ctrl, a), ws=True, t=(X.y, Y.x, Z.y))
-    
 for a in cvs["-x-yz"]:
     cmds.xform("{0}.cv[{1}]".format(ctrl, a), ws=True, t=(X.x, Y.x, Z.y))
-
 for a in cvs["xy-z"]:
     cmds.xform("{0}.cv[{1}]".format(ctrl, a), ws=True, t=(X.y, Y.y, Z.x))
-
 for a in cvs["-xy-z"]:
     cmds.xform("{0}.cv[{1}]".format(ctrl, a), ws=True, t=(X.x, Y.y, Z.x))
-    
 for a in cvs["-x-y-z"]:
     cmds.xform("{0}.cv[{1}]".format(ctrl, a), ws=True, t=(X.x, Y.x, Z.x))
-    
 for a in cvs["x-y-z"]:
     cmds.xform("{0}.cv[{1}]".format(ctrl, a), ws=True, t=(X.y, Y.x, Z.x))
     

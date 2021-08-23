@@ -12,7 +12,6 @@ reload(tools)
 #----------------translate stretch controls
 
 
-#---------------- squash and stretch on a ramp which tells where the effect takes place along the curve (ie. move joints up and down curve?)
 #---------------- maybe a switch for dual quat skinning in fk mode and normal in ik mode?
 
 
