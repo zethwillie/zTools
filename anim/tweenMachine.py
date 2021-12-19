@@ -129,9 +129,9 @@ def tween(bias, nodes=None):
     # Wrap the main operation in a try/except to prevent the waitcursor from
     # sticking if something should fail
     try:
-    	# If we have no curves, force a list
-    	if curves is None:
-    		curves = []
+        # If we have no curves, force a list
+        if curves is None:
+            curves = []
         # Process all curves
         for curve in curves:
             # Find time for next and previous keys...
@@ -213,7 +213,7 @@ class TMData(object):
                            + self.node)
             # If the data is in the old format (tmXML has children), convert it
             if mc.listRelatives(self.node, children=True):
-                print "# tweenMachine: Old data found.  Converting."
+                print("# tweenMachine: Old data found.  Converting.")
                 self.root = etree.XML("<tweenMachineData />")
                 self.tree = etree.ElementTree(self.root)
                 # Create base elements
@@ -871,7 +871,7 @@ class TMWindowUI(object):
             if data.strip() != __version__:
                 mc.warning("A new version is available")
             else:
-                print "Versions match"
+                print("Versions match")
         link.close()
             
 
