@@ -7,9 +7,6 @@
 # Notes/Descriptions: some rigging, anim, modeling and shading tools. *** requires zTools package in a python path.
 ########################
 
-# TODO add some tooltips to buttons
-# Todo - add docs to all of these
-
 #TODO convert to windows class
 
 from functools import partial
@@ -20,13 +17,9 @@ import maya.OpenMaya as om
 import importlib
 
 import zTools.rig.zbw_rig as rig
-reload(rig)
 import zTools.resources.zbw_pipe as pipe
-reload(pipe)
 import zTools.resources.zbw_removeNamespaces as rmns
 import zTools.resources.zbw_registeredTools as zReg
-reload(zReg)
-
 
 widgets = {}
 
